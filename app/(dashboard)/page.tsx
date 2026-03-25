@@ -1,6 +1,6 @@
 import { Header } from "@/components/dashboard/header";
 import { StatsCards } from "@/components/dashboard/stats-cards";
-import { UserActivityTable } from "@/components/dashboard/user-activity-table";
+import { ActivityTable } from "@/components/dashboard/activity-table";
 import { AssessmentTable } from "@/components/dashboard/assessment-table";
 import { UserProfilesTable } from "@/components/dashboard/user-profiles-table";
 
@@ -14,7 +14,7 @@ export default function DashboardPage() {
         </div>
         <div className="space-y-6">
           <UserProfilesTable />
-          <UserActivityTable />
+          <ActivityTable />
           <AssessmentTable />
         </div>
       </div>

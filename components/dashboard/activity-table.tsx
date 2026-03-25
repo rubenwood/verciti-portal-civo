@@ -212,7 +212,7 @@ function UserRow({
   );
 }
 
-export function UserActivityTable() {
+export function ActivityTable() {
   const [notificationUser, setNotificationUser] = useState<UserActivity | null>(null);
 
   return (
@@ -230,7 +230,7 @@ export function UserActivityTable() {
               <tr className="border-b border-border">
                 <th className="text-muted-foreground h-10 px-2 text-left align-middle font-normal">User</th>
                 <th className="text-muted-foreground h-10 px-2 text-left align-middle font-normal">Logins</th>
-                <th className="text-muted-foreground h-10 px-2 text-left align-middle font-normal">Activity</th>
+                <th className="text-muted-foreground h-10 px-2 text-left align-middle font-normal">Modules</th>
                 <th className="text-muted-foreground h-10 px-2 text-right align-middle font-normal">Actions</th>
               </tr>
             </thead>

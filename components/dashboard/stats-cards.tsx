@@ -41,7 +41,7 @@ export function StatsCards() {
         <div className="rounded-lg border border-border bg-card p-4">
           <BookOpen className="h-5 w-5 text-muted-foreground mb-3" />
           <p className="text-2xl font-bold text-foreground">{modulesCompleted}</p>
-          <p className="text-sm text-muted-foreground">App Modules Completed</p>
+          <p className="text-sm text-muted-foreground">Modules Completed</p>
         </div>
         
         <div className="rounded-lg border border-border bg-card p-4">
