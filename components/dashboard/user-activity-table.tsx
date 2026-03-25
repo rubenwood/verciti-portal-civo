@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  ChevronRight,
-  Bell,
-  Clock,
-  Layers,
-} from "lucide-react";
+import { ChevronRight, Bell, Clock, Layers } from "lucide-react";
 import { userActivityData, type UserActivity, type Activity } from "@/lib/mock-data";
 import { NotificationDialog } from "./notification-dialog";
 import { cn, anonymizeEmail, getAvatarInitials } from "@/lib/utils";

@@ -12,12 +12,12 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   CheckCircle,
@@ -26,14 +26,12 @@ import {
   Download,
   Upload,
   Award,
-  BookOpen,
   FileText,
   Shield,
   Star,
   Zap,
   Wind,
   Trophy,
-  User,
 } from "lucide-react";
 import { userProfiles, type UserProfile, type UserStatus } from "@/lib/mock-data";
 import { anonymizeEmail, getAvatarInitials, cn } from "@/lib/utils";
@@ -80,21 +78,7 @@ function StatusBadge({ status }: { status: UserStatus }) {
   );
 }
 
-function SkillLevelBadge({ level }: { level: string }) {
-  const colors = {
-    beginner: "bg-info/10 text-info",
-    intermediate: "bg-warning/10 text-warning",
-    advanced: "bg-primary/10 text-primary",
-    expert: "bg-success/10 text-success",
-  };
-  return (
-    <span className={cn("px-2 py-0.5 rounded text-xs capitalize", colors[level as keyof typeof colors])}>
-      {level}
-    </span>
-  );
-}
-
-function BadgeIcon({ iconName }: { iconName: string }) {
+function CertificationIcon({ iconName }: { iconName: string }) {
   const icons: Record<string, React.ComponentType<{ className?: string }>> = {
     hydrogen: Zap,
     star: Star,
@@ -121,9 +105,10 @@ function UserProfileModal({ user, open, onOpenChange }: {
           <div className="flex items-center gap-4">
             <UserAvatar email={user.email} size="lg" />
             <div>
-              <DialogTitle className="text-xl">{user.fullName}</DialogTitle>
-              <p className="text-sm text-muted-foreground">{displayEmail}</p>
-              <p className="text-sm text-muted-foreground">{user.jobTitle} - {user.department}</p>
+              <DialogTitle className="text-xl">{displayEmail}</DialogTitle>
+              <DialogDescription className="text-muted-foreground">
+                {user.jobTitle} - {user.department}
+              </DialogDescription>
               <div className="mt-2">
                 <StatusBadge status={user.status} />
               </div>
@@ -131,45 +116,11 @@ function UserProfileModal({ user, open, onOpenChange }: {
           </div>
         </DialogHeader>
 
-        {/* Progress Overview */}
-        <div className="mt-4 p-4 rounded-lg bg-muted/30 border border-border">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium">Overall Progress</span>
-            <span className="text-sm text-primary font-semibold">{user.overallProgress}%</span>
-          </div>
-          <Progress value={user.overallProgress} className="h-2" />
-          <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
-            <span>Total Time: {user.totalTimeSpent}</span>
-            <span>{user.completedActivities.length} activities completed</span>
-          </div>
-        </div>
-
-        <Tabs defaultValue="skills" className="mt-4">
-          <TabsList className="grid w-full grid-cols-4 bg-muted/50">
-            <TabsTrigger value="skills">Skills</TabsTrigger>
+        <Tabs defaultValue="qualifications" className="mt-4">
+          <TabsList className="grid w-full grid-cols-2 bg-muted/50">
             <TabsTrigger value="qualifications">Qualifications</TabsTrigger>
-            <TabsTrigger value="badges">Badges</TabsTrigger>
-            <TabsTrigger value="activities">Activities</TabsTrigger>
+            <TabsTrigger value="certifications">Certifications</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="skills" className="mt-4 space-y-3">
-            {user.skills.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">No skills recorded yet</p>
-            ) : (
-              user.skills.map((skill) => (
-                <div key={skill.id} className="p-3 rounded-lg bg-muted/20 border border-border">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm">{skill.name}</span>
-                      <SkillLevelBadge level={skill.level} />
-                    </div>
-                    <span className="text-sm text-primary">{skill.progress}%</span>
-                  </div>
-                  <Progress value={skill.progress} className="h-1.5" />
-                </div>
-              ))
-            )}
-          </TabsContent>
 
           <TabsContent value="qualifications" className="mt-4 space-y-3">
             <div className="flex justify-end mb-2">
@@ -229,15 +180,15 @@ function UserProfileModal({ user, open, onOpenChange }: {
             )}
           </TabsContent>
 
-          <TabsContent value="badges" className="mt-4">
+          <TabsContent value="certifications" className="mt-4">
             {user.badges.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">No badges earned yet</p>
+              <p className="text-sm text-muted-foreground text-center py-8">No certifications earned yet</p>
             ) : (
               <div className="grid grid-cols-2 gap-3">
                 {user.badges.map((badge) => (
                   <div key={badge.id} className="p-4 rounded-lg bg-muted/20 border border-border flex items-start gap-3">
                     <div className="p-2 rounded-lg bg-primary/10">
-                      <BadgeIcon iconName={badge.icon} />
+                      <CertificationIcon iconName={badge.icon} />
                     </div>
                     <div className="flex-1">
                       <p className="font-medium text-sm">{badge.name}</p>
@@ -246,24 +197,6 @@ function UserProfileModal({ user, open, onOpenChange }: {
                         Earned: {new Date(badge.earnedDate).toLocaleDateString("en-GB")}
                       </p>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="activities" className="mt-4">
-            {user.completedActivities.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">No activities completed yet</p>
-            ) : (
-              <div className="space-y-2">
-                {user.completedActivities.map((activity, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-muted/20 border border-border">
-                    <div className="p-2 rounded-full bg-success/10">
-                      <BookOpen className="h-4 w-4 text-success" />
-                    </div>
-                    <span className="text-sm">{activity}</span>
-                    <CheckCircle className="h-4 w-4 text-success ml-auto" />
                   </div>
                 ))}
               </div>
@@ -288,10 +221,7 @@ function UserProfileRow({ user }: { user: UserProfile }) {
         <TableCell>
           <div className="flex items-center gap-3">
             <UserAvatar email={user.email} />
-            <div>
-              <p className="font-medium text-foreground">{user.fullName}</p>
-              <p className="text-xs text-muted-foreground">{displayEmail}</p>
-            </div>
+            <span className="text-foreground">{displayEmail}</span>
           </div>
         </TableCell>
         <TableCell className="text-muted-foreground">
@@ -302,12 +232,6 @@ function UserProfileRow({ user }: { user: UserProfile }) {
         </TableCell>
         <TableCell>
           <StatusBadge status={user.status} />
-        </TableCell>
-        <TableCell>
-          <div className="flex items-center gap-2">
-            <Progress value={user.overallProgress} className="h-1.5 w-20" />
-            <span className="text-xs text-muted-foreground">{user.overallProgress}%</span>
-          </div>
         </TableCell>
         <TableCell className="text-muted-foreground text-right">
           {user.lastLogin 
@@ -328,7 +252,7 @@ export function UserProfilesTable() {
       <div className="p-4">
         <h3 className="text-base font-semibold text-foreground">User Profiles</h3>
         <p className="text-sm text-muted-foreground">
-          View all users in your organisation with their status and progress
+          View all users in your organisation with their status
         </p>
       </div>
       <Table>
@@ -338,7 +262,6 @@ export function UserProfilesTable() {
             <TableHead className="text-muted-foreground font-normal">Department</TableHead>
             <TableHead className="text-muted-foreground font-normal">Job Title</TableHead>
             <TableHead className="text-muted-foreground font-normal">Status</TableHead>
-            <TableHead className="text-muted-foreground font-normal">Progress</TableHead>
             <TableHead className="text-muted-foreground font-normal text-right">Last Login</TableHead>
           </TableRow>
         </TableHeader>
