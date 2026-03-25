@@ -6,22 +6,18 @@ import { UserProfilesTable } from "@/components/dashboard/user-profiles-table";
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      
-      <main className="p-6 space-y-6">
-        {/* Stats */}
-        <StatsCards />
-
-        {/* User Profiles Table */}
-        <UserProfilesTable />
-
-        {/* User Activity Table */}
-        <UserActivityTable />
-        
-        {/* Assessment Attempts Table */}
-        <AssessmentTable />
-      </main>
+      <div className="flex-1 space-y-6 p-6">
+        <div>
+          <StatsCards />
+        </div>
+        <div className="space-y-6">
+          <UserActivityTable />
+          <UserProfilesTable />
+          <AssessmentTable />
+        </div>
+      </div>
     </div>
   );
 }

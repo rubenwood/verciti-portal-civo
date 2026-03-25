@@ -216,33 +216,35 @@ export function UserActivityTable() {
   const [notificationUser, setNotificationUser] = useState<UserActivity | null>(null);
 
   return (
-    <div className="rounded-lg border border-border bg-card">
-      <div className="p-4">
-        <h3 className="text-base font-semibold text-foreground">User Activity</h3>
-        <p className="text-sm text-muted-foreground">
-          Track user logins, activity and detailed attempt data
-        </p>
-      </div>
-      <div className="relative w-full overflow-x-auto">
-        <table className="w-full caption-bottom text-sm">
-          <thead className="[&_tr]:border-b">
-            <tr className="border-b border-border">
-              <th className="text-muted-foreground h-10 px-2 text-left align-middle font-normal">User</th>
-              <th className="text-muted-foreground h-10 px-2 text-left align-middle font-normal">Logins</th>
-              <th className="text-muted-foreground h-10 px-2 text-left align-middle font-normal">Activity</th>
-              <th className="text-muted-foreground h-10 px-2 text-right align-middle font-normal">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="[&_tr:last-child]:border-0">
-            {userActivityData.map((user) => (
-              <UserRow 
-                key={user.id} 
-                user={user} 
-                onNotify={setNotificationUser}
-              />
-            ))}
-          </tbody>
-        </table>
+    <>
+      <div className="rounded-lg border border-border bg-card">
+        <div className="p-4">
+          <h3 className="text-base font-semibold text-foreground">User Activity</h3>
+          <p className="text-sm text-muted-foreground">
+            Track user logins, activity and detailed attempt data
+          </p>
+        </div>
+        <div className="relative w-full overflow-x-auto">
+          <table className="w-full caption-bottom text-sm">
+            <thead className="[&_tr]:border-b">
+              <tr className="border-b border-border">
+                <th className="text-muted-foreground h-10 px-2 text-left align-middle font-normal">User</th>
+                <th className="text-muted-foreground h-10 px-2 text-left align-middle font-normal">Logins</th>
+                <th className="text-muted-foreground h-10 px-2 text-left align-middle font-normal">Activity</th>
+                <th className="text-muted-foreground h-10 px-2 text-right align-middle font-normal">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="[&_tr:last-child]:border-0">
+              {userActivityData.map((user) => (
+                <UserRow 
+                  key={user.id} 
+                  user={user} 
+                  onNotify={setNotificationUser}
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {notificationUser && (
@@ -254,6 +256,6 @@ export function UserActivityTable() {
           userId={notificationUser.userId}
         />
       )}
-    </div>
+    </>
   );
 }

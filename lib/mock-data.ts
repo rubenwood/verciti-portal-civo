@@ -649,13 +649,12 @@ export interface Qualification {
   verified: boolean;
 }
 
-export interface Badge {
+export interface Certification {
   id: string;
-  name: string;
-  description: string;
+  activityName: string; // Matches the activity name exactly
   earnedDate: string;
-  module: string;
-  icon: string;
+  score: number; // 100 means they achieved 100% to earn this
+  verificationCode: string; // Unique code for QR verification
 }
 
 export interface UserProfile {
@@ -671,7 +670,7 @@ export interface UserProfile {
   overallProgress: number;
   skills: Skill[];
   qualifications: Qualification[];
-  badges: Badge[];
+  certifications: Certification[];
   completedActivities: string[];
   totalTimeSpent: string;
 }
@@ -714,9 +713,8 @@ export const userProfiles: UserProfile[] = [
         verified: true,
       },
     ],
-    badges: [
-      { id: "b1", name: "Hydrogen Pioneer", description: "Completed Hydrogen Fundamentals module", earnedDate: "2024-03-10", module: "Hydrogen Fundamentals", icon: "hydrogen" },
-      { id: "b2", name: "Quick Learner", description: "Completed 5 activities in one week", earnedDate: "2024-02-20", module: "General", icon: "star" },
+    certifications: [
+      { id: "c1", activityName: "Hydrogen Fundamentals", earnedDate: "2024-03-10", score: 100, verificationCode: "GS-HF-UP1-2024031A" },
     ],
     completedActivities: ["Hydrogen Fundamentals", "Solar Power", "Energy Storage"],
   },
@@ -757,9 +755,9 @@ export const userProfiles: UserProfile[] = [
         verified: true,
       },
     ],
-    badges: [
-      { id: "b3", name: "Wind Master", description: "Achieved 100% in Wind Energy assessment", earnedDate: "2024-03-15", module: "Wind Energy", icon: "wind" },
-      { id: "b4", name: "Perfect Score", description: "Scored 100% on an assessment", earnedDate: "2024-03-15", module: "Wind Energy", icon: "trophy" },
+    certifications: [
+      { id: "c2", activityName: "Wind Energy", earnedDate: "2024-03-15", score: 100, verificationCode: "GS-WE-UP2-2024031B" },
+      { id: "c3", activityName: "Energy Storage", earnedDate: "2024-02-28", score: 100, verificationCode: "GS-ES-UP2-2024022C" },
     ],
     completedActivities: ["Wind Energy", "Energy Storage", "Solar Power", "Hydrogen Fundamentals"],
   },
@@ -788,7 +786,7 @@ export const userProfiles: UserProfile[] = [
         verified: false,
       },
     ],
-    badges: [],
+    certifications: [],
     completedActivities: [],
   },
   {
@@ -803,7 +801,7 @@ export const userProfiles: UserProfile[] = [
     totalTimeSpent: "0m",
     skills: [],
     qualifications: [],
-    badges: [],
+    certifications: [],
     completedActivities: [],
   },
   {
@@ -832,8 +830,8 @@ export const userProfiles: UserProfile[] = [
         verified: true,
       },
     ],
-    badges: [
-      { id: "b5", name: "Power Pro", description: "Completed Power Electronics module", earnedDate: "2024-03-14", module: "Introduction to Power Electronics", icon: "zap" },
+    certifications: [
+      { id: "c4", activityName: "Introduction to Power Electronics", earnedDate: "2024-03-14", score: 100, verificationCode: "GS-PE-UP5-2024031D" },
     ],
     completedActivities: ["Introduction to Power Electronics", "Introduction to Motors and Drives"],
   },
@@ -872,8 +870,8 @@ export const userProfiles: UserProfile[] = [
         verified: true,
       },
     ],
-    badges: [
-      { id: "b6", name: "Safety Champion", description: "Achieved 100% in Hazardous Voltages", earnedDate: "2024-03-12", module: "Hazardous Voltages", icon: "shield" },
+    certifications: [
+      { id: "c5", activityName: "Hazardous Voltages", earnedDate: "2024-03-12", score: 100, verificationCode: "GS-HV-UP6-2024031E" },
     ],
     completedActivities: ["Hazardous Voltages", "Introduction to Motors and Drives"],
   },
