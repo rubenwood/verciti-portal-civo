@@ -13,8 +13,8 @@ export default function DashboardPage() {
           <StatsCards />
         </div>
         <div className="space-y-6">
-          <UserActivityTable />
           <UserProfilesTable />
+          <UserActivityTable />
           <AssessmentTable />
         </div>
       </div>

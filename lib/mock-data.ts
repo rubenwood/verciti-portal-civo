@@ -645,8 +645,6 @@ export interface Qualification {
   expiryDate?: string;
   documentUrl?: string;
   documentName?: string;
-  isExternal: boolean;
-  verified: boolean;
 }
 
 export interface Certification {
@@ -701,16 +699,6 @@ export const userProfiles: UserProfile[] = [
         dateObtained: "2022-06-15",
         documentUrl: "/documents/cg-level3.pdf",
         documentName: "CG_Level3_Certificate.pdf",
-        isExternal: true,
-        verified: true,
-      },
-      {
-        id: "qual2",
-        name: "Hydrogen Fundamentals Certification",
-        issuingBody: "Greenskills",
-        dateObtained: "2024-03-10",
-        isExternal: false,
-        verified: true,
       },
     ],
     certifications: [
@@ -743,16 +731,6 @@ export const userProfiles: UserProfile[] = [
         dateObtained: "2019-07-01",
         documentUrl: "/documents/bsc-degree.pdf",
         documentName: "BSc_Degree_Certificate.pdf",
-        isExternal: true,
-        verified: true,
-      },
-      {
-        id: "qual4",
-        name: "Wind Energy Certification",
-        issuingBody: "Greenskills",
-        dateObtained: "2024-03-15",
-        isExternal: false,
-        verified: true,
       },
     ],
     certifications: [
@@ -782,8 +760,6 @@ export const userProfiles: UserProfile[] = [
         expiryDate: "2026-03-20",
         documentUrl: "/documents/nebosh.pdf",
         documentName: "NEBOSH_Certificate.pdf",
-        isExternal: true,
-        verified: false,
       },
     ],
     certifications: [],
@@ -820,16 +796,7 @@ export const userProfiles: UserProfile[] = [
       { id: "sk7", name: "Power Electronics", level: "advanced", progress: 90 },
       { id: "sk8", name: "Motors and Drives", level: "intermediate", progress: 60 },
     ],
-    qualifications: [
-      {
-        id: "qual6",
-        name: "Power Electronics Certification",
-        issuingBody: "Greenskills",
-        dateObtained: "2024-03-14",
-        isExternal: false,
-        verified: true,
-      },
-    ],
+    qualifications: [],
     certifications: [
       { id: "c4", activityName: "Introduction to Power Electronics", earnedDate: "2024-03-14", score: 100, verificationCode: "GS-PE-UP5-2024031D" },
     ],
@@ -853,21 +820,11 @@ export const userProfiles: UserProfile[] = [
     ],
     qualifications: [
       {
-        id: "qual7",
-        name: "Hazardous Voltages Safety Certification",
-        issuingBody: "Greenskills",
-        dateObtained: "2024-03-12",
-        isExternal: false,
-        verified: true,
-      },
-      {
         id: "qual8",
         name: "18th Edition Wiring Regulations",
         issuingBody: "IET",
         dateObtained: "2023-09-10",
         documentName: "18th_Edition_Cert.pdf",
-        isExternal: true,
-        verified: true,
       },
     ],
     certifications: [

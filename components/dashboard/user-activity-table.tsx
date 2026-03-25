@@ -1,5 +1,6 @@
 "use client";
 
+// UserActivityTable - uses native HTML table elements only (no shadcn Table)
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Bell, Clock, Layers } from "lucide-react";

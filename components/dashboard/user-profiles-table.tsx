@@ -247,16 +247,6 @@ function UserProfileModal({ user, open, onOpenChange }: {
                         <div className="flex items-center gap-2">
                           <FileText className="h-4 w-4 text-muted-foreground" />
                           <span className="font-medium">{qual.name}</span>
-                          {qual.verified && (
-                            <Badge variant="outline" className="bg-success/10 text-success border-success/20 text-xs">
-                              Verified
-                            </Badge>
-                          )}
-                          {!qual.verified && (
-                            <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-xs">
-                              Pending
-                            </Badge>
-                          )}
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
                           {qual.issuingBody} - {new Date(qual.dateObtained).toLocaleDateString("en-GB")}
@@ -266,9 +256,6 @@ function UserProfileModal({ user, open, onOpenChange }: {
                             Expires: {new Date(qual.expiryDate).toLocaleDateString("en-GB")}
                           </p>
                         )}
-                        {qual.isExternal && (
-                          <Badge variant="outline" className="mt-2 text-xs">External</Badge>
-                        )}
                       </div>
                       {qual.documentName && (
                         <Button variant="ghost" size="sm" className="gap-1 text-info hover:text-info">
@@ -276,7 +263,7 @@ function UserProfileModal({ user, open, onOpenChange }: {
                           <span className="text-xs">{qual.documentName}</span>
                         </Button>
                       )}
-                      {!qual.documentName && qual.isExternal && (
+                      {!qual.documentName && (
                         <Button variant="outline" size="sm" className="gap-1">
                           <Upload className="h-4 w-4" />
                           Upload
