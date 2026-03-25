@@ -108,7 +108,7 @@ export function LearningPathwayModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+        <Button variant="outline" className="border-border h-8 px-4 text-sm">
           <Plus className="mr-2 h-4 w-4" />
           Create Learning Pathway
         </Button>

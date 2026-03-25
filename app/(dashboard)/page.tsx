@@ -2,7 +2,6 @@ import { Header } from "@/components/dashboard/header";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { UserActivityTable } from "@/components/dashboard/user-activity-table";
 import { AssessmentTable } from "@/components/dashboard/assessment-table";
-import { LearningPathwayModal } from "@/components/dashboard/learning-pathway-modal";
 
 export default function DashboardPage() {
   return (
@@ -19,11 +18,6 @@ export default function DashboardPage() {
         {/* Assessment Attempts Table */}
         <AssessmentTable />
       </main>
-      
-      {/* Learning Pathway Modal - floating button */}
-      <div className="fixed bottom-6 right-6">
-        <LearningPathwayModal />
-      </div>
     </div>
   );
 }
