@@ -1,5 +1,8 @@
 "use client";
 
+// UserActivityTable v2 - Pure HTML tables, no shadcn Table components
+// Last updated: This file uses native <table> elements to avoid hydration issues
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Bell, Clock, Layers } from "lucide-react";

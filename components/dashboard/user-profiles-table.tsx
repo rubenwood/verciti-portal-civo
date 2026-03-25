@@ -245,6 +245,203 @@ function CertificationQRModal({
   );
 }
 
+// External Training Details Modal
+function ExternalTrainingDetailsModal({
+  training,
+  open,
+  onOpenChange,
+  onDelete,
+}: {
+  training: Training;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onDelete: () => void;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedDeadline, setEditedDeadline] = useState(training.deadline);
+  const [editedDescription, setEditedDescription] = useState(training.description || "");
+  const [documents, setDocuments] = useState<{ name: string; uploadedAt: string }[]>([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const handleSave = () => {
+    // Here you would save the changes
+    setIsEditing(false);
+  };
+
+  const handleDelete = () => {
+    onDelete();
+    onOpenChange(false);
+  };
+
+  const handleUploadDocument = () => {
+    // Simulate document upload
+    const newDoc = {
+      name: `completion_evidence_${Date.now()}.pdf`,
+      uploadedAt: new Date().toISOString(),
+    };
+    setDocuments([...documents, newDoc]);
+  };
+
+  const providerName = trainingProviders.find(p => p.id === training.provider)?.name || training.provider;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg bg-card border-border">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <ExternalLink className="h-5 w-5 text-info" />
+            External Training Details
+          </DialogTitle>
+          <DialogDescription>
+            View and manage this external training assignment
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          {/* Training Info */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Provider</span>
+              <span className="font-medium">{providerName}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Status</span>
+              <TrainingStatusBadge status={training.status} />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Assigned</span>
+              <span className="text-sm">{new Date(training.assignedDate).toLocaleDateString("en-GB")}</span>
+            </div>
+          </div>
+
+          {/* Editable Fields */}
+          <div className="space-y-3 pt-3 border-t border-border">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">Deadline</label>
+                {!isEditing && (
+                  <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)}>
+                    Edit
+                  </Button>
+                )}
+              </div>
+              {isEditing ? (
+                <Input
+                  type="date"
+                  value={editedDeadline}
+                  onChange={(e) => setEditedDeadline(e.target.value)}
+                />
+              ) : (
+                <p className={cn(
+                  "text-sm",
+                  training.status === "overdue" && "text-destructive"
+                )}>
+                  {new Date(training.deadline).toLocaleDateString("en-GB")}
+                  {training.status === "overdue" && (
+                    <span className="ml-2 text-xs">(Overdue)</span>
+                  )}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Training Details</label>
+              {isEditing ? (
+                <Textarea
+                  value={editedDescription}
+                  onChange={(e) => setEditedDescription(e.target.value)}
+                  rows={3}
+                />
+              ) : (
+                <p className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-md">
+                  {training.description || "No description provided"}
+                </p>
+              )}
+            </div>
+
+            {isEditing && (
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSave}>
+                  Save Changes
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Supporting Documents */}
+          <div className="space-y-3 pt-3 border-t border-border">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">Supporting Documents</label>
+              <Button variant="outline" size="sm" className="gap-2" onClick={handleUploadDocument}>
+                <Upload className="h-4 w-4" />
+                Upload
+              </Button>
+            </div>
+            
+            {documents.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4 bg-muted/20 rounded-md">
+                No documents uploaded yet. Upload evidence of completion.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {documents.map((doc, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-2 bg-muted/20 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{doc.name}</span>
+                    </div>
+                    <Button variant="ghost" size="sm" className="gap-1 text-info">
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Delete Section */}
+          <div className="pt-3 border-t border-border">
+            {showDeleteConfirm ? (
+              <div className="bg-destructive/10 p-3 rounded-md space-y-3">
+                <p className="text-sm text-destructive">
+                  Are you sure you want to delete this training assignment?
+                </p>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setShowDeleteConfirm(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    size="sm" 
+                    onClick={handleDelete}
+                  >
+                    Delete Training
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Button 
+                variant="ghost" 
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 w-full"
+                onClick={() => setShowDeleteConfirm(true)}
+              >
+                Delete Training
+              </Button>
+            )}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // Assign Training Wizard
 function AssignTrainingWizard({ 
   open, 
@@ -531,6 +728,12 @@ function UserProfileModal({ user, open, onOpenChange }: {
   const displayEmail = anonymizeEmail(user.email);
   const [selectedCert, setSelectedCert] = useState<Certification | null>(null);
   const [assignTrainingOpen, setAssignTrainingOpen] = useState(false);
+  const [selectedExternalTraining, setSelectedExternalTraining] = useState<Training | null>(null);
+
+  const handleDeleteTraining = () => {
+    // Here you would delete the training from the user's training list
+    setSelectedExternalTraining(null);
+  };
 
   return (
     <>
@@ -586,11 +789,13 @@ function UserProfileModal({ user, open, onOpenChange }: {
                   {user.training.map((training) => (
                     <div 
                       key={training.id} 
+                      onClick={!training.isVerciti ? () => setSelectedExternalTraining(training) : undefined}
                       className={cn(
-                        "p-4 rounded-lg border",
+                        "p-4 rounded-lg border transition-colors",
                         training.status === "overdue" 
                           ? "border-destructive/30 bg-destructive/5" 
-                          : "border-border bg-muted/20"
+                          : "border-border bg-muted/20",
+                        !training.isVerciti && "cursor-pointer hover:bg-muted/40"
                       )}
                     >
                       <div className="flex items-start justify-between">
@@ -634,6 +839,10 @@ function UserProfileModal({ user, open, onOpenChange }: {
                               </span>
                             )}
                           </div>
+                          
+                          {!training.isVerciti && (
+                            <p className="text-xs text-info mt-2">Click to view details and upload evidence</p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -742,6 +951,15 @@ function UserProfileModal({ user, open, onOpenChange }: {
         onOpenChange={setAssignTrainingOpen}
         userEmail={user.email}
       />
+
+      {selectedExternalTraining && (
+        <ExternalTrainingDetailsModal
+          training={selectedExternalTraining}
+          open={!!selectedExternalTraining}
+          onOpenChange={(open) => !open && setSelectedExternalTraining(null)}
+          onDelete={handleDeleteTraining}
+        />
+      )}
     </>
   );
 }
