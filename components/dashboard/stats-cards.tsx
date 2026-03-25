@@ -13,7 +13,7 @@ export function StatsCards() {
     0
   );
   
-  const quizAttempts = assessmentAttemptData.length * 20 + 22;
+  const assessmentAttempts = assessmentAttemptData.length * 20 + 22;
   
   const averageScore = Math.round(
     assessmentAttemptData.reduce((acc, attempt) => acc + attempt.score, 0) / 
@@ -41,13 +41,13 @@ export function StatsCards() {
         <div className="rounded-lg border border-border bg-card p-4">
           <BookOpen className="h-5 w-5 text-muted-foreground mb-3" />
           <p className="text-2xl font-bold text-foreground">{modulesCompleted}</p>
-          <p className="text-sm text-muted-foreground">Modules Completed</p>
+          <p className="text-sm text-muted-foreground">App Modules Completed</p>
         </div>
         
         <div className="rounded-lg border border-border bg-card p-4">
           <Trophy className="h-5 w-5 text-muted-foreground mb-3" />
-          <p className="text-2xl font-bold text-foreground">{quizAttempts}</p>
-          <p className="text-sm text-muted-foreground">Quiz Attempts</p>
+          <p className="text-2xl font-bold text-foreground">{assessmentAttempts}</p>
+          <p className="text-sm text-muted-foreground">Assessment Attempts</p>
         </div>
         
         <div className="rounded-lg border border-border bg-card p-4">
@@ -71,7 +71,7 @@ export function StatsCards() {
         </button>
         
         <button className="flex items-center justify-between rounded-lg border border-border bg-card p-4 text-left hover:bg-muted/30 transition-colors">
-          <span className="font-semibold text-foreground">Quiz Stats</span>
+          <span className="font-semibold text-foreground">Assessment Stats</span>
           <ChevronRight className="h-5 w-5 text-muted-foreground" />
         </button>
       </div>
