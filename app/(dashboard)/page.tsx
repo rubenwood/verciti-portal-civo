@@ -6,30 +6,23 @@ import { LearningPathwayModal } from "@/components/dashboard/learning-pathway-mo
 
 export default function DashboardPage() {
   return (
-    <div className="flex flex-col">
-      <Header 
-        title="Dashboard Overview" 
-        subtitle="Monitor learner progress and engagement across all modules"
-      />
+    <div className="min-h-screen bg-background">
+      <Header />
       
-      <div className="flex-1 space-y-6 p-6">
-        {/* Quick Actions */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Quick Actions</h2>
-            <p className="text-sm text-muted-foreground">Manage courses and learning pathways</p>
-          </div>
-          <LearningPathwayModal />
-        </div>
-
+      <main className="p-6 space-y-6">
         {/* Stats */}
         <StatsCards />
 
-        {/* Tables */}
-        <div className="space-y-6">
-          <UserActivityTable />
-          <AssessmentTable />
-        </div>
+        {/* User Activity Table */}
+        <UserActivityTable />
+        
+        {/* Assessment Attempts Table */}
+        <AssessmentTable />
+      </main>
+      
+      {/* Learning Pathway Modal - floating button */}
+      <div className="fixed bottom-6 right-6">
+        <LearningPathwayModal />
       </div>
     </div>
   );

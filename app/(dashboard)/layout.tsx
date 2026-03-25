@@ -1,4 +1,3 @@
-import { Sidebar } from "@/components/dashboard/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 
 export default function DashboardLayout({
@@ -7,11 +6,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen bg-background">
-      <Sidebar />
-      <main className="flex-1 overflow-auto">
-        {children}
-      </main>
+    <div className="min-h-screen bg-background">
+      {children}
       <Toaster />
     </div>
   );
