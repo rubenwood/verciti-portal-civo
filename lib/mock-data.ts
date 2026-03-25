@@ -105,16 +105,13 @@ export interface AssessmentAttempt {
   questions: AssessmentQuestion[];
 }
 
-// Generate anonymized user data
-const generateAnonymizedId = (index: number) => `USR-${String(index + 1).padStart(4, '0')}`;
-const generateAnonymizedEmail = (index: number) => `user${index + 1}@anonymized.local`;
-
+// Use consistent emails across all tables (matching userProfiles)
 export const userActivityData: UserActivity[] = [
   {
     id: "1",
-    anonymizedName: "User #1847",
-    anonymizedEmail: generateAnonymizedEmail(1847),
-    userId: generateAnonymizedId(1847),
+    anonymizedName: "User #1",
+    anonymizedEmail: "ruben.wood1@gmail.com",
+    userId: "USR-0001",
     lastActive: "2024-03-15T14:32:00",
     totalLogins: 24,
     activitiesCompleted: 12,
@@ -190,9 +187,9 @@ export const userActivityData: UserActivity[] = [
   },
   {
     id: "2",
-    anonymizedName: "User #2391",
-    anonymizedEmail: generateAnonymizedEmail(2391),
-    userId: generateAnonymizedId(2391),
+    anonymizedName: "User #2",
+    anonymizedEmail: "chris.shay72@gmail.com",
+    userId: "USR-0002",
     lastActive: "2024-03-15T11:20:00",
     totalLogins: 18,
     activitiesCompleted: 8,
@@ -240,9 +237,9 @@ export const userActivityData: UserActivity[] = [
   },
   {
     id: "3",
-    anonymizedName: "User #0934",
-    anonymizedEmail: generateAnonymizedEmail(934),
-    userId: generateAnonymizedId(934),
+    anonymizedName: "User #3",
+    anonymizedEmail: "nile@verciti.com",
+    userId: "USR-0003",
     lastActive: "2024-03-14T16:45:00",
     totalLogins: 32,
     activitiesCompleted: 18,
@@ -290,9 +287,9 @@ export const userActivityData: UserActivity[] = [
   },
   {
     id: "4",
-    anonymizedName: "User #5672",
-    anonymizedEmail: generateAnonymizedEmail(5672),
-    userId: generateAnonymizedId(5672),
+    anonymizedName: "User #4",
+    anonymizedEmail: "test1@verciti.com",
+    userId: "USR-0004",
     lastActive: "2024-03-15T09:10:00",
     totalLogins: 15,
     activitiesCompleted: 6,
@@ -342,9 +339,9 @@ export const userActivityData: UserActivity[] = [
   },
   {
     id: "5",
-    anonymizedName: "User #8123",
-    anonymizedEmail: generateAnonymizedEmail(8123),
-    userId: generateAnonymizedId(8123),
+    anonymizedName: "User #5",
+    anonymizedEmail: "test2@verciti.com",
+    userId: "USR-0005",
     lastActive: "2024-03-13T18:30:00",
     totalLogins: 9,
     activitiesCompleted: 4,
@@ -374,9 +371,9 @@ export const userActivityData: UserActivity[] = [
 export const assessmentAttemptData: AssessmentAttempt[] = [
   {
     id: "aa1",
-    anonymizedName: "User #1847",
-    anonymizedEmail: generateAnonymizedEmail(1847),
-    userId: generateAnonymizedId(1847),
+    anonymizedName: "User #1",
+    anonymizedEmail: "ruben.wood1@gmail.com",
+    userId: "USR-0001",
     assessmentName: "Hydrogen Fundamentals Assessment",
     module: "Hydrogen Fundamentals",
     timestamp: "2024-03-15T15:45:00",
@@ -443,9 +440,9 @@ export const assessmentAttemptData: AssessmentAttempt[] = [
   },
   {
     id: "aa2",
-    anonymizedName: "User #2391",
-    anonymizedEmail: generateAnonymizedEmail(2391),
-    userId: generateAnonymizedId(2391),
+    anonymizedName: "User #2",
+    anonymizedEmail: "chris.shay72@gmail.com",
+    userId: "USR-0002",
     assessmentName: "Wind Energy Certification Exam",
     module: "Wind Energy",
     timestamp: "2024-03-15T12:30:00",
@@ -491,9 +488,9 @@ export const assessmentAttemptData: AssessmentAttempt[] = [
   },
   {
     id: "aa3",
-    anonymizedName: "User #0934",
-    anonymizedEmail: generateAnonymizedEmail(934),
-    userId: generateAnonymizedId(934),
+    anonymizedName: "User #3",
+    anonymizedEmail: "test1@verciti.com",
+    userId: "USR-0004",
     assessmentName: "Power Electronics Fundamentals",
     module: "Introduction to Power Electronics",
     timestamp: "2024-03-14T18:15:00",
@@ -538,9 +535,9 @@ export const assessmentAttemptData: AssessmentAttempt[] = [
   },
   {
     id: "aa4",
-    anonymizedName: "User #5672",
-    anonymizedEmail: generateAnonymizedEmail(5672),
-    userId: generateAnonymizedId(5672),
+    anonymizedName: "User #4",
+    anonymizedEmail: "test2@verciti.com",
+    userId: "USR-0005",
     assessmentName: "Hazardous Voltages Safety Certification",
     module: "Hazardous Voltages",
     timestamp: "2024-03-12T15:05:00",
@@ -580,9 +577,9 @@ export const assessmentAttemptData: AssessmentAttempt[] = [
   },
   {
     id: "aa5",
-    anonymizedName: "User #1847",
-    anonymizedEmail: generateAnonymizedEmail(1847),
-    userId: generateAnonymizedId(1847),
+    anonymizedName: "User #1",
+    anonymizedEmail: "ruben.wood1@gmail.com",
+    userId: "USR-0001",
     assessmentName: "Solar Power Systems Quiz",
     module: "Solar Power",
     timestamp: "2024-03-12T17:00:00",
@@ -655,6 +652,37 @@ export interface Certification {
   verificationCode: string; // Unique code for QR verification
 }
 
+// Training types
+export type TrainingStatus = "not_started" | "in_progress" | "completed" | "overdue";
+
+export interface Training {
+  id: string;
+  title: string;
+  isVerciti: boolean; // true = Verciti app training, false = external
+  courseName?: string; // For Verciti training
+  moduleName?: string; // For Verciti training
+  provider?: string; // For external training
+  description?: string; // For external training
+  deadline: string;
+  assignedDate: string;
+  status: TrainingStatus;
+  completedDate?: string;
+}
+
+// Third party training providers
+export const trainingProviders = [
+  { id: "udemy", name: "Udemy", logo: "U" },
+  { id: "coursera", name: "Coursera", logo: "C" },
+  { id: "linkedin", name: "LinkedIn Learning", logo: "L" },
+  { id: "pluralsight", name: "Pluralsight", logo: "P" },
+  { id: "skillshare", name: "Skillshare", logo: "S" },
+  { id: "edx", name: "edX", logo: "E" },
+  { id: "futurelearn", name: "FutureLearn", logo: "F" },
+  { id: "oplearn", name: "Open Learn", logo: "O" },
+  { id: "alison", name: "Alison", logo: "A" },
+  { id: "other", name: "Other", logo: "?" },
+] as const;
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -669,6 +697,7 @@ export interface UserProfile {
   skills: Skill[];
   qualifications: Qualification[];
   certifications: Certification[];
+  training: Training[];
   completedActivities: string[];
   totalTimeSpent: string;
 }
@@ -704,6 +733,11 @@ export const userProfiles: UserProfile[] = [
     certifications: [
       { id: "c1", activityName: "Hydrogen Fundamentals", earnedDate: "2024-03-10", score: 100, verificationCode: "GS-HF-UP1-2024031A" },
     ],
+    training: [
+      { id: "t1", title: "Wind Energy", isVerciti: true, courseName: "Hydrogen", moduleName: "Wind Energy", deadline: "2024-04-15", assignedDate: "2024-03-01", status: "in_progress" },
+      { id: "t2", title: "Energy Storage", isVerciti: true, courseName: "Hydrogen", moduleName: "Energy Storage", deadline: "2024-04-30", assignedDate: "2024-03-05", status: "not_started" },
+      { id: "t3", title: "Electrical Safety Fundamentals", isVerciti: false, provider: "Udemy", description: "Complete the electrical safety course on Udemy covering basic principles and regulations.", deadline: "2024-03-20", assignedDate: "2024-02-15", status: "overdue" },
+    ],
     completedActivities: ["Hydrogen Fundamentals", "Solar Power", "Energy Storage"],
   },
   {
@@ -737,6 +771,9 @@ export const userProfiles: UserProfile[] = [
       { id: "c2", activityName: "Wind Energy", earnedDate: "2024-03-15", score: 100, verificationCode: "GS-WE-UP2-2024031B" },
       { id: "c3", activityName: "Energy Storage", earnedDate: "2024-02-28", score: 100, verificationCode: "GS-ES-UP2-2024022C" },
     ],
+    training: [
+      { id: "t4", title: "Intermediate Power Electronics", isVerciti: true, courseName: "Electrification", moduleName: "Intermediate Power Electronics", deadline: "2024-05-01", assignedDate: "2024-03-10", status: "not_started" },
+    ],
     completedActivities: ["Wind Energy", "Energy Storage", "Solar Power", "Hydrogen Fundamentals"],
   },
   {
@@ -763,6 +800,10 @@ export const userProfiles: UserProfile[] = [
       },
     ],
     certifications: [],
+    training: [
+      { id: "t5", title: "Hydrogen Fundamentals", isVerciti: true, courseName: "Hydrogen", moduleName: "Hydrogen Fundamentals", deadline: "2024-04-01", assignedDate: "2024-02-20", status: "overdue" },
+      { id: "t6", title: "Project Management Basics", isVerciti: false, provider: "Coursera", description: "Introduction to project management methodology and best practices.", deadline: "2024-04-15", assignedDate: "2024-03-01", status: "in_progress" },
+    ],
     completedActivities: [],
   },
   {
@@ -778,6 +819,7 @@ export const userProfiles: UserProfile[] = [
     skills: [],
     qualifications: [],
     certifications: [],
+    training: [],
     completedActivities: [],
   },
   {
@@ -799,6 +841,10 @@ export const userProfiles: UserProfile[] = [
     qualifications: [],
     certifications: [
       { id: "c4", activityName: "Introduction to Power Electronics", earnedDate: "2024-03-14", score: 100, verificationCode: "GS-PE-UP5-2024031D" },
+    ],
+    training: [
+      { id: "t7", title: "Intermediate Power Electronics", isVerciti: true, courseName: "Electrification", moduleName: "Intermediate Power Electronics", deadline: "2024-04-20", assignedDate: "2024-03-15", status: "in_progress" },
+      { id: "t8", title: "Hazardous Voltages", isVerciti: true, courseName: "Electrification", moduleName: "Hazardous Voltages", deadline: "2024-05-15", assignedDate: "2024-03-15", status: "not_started" },
     ],
     completedActivities: ["Introduction to Power Electronics", "Introduction to Motors and Drives"],
   },
@@ -829,6 +875,9 @@ export const userProfiles: UserProfile[] = [
     ],
     certifications: [
       { id: "c5", activityName: "Hazardous Voltages", earnedDate: "2024-03-12", score: 100, verificationCode: "GS-HV-UP6-2024031E" },
+    ],
+    training: [
+      { id: "t9", title: "ISO 45001 Safety Management", isVerciti: false, provider: "LinkedIn Learning", description: "Complete the ISO 45001 Occupational Health and Safety course covering standards and implementation.", deadline: "2024-04-10", assignedDate: "2024-03-01", status: "in_progress" },
     ],
     completedActivities: ["Hazardous Voltages", "Introduction to Motors and Drives"],
   },

@@ -1,6 +1,5 @@
 "use client";
 
-// UserActivityTable - uses native HTML table elements only (no shadcn Table)
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Bell, Clock, Layers } from "lucide-react";
@@ -217,7 +216,7 @@ export function UserActivityTable() {
   const [notificationUser, setNotificationUser] = useState<UserActivity | null>(null);
 
   return (
-    <section id="user-activity-table">
+    <section>
       <div className="rounded-lg border border-border bg-card">
         <div className="p-4">
           <h3 className="text-base font-semibold text-foreground">User Activity</h3>

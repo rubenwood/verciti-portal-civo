@@ -19,6 +19,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   CheckCircle,
   Clock,
@@ -27,9 +36,24 @@ import {
   Upload,
   Award,
   FileText,
-  X,
+  Plus,
+  ArrowLeft,
+  ArrowRight,
+  Calendar,
+  BookOpen,
+  ExternalLink,
+  AlertTriangle,
 } from "lucide-react";
-import { userProfiles, type UserProfile, type UserStatus, type Certification } from "@/lib/mock-data";
+import { 
+  userProfiles, 
+  courses, 
+  modules, 
+  trainingProviders,
+  type UserProfile, 
+  type UserStatus, 
+  type Certification,
+  type Training,
+} from "@/lib/mock-data";
 import { anonymizeEmail, getAvatarInitials, cn } from "@/lib/utils";
 
 function UserAvatar({ email, size = "sm" }: { email: string; size?: "sm" | "lg" }) {
@@ -74,18 +98,45 @@ function StatusBadge({ status }: { status: UserStatus }) {
   );
 }
 
+function TrainingStatusBadge({ status }: { status: Training["status"] }) {
+  const config = {
+    not_started: {
+      label: "Not Started",
+      className: "bg-muted text-muted-foreground border-border",
+    },
+    in_progress: {
+      label: "In Progress",
+      className: "bg-info/10 text-info border-info/20",
+    },
+    completed: {
+      label: "Completed",
+      className: "bg-success/10 text-success border-success/20",
+    },
+    overdue: {
+      label: "Overdue",
+      className: "bg-destructive/10 text-destructive border-destructive/20",
+    },
+  };
+
+  const { label, className } = config[status];
+
+  return (
+    <Badge variant="outline" className={cn("text-xs", className)}>
+      {label}
+    </Badge>
+  );
+}
+
 // Generate QR code SVG using a simple pattern based on verification code
 function QRCodeDisplay({ verificationCode, activityName, userEmail }: { 
   verificationCode: string; 
   activityName: string;
   userEmail: string;
 }) {
-  // Generate a deterministic pattern based on the verification code
   const generatePattern = (code: string) => {
     const cells: boolean[][] = [];
-    const size = 21; // Standard QR code size
+    const size = 21;
     
-    // Create a hash-like pattern from the code
     let hash = 0;
     for (let i = 0; i < code.length; i++) {
       hash = ((hash << 5) - hash) + code.charCodeAt(i);
@@ -95,13 +146,11 @@ function QRCodeDisplay({ verificationCode, activityName, userEmail }: {
     for (let row = 0; row < size; row++) {
       cells[row] = [];
       for (let col = 0; col < size; col++) {
-        // Position detection patterns (corners)
         const isTopLeft = row < 7 && col < 7;
         const isTopRight = row < 7 && col >= size - 7;
         const isBottomLeft = row >= size - 7 && col < 7;
         
         if (isTopLeft || isTopRight || isBottomLeft) {
-          // Create finder patterns
           const localRow = row >= size - 7 ? row - (size - 7) : row;
           const localCol = col >= size - 7 ? col - (size - 7) : col;
           
@@ -113,7 +162,6 @@ function QRCodeDisplay({ verificationCode, activityName, userEmail }: {
             cells[row][col] = false;
           }
         } else {
-          // Generate data pattern based on hash
           const seed = (hash + row * 31 + col * 17) % 100;
           cells[row][col] = seed > 45;
         }
@@ -197,6 +245,284 @@ function CertificationQRModal({
   );
 }
 
+// Assign Training Wizard
+function AssignTrainingWizard({ 
+  open, 
+  onOpenChange,
+  userEmail,
+}: { 
+  open: boolean; 
+  onOpenChange: (open: boolean) => void;
+  userEmail: string;
+}) {
+  const [step, setStep] = useState(1);
+  const [isVerciti, setIsVerciti] = useState<boolean | null>(null);
+  
+  // Verciti training state
+  const [selectedCourse, setSelectedCourse] = useState<string>("");
+  const [selectedModule, setSelectedModule] = useState<string>("");
+  
+  // External training state
+  const [selectedProvider, setSelectedProvider] = useState<string>("");
+  const [providerSearch, setProviderSearch] = useState<string>("");
+  const [trainingDescription, setTrainingDescription] = useState<string>("");
+  
+  // Shared state
+  const [deadline, setDeadline] = useState<string>("");
+
+  const resetForm = () => {
+    setStep(1);
+    setIsVerciti(null);
+    setSelectedCourse("");
+    setSelectedModule("");
+    setSelectedProvider("");
+    setProviderSearch("");
+    setTrainingDescription("");
+    setDeadline("");
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onOpenChange(false);
+  };
+
+  const handleAssign = () => {
+    // Here you would save the training assignment
+    handleClose();
+  };
+
+  const filteredProviders = trainingProviders.filter(provider =>
+    provider.name.toLowerCase().includes(providerSearch.toLowerCase())
+  );
+
+  const selectedCourseData = courses.find(c => c.id === selectedCourse);
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-md bg-card border-border">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Plus className="h-5 w-5 text-primary" />
+            Assign New Training
+          </DialogTitle>
+          <DialogDescription>
+            Assign training to {anonymizeEmail(userEmail)}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          {/* Step indicator */}
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className={cn("px-2 py-1 rounded", step === 1 ? "bg-primary text-primary-foreground" : "bg-muted")}>
+              Step {step}
+            </span>
+            <span>of {isVerciti === null ? "?" : isVerciti ? "3" : "3"}</span>
+          </div>
+
+          {/* Step 1: Choose training type */}
+          {step === 1 && (
+            <div className="space-y-4">
+              <p className="text-sm text-foreground">Is this training provided via the Verciti app?</p>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => { setIsVerciti(true); setStep(2); }}
+                  className={cn(
+                    "p-4 rounded-lg border text-left transition-colors",
+                    "hover:border-primary hover:bg-primary/5",
+                    "border-border bg-muted/20"
+                  )}
+                >
+                  <BookOpen className="h-6 w-6 text-primary mb-2" />
+                  <p className="font-medium text-sm">Verciti Training</p>
+                  <p className="text-xs text-muted-foreground mt-1">Assign from our course catalog</p>
+                </button>
+                <button
+                  onClick={() => { setIsVerciti(false); setStep(2); }}
+                  className={cn(
+                    "p-4 rounded-lg border text-left transition-colors",
+                    "hover:border-primary hover:bg-primary/5",
+                    "border-border bg-muted/20"
+                  )}
+                >
+                  <ExternalLink className="h-6 w-6 text-info mb-2" />
+                  <p className="font-medium text-sm">External Training</p>
+                  <p className="text-xs text-muted-foreground mt-1">Third-party provider</p>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Verciti - Select course and module */}
+          {step === 2 && isVerciti && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Select Course</label>
+                <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a course..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {courses.map(course => (
+                      <SelectItem key={course.id} value={course.id}>
+                        {course.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {selectedCourse && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Select Module</label>
+                  <Select value={selectedModule} onValueChange={setSelectedModule}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a module..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {selectedCourseData?.modules.map(mod => (
+                        <SelectItem key={mod} value={mod}>
+                          {mod}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              <div className="flex gap-2 pt-2">
+                <Button variant="outline" onClick={() => setStep(1)} className="gap-1">
+                  <ArrowLeft className="h-4 w-4" />
+                  Back
+                </Button>
+                <Button 
+                  onClick={() => setStep(3)} 
+                  disabled={!selectedModule}
+                  className="flex-1 gap-1"
+                >
+                  Next
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: External - Select provider and add description */}
+          {step === 2 && isVerciti === false && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Training Provider</label>
+                <Input
+                  placeholder="Search providers..."
+                  value={providerSearch}
+                  onChange={(e) => setProviderSearch(e.target.value)}
+                  className="mb-2"
+                />
+                <div className="max-h-40 overflow-y-auto space-y-1 border border-border rounded-md p-2">
+                  {filteredProviders.map(provider => (
+                    <button
+                      key={provider.id}
+                      onClick={() => setSelectedProvider(provider.id)}
+                      className={cn(
+                        "w-full flex items-center gap-2 p-2 rounded text-left text-sm transition-colors",
+                        selectedProvider === provider.id 
+                          ? "bg-primary text-primary-foreground" 
+                          : "hover:bg-muted"
+                      )}
+                    >
+                      <span className="flex h-6 w-6 items-center justify-center rounded bg-muted text-xs font-medium shrink-0">
+                        {provider.logo}
+                      </span>
+                      {provider.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Training Details</label>
+                <Textarea
+                  placeholder="Describe the training, including any specific course URLs or requirements..."
+                  value={trainingDescription}
+                  onChange={(e) => setTrainingDescription(e.target.value)}
+                  rows={3}
+                />
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button variant="outline" onClick={() => setStep(1)} className="gap-1">
+                  <ArrowLeft className="h-4 w-4" />
+                  Back
+                </Button>
+                <Button 
+                  onClick={() => setStep(3)} 
+                  disabled={!selectedProvider || !trainingDescription}
+                  className="flex-1 gap-1"
+                >
+                  Next
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Set deadline */}
+          {step === 3 && (
+            <div className="space-y-4">
+              <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                <p className="text-xs text-muted-foreground mb-1">Training Summary</p>
+                {isVerciti ? (
+                  <>
+                    <p className="font-medium text-sm">{selectedModule}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Course: {selectedCourseData?.name}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-medium text-sm">
+                      {trainingProviders.find(p => p.id === selectedProvider)?.name} Training
+                    </p>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {trainingDescription}
+                    </p>
+                  </>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Deadline
+                </label>
+                <Input
+                  type="date"
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
+                  min={new Date().toISOString().split("T")[0]}
+                />
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button variant="outline" onClick={() => setStep(2)} className="gap-1">
+                  <ArrowLeft className="h-4 w-4" />
+                  Back
+                </Button>
+                <Button 
+                  onClick={handleAssign}
+                  disabled={!deadline}
+                  className="flex-1"
+                >
+                  Assign Training
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function UserProfileModal({ user, open, onOpenChange }: { 
   user: UserProfile; 
   open: boolean; 
@@ -204,6 +530,7 @@ function UserProfileModal({ user, open, onOpenChange }: {
 }) {
   const displayEmail = anonymizeEmail(user.email);
   const [selectedCert, setSelectedCert] = useState<Certification | null>(null);
+  const [assignTrainingOpen, setAssignTrainingOpen] = useState(false);
 
   return (
     <>
@@ -224,11 +551,96 @@ function UserProfileModal({ user, open, onOpenChange }: {
             </div>
           </DialogHeader>
 
-          <Tabs defaultValue="qualifications" className="mt-4">
-            <TabsList className="grid w-full grid-cols-2 bg-muted/50">
+          <Tabs defaultValue="training" className="mt-4">
+            <TabsList className="grid w-full grid-cols-3 bg-muted/50">
+              <TabsTrigger value="training">Training</TabsTrigger>
               <TabsTrigger value="qualifications">Qualifications</TabsTrigger>
               <TabsTrigger value="certifications">Certifications</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="training" className="mt-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Manage ongoing and assigned training
+                </p>
+                <Button 
+                  size="sm" 
+                  className="gap-2"
+                  onClick={() => setAssignTrainingOpen(true)}
+                >
+                  <Plus className="h-4 w-4" />
+                  Assign New Training
+                </Button>
+              </div>
+
+              {user.training.length === 0 ? (
+                <div className="text-center py-8">
+                  <BookOpen className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
+                  <p className="text-sm text-muted-foreground">No training assigned</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Assign training to help this user develop their skills
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {user.training.map((training) => (
+                    <div 
+                      key={training.id} 
+                      className={cn(
+                        "p-4 rounded-lg border",
+                        training.status === "overdue" 
+                          ? "border-destructive/30 bg-destructive/5" 
+                          : "border-border bg-muted/20"
+                      )}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            {training.isVerciti ? (
+                              <BookOpen className="h-4 w-4 text-primary" />
+                            ) : (
+                              <ExternalLink className="h-4 w-4 text-info" />
+                            )}
+                            <span className="font-medium text-sm">{training.title}</span>
+                            <TrainingStatusBadge status={training.status} />
+                          </div>
+                          
+                          {training.isVerciti ? (
+                            <p className="text-xs text-muted-foreground">
+                              Course: {training.courseName} - Module: {training.moduleName}
+                            </p>
+                          ) : (
+                            <>
+                              <p className="text-xs text-muted-foreground">
+                                Provider: {training.provider}
+                              </p>
+                              {training.description && (
+                                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                  {training.description}
+                                </p>
+                              )}
+                            </>
+                          )}
+                          
+                          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              Deadline: {new Date(training.deadline).toLocaleDateString("en-GB")}
+                            </span>
+                            {training.status === "overdue" && (
+                              <span className="flex items-center gap-1 text-destructive">
+                                <AlertTriangle className="h-3 w-3" />
+                                Overdue
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
 
             <TabsContent value="qualifications" className="mt-4 space-y-3">
               <div className="flex justify-end mb-2">
@@ -324,6 +736,12 @@ function UserProfileModal({ user, open, onOpenChange }: {
           onOpenChange={(open) => !open && setSelectedCert(null)}
         />
       )}
+
+      <AssignTrainingWizard
+        open={assignTrainingOpen}
+        onOpenChange={setAssignTrainingOpen}
+        userEmail={user.email}
+      />
     </>
   );
 }
