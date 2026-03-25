@@ -1,10 +1,12 @@
 "use client";
 
-import { Users, Clock, BookOpen, Trophy, TrendingUp, ChevronRight } from "lucide-react";
+import { Users, Clock, BookOpen, Trophy, TrendingUp, ChevronRight, Key } from "lucide-react";
 import { userActivityData, assessmentAttemptData } from "@/lib/mock-data";
 
 export function StatsCards() {
+  const maxLicences = 200;
   const totalUsers = userActivityData.length;
+  const availableLicences = maxLicences - totalUsers;
   
   const modulesCompleted = userActivityData.reduce(
     (acc, user) => acc + user.activitiesCompleted,
@@ -21,7 +23,7 @@ export function StatsCards() {
   return (
     <div className="space-y-4">
       {/* Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div className="rounded-lg border border-border bg-card p-4">
           <Users className="h-5 w-5 text-muted-foreground mb-3" />
           <p className="text-2xl font-bold text-foreground">{totalUsers}</p>
@@ -48,10 +50,16 @@ export function StatsCards() {
           <p className="text-sm text-muted-foreground">Quiz Attempts</p>
         </div>
         
-        <div className="rounded-lg border border-primary/50 bg-primary/10 p-4">
-          <TrendingUp className="h-5 w-5 text-primary mb-3" />
-          <p className="text-2xl font-bold text-primary">{averageScore}%</p>
+        <div className="rounded-lg border border-border bg-card p-4">
+          <TrendingUp className="h-5 w-5 text-muted-foreground mb-3" />
+          <p className="text-2xl font-bold text-foreground">{averageScore}%</p>
           <p className="text-sm text-muted-foreground">Average Score</p>
+        </div>
+        
+        <div className="rounded-lg border border-border bg-card p-4">
+          <Key className="h-5 w-5 text-muted-foreground mb-3" />
+          <p className="text-2xl font-bold text-foreground">{availableLicences}</p>
+          <p className="text-sm text-muted-foreground">Licences Available</p>
         </div>
       </div>
 
