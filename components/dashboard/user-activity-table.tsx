@@ -1,15 +1,6 @@
 "use client";
 
-// User Activity Table - No Collapsible components used
 import { useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import {
   ChevronRight,
@@ -17,9 +8,9 @@ import {
   Clock,
   Layers,
 } from "lucide-react";
-import { userActivityData, type UserActivity, type Activity, type Attempt } from "@/lib/mock-data";
+import { userActivityData, type UserActivity, type Activity } from "@/lib/mock-data";
 import { NotificationDialog } from "./notification-dialog";
-import { cn } from "@/lib/utils";
+import { cn, anonymizeEmail, getAvatarInitials } from "@/lib/utils";
 
 function formatLoginString(timestamp: string) {
   const date = new Date(timestamp);
@@ -43,10 +34,11 @@ function formatAttemptDate(timestamp: string) {
   });
 }
 
-function UserAvatar() {
+function UserAvatar({ email }: { email: string }) {
+  const initials = getAvatarInitials(email);
   return (
-    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#4a5d23] text-xs font-medium text-white shrink-0">
-      AV
+    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#4a5d23] text-xs font-medium text-white shrink-0 uppercase">
+      {initials}
     </div>
   );
 }
@@ -134,102 +126,100 @@ function ActivityItem({ activity }: { activity: Activity }) {
   );
 }
 
-function UserRow({ user }: { user: UserActivity }) {
+function UserRow({ 
+  user, 
+  onNotify 
+}: { 
+  user: UserActivity;
+  onNotify: (user: UserActivity) => void;
+}) {
   const [loginsExpanded, setLoginsExpanded] = useState(false);
   const [activitiesExpanded, setActivitiesExpanded] = useState(false);
-  const [notificationOpen, setNotificationOpen] = useState(false);
+  const displayEmail = anonymizeEmail(user.anonymizedEmail);
 
   return (
-    <>
-      <TableRow className="border-border hover:bg-muted/20">
-        <TableCell>
-          <div className="flex items-center gap-3">
-            <UserAvatar />
-            <span className="text-foreground">{user.anonymizedEmail}</span>
-          </div>
-        </TableCell>
-        <TableCell>
-          <div>
-            <button
-              onClick={() => setLoginsExpanded(!loginsExpanded)}
-              className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
-            >
-              <ChevronRight
-                className={cn(
-                  "h-4 w-4 text-muted-foreground transition-transform",
-                  loginsExpanded && "rotate-90"
-                )}
-              />
-              <span>{user.totalLogins} logins</span>
-            </button>
-            {loginsExpanded && (
-              <div className="mt-3 ml-6 space-y-2">
-                {user.loginSessions.slice(0, 5).map((session) => (
-                  <div key={session.id} className="bg-secondary/50 rounded-md p-3">
-                    <div className="flex items-center justify-between">
-                      <span className="flex text-xs font-light gap-1 text-muted-foreground">
-                        <Clock className="size-3" />
-                        {formatLoginString(session.timestamp)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-                {user.loginSessions.length > 5 && (
-                  <p className="text-xs text-muted-foreground pl-1">
-                    +{user.loginSessions.length - 5} more sessions
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-        </TableCell>
-        <TableCell>
-          <div>
-            <button
-              onClick={() => setActivitiesExpanded(!activitiesExpanded)}
-              className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
-            >
-              <ChevronRight
-                className={cn(
-                  "h-4 w-4 text-muted-foreground transition-transform",
-                  activitiesExpanded && "rotate-90"
-                )}
-              />
-              <span>{user.activitiesCompleted} modules</span>
-            </button>
-            {activitiesExpanded && (
-              <div className="mt-3 ml-6 space-y-2">
-                {user.activities.map((activity) => (
-                  <ActivityItem key={activity.id} activity={activity} />
-                ))}
-              </div>
-            )}
-          </div>
-        </TableCell>
-        <TableCell className="text-right">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setNotificationOpen(true)}
-            className="text-muted-foreground hover:text-foreground h-8 w-8"
+    <tr className="border-b border-border hover:bg-muted/20 transition-colors">
+      <td className="p-2 align-top">
+        <div className="flex items-center gap-3">
+          <UserAvatar email={user.anonymizedEmail} />
+          <span className="text-foreground">{displayEmail}</span>
+        </div>
+      </td>
+      <td className="p-2 align-top">
+        <div>
+          <button
+            onClick={() => setLoginsExpanded(!loginsExpanded)}
+            className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
           >
-            <Bell className="h-4 w-4" />
-          </Button>
-        </TableCell>
-      </TableRow>
-
-      <NotificationDialog
-        open={notificationOpen}
-        onOpenChange={setNotificationOpen}
-        userName={user.anonymizedName}
-        userEmail={user.anonymizedEmail}
-        userId={user.userId}
-      />
-    </>
+            <ChevronRight
+              className={cn(
+                "h-4 w-4 text-muted-foreground transition-transform",
+                loginsExpanded && "rotate-90"
+              )}
+            />
+            <span>{user.totalLogins} logins</span>
+          </button>
+          {loginsExpanded && (
+            <div className="mt-3 ml-6 space-y-2">
+              {user.loginSessions.slice(0, 5).map((session) => (
+                <div key={session.id} className="bg-secondary/50 rounded-md p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="flex text-xs font-light gap-1 text-muted-foreground">
+                      <Clock className="size-3" />
+                      {formatLoginString(session.timestamp)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+              {user.loginSessions.length > 5 && (
+                <p className="text-xs text-muted-foreground pl-1">
+                  +{user.loginSessions.length - 5} more sessions
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </td>
+      <td className="p-2 align-top">
+        <div>
+          <button
+            onClick={() => setActivitiesExpanded(!activitiesExpanded)}
+            className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
+          >
+            <ChevronRight
+              className={cn(
+                "h-4 w-4 text-muted-foreground transition-transform",
+                activitiesExpanded && "rotate-90"
+              )}
+            />
+            <span>{user.activitiesCompleted} modules</span>
+          </button>
+          {activitiesExpanded && (
+            <div className="mt-3 ml-6 space-y-2">
+              {user.activities.map((activity) => (
+                <ActivityItem key={activity.id} activity={activity} />
+              ))}
+            </div>
+          )}
+        </div>
+      </td>
+      <td className="p-2 align-top text-right">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onNotify(user)}
+          className="text-muted-foreground hover:text-foreground h-8 w-8"
+        >
+          <Bell className="h-4 w-4" />
+        </Button>
+      </td>
+    </tr>
   );
 }
 
 export function UserActivityTable() {
+  const [notificationUser, setNotificationUser] = useState<UserActivity | null>(null);
+
   return (
     <div className="rounded-lg border border-border bg-card">
       <div className="p-4">
@@ -238,21 +228,37 @@ export function UserActivityTable() {
           Track user logins, activity and detailed attempt data
         </p>
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow className="border-border hover:bg-transparent">
-            <TableHead className="text-muted-foreground font-normal">User</TableHead>
-            <TableHead className="text-muted-foreground font-normal">Logins</TableHead>
-            <TableHead className="text-muted-foreground font-normal">Activity</TableHead>
-            <TableHead className="text-muted-foreground font-normal text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {userActivityData.map((user) => (
-            <UserRow key={user.id} user={user} />
-          ))}
-        </TableBody>
-      </Table>
+      <div className="relative w-full overflow-x-auto">
+        <table className="w-full caption-bottom text-sm">
+          <thead className="[&_tr]:border-b">
+            <tr className="border-b border-border">
+              <th className="text-muted-foreground h-10 px-2 text-left align-middle font-normal">User</th>
+              <th className="text-muted-foreground h-10 px-2 text-left align-middle font-normal">Logins</th>
+              <th className="text-muted-foreground h-10 px-2 text-left align-middle font-normal">Activity</th>
+              <th className="text-muted-foreground h-10 px-2 text-right align-middle font-normal">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="[&_tr:last-child]:border-0">
+            {userActivityData.map((user) => (
+              <UserRow 
+                key={user.id} 
+                user={user} 
+                onNotify={setNotificationUser}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {notificationUser && (
+        <NotificationDialog
+          open={!!notificationUser}
+          onOpenChange={(open) => !open && setNotificationUser(null)}
+          userName={notificationUser.anonymizedName}
+          userEmail={notificationUser.anonymizedEmail}
+          userId={notificationUser.userId}
+        />
+      )}
     </div>
   );
 }

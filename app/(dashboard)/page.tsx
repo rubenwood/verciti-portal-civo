@@ -2,6 +2,7 @@ import { Header } from "@/components/dashboard/header";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { UserActivityTable } from "@/components/dashboard/user-activity-table";
 import { AssessmentTable } from "@/components/dashboard/assessment-table";
+import { UserProfilesTable } from "@/components/dashboard/user-profiles-table";
 
 export default function DashboardPage() {
   return (
@@ -11,6 +12,9 @@ export default function DashboardPage() {
       <main className="p-6 space-y-6">
         {/* Stats */}
         <StatsCards />
+
+        {/* User Profiles Table */}
+        <UserProfilesTable />
 
         {/* User Activity Table */}
         <UserActivityTable />

@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import {
   ChevronDown,
   ChevronRight,
@@ -17,7 +16,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { assessmentAttemptData, type AssessmentAttempt, type AssessmentQuestion } from "@/lib/mock-data";
-import { cn } from "@/lib/utils";
+import { cn, anonymizeEmail, getAvatarInitials } from "@/lib/utils";
 
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString("en-GB", {
@@ -27,10 +26,11 @@ function formatDate(dateString: string) {
   });
 }
 
-function UserAvatar() {
+function UserAvatar({ email }: { email: string }) {
+  const initials = getAvatarInitials(email);
   return (
-    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#4a5d23] text-xs font-medium text-white shrink-0">
-      AV
+    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#4a5d23] text-xs font-medium text-white shrink-0 uppercase">
+      {initials}
     </div>
   );
 }
@@ -125,14 +125,18 @@ function AssessmentRow({ attempt }: { attempt: AssessmentAttempt }) {
   const [expanded, setExpanded] = useState(false);
   const scorePercentage = Math.round((attempt.score / attempt.maxScore) * 100);
   const correctCount = attempt.questions.filter(q => q.isCorrect).length;
+  const displayEmail = anonymizeEmail(attempt.anonymizedEmail);
 
   return (
     <>
-      <TableRow className="border-border hover:bg-muted/20">
+      <TableRow 
+        className="border-border hover:bg-muted/20 cursor-pointer"
+        onClick={() => setExpanded(!expanded)}
+      >
         <TableCell>
           <div className="flex items-center gap-3">
-            <UserAvatar />
-            <span className="text-foreground">{attempt.anonymizedEmail}</span>
+            <UserAvatar email={attempt.anonymizedEmail} />
+            <span className="text-foreground">{displayEmail}</span>
           </div>
         </TableCell>
         <TableCell className="text-foreground">
@@ -151,18 +155,13 @@ function AssessmentRow({ attempt }: { attempt: AssessmentAttempt }) {
           {attempt.duration}
         </TableCell>
         <TableCell>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-6 w-6 text-muted-foreground hover:text-foreground"
-            onClick={() => setExpanded(!expanded)}
-          >
+          <div className="h-6 w-6 flex items-center justify-center text-muted-foreground">
             {expanded ? (
               <ChevronDown className="h-4 w-4" />
             ) : (
               <ChevronRight className="h-4 w-4" />
             )}
-          </Button>
+          </div>
         </TableCell>
       </TableRow>
 

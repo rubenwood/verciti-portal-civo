@@ -626,3 +626,255 @@ export const dashboardStats = {
   coursesInProgress: 89,
   certificationsIssued: 156,
 };
+
+// User Profile Types
+export type UserStatus = "not_signed_up" | "signed_up_not_logged_in" | "active";
+
+export interface Skill {
+  id: string;
+  name: string;
+  level: "beginner" | "intermediate" | "advanced" | "expert";
+  progress: number; // 0-100
+}
+
+export interface Qualification {
+  id: string;
+  name: string;
+  issuingBody: string;
+  dateObtained: string;
+  expiryDate?: string;
+  documentUrl?: string;
+  documentName?: string;
+  isExternal: boolean;
+  verified: boolean;
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  earnedDate: string;
+  module: string;
+  icon: string;
+}
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  fullName: string;
+  department: string;
+  jobTitle: string;
+  status: UserStatus;
+  dateInvited: string;
+  dateSignedUp?: string;
+  lastLogin?: string;
+  overallProgress: number;
+  skills: Skill[];
+  qualifications: Qualification[];
+  badges: Badge[];
+  completedActivities: string[];
+  totalTimeSpent: string;
+}
+
+export const userProfiles: UserProfile[] = [
+  {
+    id: "up1",
+    email: "ruben.wood1@gmail.com",
+    fullName: "Ruben Wood",
+    department: "Engineering",
+    jobTitle: "Electrical Engineer",
+    status: "active",
+    dateInvited: "2024-01-15",
+    dateSignedUp: "2024-01-16",
+    lastLogin: "2024-03-15T14:32:00",
+    overallProgress: 78,
+    totalTimeSpent: "45h 30m",
+    skills: [
+      { id: "sk1", name: "Hydrogen Systems", level: "advanced", progress: 85 },
+      { id: "sk2", name: "Solar Technology", level: "intermediate", progress: 60 },
+      { id: "sk3", name: "Power Electronics", level: "beginner", progress: 25 },
+    ],
+    qualifications: [
+      {
+        id: "qual1",
+        name: "City & Guilds Level 3 Electrical Installation",
+        issuingBody: "City & Guilds",
+        dateObtained: "2022-06-15",
+        documentUrl: "/documents/cg-level3.pdf",
+        documentName: "CG_Level3_Certificate.pdf",
+        isExternal: true,
+        verified: true,
+      },
+      {
+        id: "qual2",
+        name: "Hydrogen Fundamentals Certification",
+        issuingBody: "Greenskills",
+        dateObtained: "2024-03-10",
+        isExternal: false,
+        verified: true,
+      },
+    ],
+    badges: [
+      { id: "b1", name: "Hydrogen Pioneer", description: "Completed Hydrogen Fundamentals module", earnedDate: "2024-03-10", module: "Hydrogen Fundamentals", icon: "hydrogen" },
+      { id: "b2", name: "Quick Learner", description: "Completed 5 activities in one week", earnedDate: "2024-02-20", module: "General", icon: "star" },
+    ],
+    completedActivities: ["Hydrogen Fundamentals", "Solar Power", "Energy Storage"],
+  },
+  {
+    id: "up2",
+    email: "chris.shay72@gmail.com",
+    fullName: "Chris Shay",
+    department: "Operations",
+    jobTitle: "Technical Lead",
+    status: "active",
+    dateInvited: "2024-01-10",
+    dateSignedUp: "2024-01-12",
+    lastLogin: "2024-03-15T11:20:00",
+    overallProgress: 92,
+    totalTimeSpent: "68h 15m",
+    skills: [
+      { id: "sk4", name: "Wind Energy", level: "expert", progress: 95 },
+      { id: "sk5", name: "Energy Storage", level: "advanced", progress: 80 },
+      { id: "sk6", name: "Power Electronics", level: "intermediate", progress: 55 },
+    ],
+    qualifications: [
+      {
+        id: "qual3",
+        name: "BSc Renewable Energy Engineering",
+        issuingBody: "University of Manchester",
+        dateObtained: "2019-07-01",
+        documentUrl: "/documents/bsc-degree.pdf",
+        documentName: "BSc_Degree_Certificate.pdf",
+        isExternal: true,
+        verified: true,
+      },
+      {
+        id: "qual4",
+        name: "Wind Energy Certification",
+        issuingBody: "Greenskills",
+        dateObtained: "2024-03-15",
+        isExternal: false,
+        verified: true,
+      },
+    ],
+    badges: [
+      { id: "b3", name: "Wind Master", description: "Achieved 100% in Wind Energy assessment", earnedDate: "2024-03-15", module: "Wind Energy", icon: "wind" },
+      { id: "b4", name: "Perfect Score", description: "Scored 100% on an assessment", earnedDate: "2024-03-15", module: "Wind Energy", icon: "trophy" },
+    ],
+    completedActivities: ["Wind Energy", "Energy Storage", "Solar Power", "Hydrogen Fundamentals"],
+  },
+  {
+    id: "up3",
+    email: "nile@verciti.com",
+    fullName: "Nile Anderson",
+    department: "Training",
+    jobTitle: "Training Coordinator",
+    status: "signed_up_not_logged_in",
+    dateInvited: "2024-02-01",
+    dateSignedUp: "2024-02-05",
+    overallProgress: 0,
+    totalTimeSpent: "0m",
+    skills: [],
+    qualifications: [
+      {
+        id: "qual5",
+        name: "NEBOSH Certificate",
+        issuingBody: "NEBOSH",
+        dateObtained: "2023-03-20",
+        expiryDate: "2026-03-20",
+        documentUrl: "/documents/nebosh.pdf",
+        documentName: "NEBOSH_Certificate.pdf",
+        isExternal: true,
+        verified: false,
+      },
+    ],
+    badges: [],
+    completedActivities: [],
+  },
+  {
+    id: "up4",
+    email: "jack@example.com",
+    fullName: "Jack Thompson",
+    department: "Maintenance",
+    jobTitle: "Maintenance Technician",
+    status: "not_signed_up",
+    dateInvited: "2024-03-01",
+    overallProgress: 0,
+    totalTimeSpent: "0m",
+    skills: [],
+    qualifications: [],
+    badges: [],
+    completedActivities: [],
+  },
+  {
+    id: "up5",
+    email: "test1@verciti.com",
+    fullName: "Test User One",
+    department: "Engineering",
+    jobTitle: "Junior Engineer",
+    status: "active",
+    dateInvited: "2024-01-20",
+    dateSignedUp: "2024-01-21",
+    lastLogin: "2024-03-14T16:45:00",
+    overallProgress: 65,
+    totalTimeSpent: "32h 45m",
+    skills: [
+      { id: "sk7", name: "Power Electronics", level: "advanced", progress: 90 },
+      { id: "sk8", name: "Motors and Drives", level: "intermediate", progress: 60 },
+    ],
+    qualifications: [
+      {
+        id: "qual6",
+        name: "Power Electronics Certification",
+        issuingBody: "Greenskills",
+        dateObtained: "2024-03-14",
+        isExternal: false,
+        verified: true,
+      },
+    ],
+    badges: [
+      { id: "b5", name: "Power Pro", description: "Completed Power Electronics module", earnedDate: "2024-03-14", module: "Introduction to Power Electronics", icon: "zap" },
+    ],
+    completedActivities: ["Introduction to Power Electronics", "Introduction to Motors and Drives"],
+  },
+  {
+    id: "up6",
+    email: "test2@verciti.com",
+    fullName: "Test User Two",
+    department: "Safety",
+    jobTitle: "Safety Officer",
+    status: "active",
+    dateInvited: "2024-01-25",
+    dateSignedUp: "2024-01-26",
+    lastLogin: "2024-03-12T15:05:00",
+    overallProgress: 45,
+    totalTimeSpent: "18h 20m",
+    skills: [
+      { id: "sk9", name: "Hazardous Voltages", level: "expert", progress: 100 },
+      { id: "sk10", name: "Motors and Drives", level: "beginner", progress: 30 },
+    ],
+    qualifications: [
+      {
+        id: "qual7",
+        name: "Hazardous Voltages Safety Certification",
+        issuingBody: "Greenskills",
+        dateObtained: "2024-03-12",
+        isExternal: false,
+        verified: true,
+      },
+      {
+        id: "qual8",
+        name: "18th Edition Wiring Regulations",
+        issuingBody: "IET",
+        dateObtained: "2023-09-10",
+        documentName: "18th_Edition_Cert.pdf",
+        isExternal: true,
+        verified: true,
+      },
+    ],
+    badges: [
+      { id: "b6", name: "Safety Champion", description: "Achieved 100% in Hazardous Voltages", earnedDate: "2024-03-12", module: "Hazardous Voltages", icon: "shield" },
+    ],
+    completedActivities: ["Hazardous Voltages", "Introduction to Motors and Drives"],
+  },
+];
