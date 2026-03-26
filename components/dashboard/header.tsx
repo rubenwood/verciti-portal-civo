@@ -12,7 +12,7 @@ export function Header() {
           <Leaf className="h-5 w-5 text-primary-foreground" />
         </div>
         <div>
-          <h1 className="text-base font-semibold text-foreground">Greenskills Analytics</h1>
+          <h1 className="text-base font-semibold text-foreground">Workforce Readiness</h1>
           <p className="text-xs text-muted-foreground">Dashboard Overview</p>
         </div>
       </div>
