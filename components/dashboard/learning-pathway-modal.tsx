@@ -110,7 +110,7 @@ export function LearningPathwayModal() {
       <DialogTrigger asChild>
         <Button variant="outline" className="border-border h-8 px-4 text-sm">
           <Plus className="mr-2 h-4 w-4" />
-          Create Training Pathway
+          Verciti Courses
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-border">
