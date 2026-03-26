@@ -1,22 +1,36 @@
+"use client";
+
+import { useState } from "react";
 import { Header } from "@/components/dashboard/header";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { ActivityTable } from "@/components/dashboard/activity-table";
 import { AssessmentTable } from "@/components/dashboard/assessment-table";
 import { UserProfilesTable } from "@/components/dashboard/user-profiles-table";
+import { WorkforceStats } from "@/components/dashboard/workforce-stats";
 
 export default function DashboardPage() {
+  const [activeTab, setActiveTab] = useState<"analytics" | "workforce">("analytics");
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <Header />
+      <Header activeTab={activeTab} onTabChange={setActiveTab} />
       <div className="flex-1 space-y-6 p-6">
-        <div>
-          <StatsCards />
-        </div>
-        <div className="space-y-6">
-          <UserProfilesTable />
-          <ActivityTable />
-          <AssessmentTable />
-        </div>
+        {activeTab === "analytics" ? (
+          <>
+            <div>
+              <StatsCards />
+            </div>
+            <div className="space-y-6">
+              <ActivityTable />
+              <AssessmentTable />
+            </div>
+          </>
+        ) : (
+          <>
+            <WorkforceStats />
+            <UserProfilesTable />
+          </>
+        )}
       </div>
     </div>
   );
