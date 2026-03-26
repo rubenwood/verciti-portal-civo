@@ -123,8 +123,9 @@ function QuestionDetails({ question }: { question: AssessmentQuestion }) {
 
 function AssessmentRow({ attempt }: { attempt: AssessmentAttempt }) {
   const [expanded, setExpanded] = useState(false);
-  const scorePercentage = Math.round((attempt.score / attempt.maxScore) * 100);
   const correctCount = attempt.questions.filter(q => q.isCorrect).length;
+  const totalQuestions = attempt.questions.length;
+  const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
   const displayEmail = anonymizeEmail(attempt.anonymizedEmail);
 
   return (
