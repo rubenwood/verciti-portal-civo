@@ -1,13 +1,23 @@
 // Greenskills EdTech Mock Data with GDPR Anonymized Users
 
 export const modules = [
-  "Hydrogen Fundamentals",
-  "Wind Energy",
+  // Electrification modules
   "Electrical Theory (Fundamentals)",
   "Intermediate Electrical Theory",
   "Solar Power",
   "Energy Storage",
   "Hazardous Voltages",
+  // Hydrogen modules
+  "Hydrogen Fundamentals",
+  "Electrolyser(s)",
+  "Hydrogen Production",
+  "Introduction to Motors and Drives",
+  "FCEV",
+  "R&D Interactive Laboratories",
+  "Plant & Machinery",
+  "Wind Energy",
+  "Marine",
+  "Storage Tanks",
 ] as const;
 
 export const courses = [
@@ -29,7 +39,15 @@ export const courses = [
     description: "Complete hydrogen technology and energy storage pathway",
     modules: [
       "Hydrogen Fundamentals",
+      "Electrolyser(s)",
+      "Hydrogen Production",
+      "Introduction to Motors and Drives",
+      "FCEV",
+      "R&D Interactive Laboratories",
+      "Plant & Machinery",
       "Wind Energy",
+      "Marine",
+      "Storage Tanks",
     ],
   },
 ] as const;
