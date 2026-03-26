@@ -807,10 +807,9 @@ function UserProfileModal({ user, open, onOpenChange }: {
           </DialogHeader>
 
           <Tabs defaultValue="training" className="mt-4">
-            <TabsList className="grid w-full grid-cols-3 bg-muted/50">
+            <TabsList className="grid w-full grid-cols-2 bg-muted/50">
               <TabsTrigger value="training">Training</TabsTrigger>
               <TabsTrigger value="qualifications">Qualifications</TabsTrigger>
-              <TabsTrigger value="certifications">Certifications</TabsTrigger>
             </TabsList>
 
             <TabsContent value="training" className="mt-4 space-y-4">
@@ -907,6 +906,43 @@ function UserProfileModal({ user, open, onOpenChange }: {
                   ))}
                 </div>
               )}
+
+              {/* Completed App Training Section */}
+              {user.certifications.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-border">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Award className="h-5 w-5 text-primary" />
+                    <h4 className="font-medium text-sm">Completed App Training</h4>
+                    <span className="text-xs text-muted-foreground">({user.certifications.length})</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {user.certifications.map((cert) => (
+                      <button
+                        key={cert.id}
+                        onClick={() => setSelectedCert(cert)}
+                        className="p-4 rounded-lg bg-primary/5 border border-primary/20 flex items-start gap-3 hover:bg-primary/10 transition-colors text-left w-full"
+                      >
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <Award className="h-6 w-6 text-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">{cert.activityName}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Completed: {new Date(cert.earnedDate).toLocaleDateString("en-GB")}
+                          </p>
+                          <p className={`text-xs mt-1 ${new Date(cert.expiryDate) <= new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) ? "text-warning" : "text-muted-foreground"}`}>
+                            Expires: {new Date(cert.expiryDate).toLocaleDateString("en-GB")}
+                            {new Date(cert.expiryDate) <= new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) && " (Expiring soon)"}
+                          </p>
+                          <p className="text-xs text-primary mt-2">
+                            Click to view certificate
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="qualifications" className="mt-4 space-y-3">
@@ -951,48 +987,6 @@ function UserProfileModal({ user, open, onOpenChange }: {
                     </div>
                   </div>
                 ))
-              )}
-            </TabsContent>
-
-            <TabsContent value="certifications" className="mt-4">
-              {user.certifications.length === 0 ? (
-                <div className="text-center py-8">
-                  <Award className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
-                  <p className="text-sm text-muted-foreground">No certifications earned yet</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Complete activities with 100% score to earn certifications
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {user.certifications.map((cert) => (
-                    <button
-                      key={cert.id}
-                      onClick={() => setSelectedCert(cert)}
-                      className="p-4 rounded-lg bg-muted/20 border border-border flex items-start gap-3 hover:bg-muted/40 transition-colors text-left w-full"
-                    >
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <Award className="h-8 w-8 text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-sm">{cert.activityName}</p>
-                        <p className="text-xs text-muted-foreground">
-                          Achieved {cert.score}% score
-                        </p>
-<p className="text-xs text-muted-foreground mt-1">
-                                  Earned: {new Date(cert.earnedDate).toLocaleDateString("en-GB")}
-                                  </p>
-                                  <p className={`text-xs mt-1 ${new Date(cert.expiryDate) <= new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) ? "text-warning" : "text-muted-foreground"}`}>
-                                  Expires: {new Date(cert.expiryDate).toLocaleDateString("en-GB")}
-                                  {new Date(cert.expiryDate) <= new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) && " (Soon)"}
-                                  </p>
-                                  <p className="text-xs text-primary mt-2">
-                                  Click to view verification QR code
-                                  </p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
               )}
             </TabsContent>
           </Tabs>
