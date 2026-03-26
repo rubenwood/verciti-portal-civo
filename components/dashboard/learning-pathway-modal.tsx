@@ -110,14 +110,14 @@ export function LearningPathwayModal() {
       <DialogTrigger asChild>
         <Button variant="outline" className="border-border h-8 px-4 text-sm">
           <Plus className="mr-2 h-4 w-4" />
-          Create Learning Pathway
+          Create Training Pathway
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-border">
         <DialogHeader>
-          <DialogTitle className="text-card-foreground">Learning Pathways</DialogTitle>
+          <DialogTitle className="text-card-foreground">Training Pathways</DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            View existing courses or create custom learning pathways from available modules.
+            View existing courses or create custom training pathways from available modules.
           </DialogDescription>
         </DialogHeader>
 

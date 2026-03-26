@@ -2,12 +2,11 @@
 
 export const modules = [
   "Hydrogen Fundamentals",
-  "Solar Power",
   "Wind Energy",
+  "Electrical Theory (Fundamentals)",
+  "Intermediate Electrical Theory",
+  "Solar Power",
   "Energy Storage",
-  "Introduction to Power Electronics",
-  "Intermediate Power Electronics",
-  "Introduction to Motors and Drives",
   "Hazardous Voltages",
 ] as const;
 
@@ -17,9 +16,10 @@ export const courses = [
     name: "Electrification",
     description: "Comprehensive pathway covering electrical systems and power electronics",
     modules: [
-      "Introduction to Power Electronics",
-      "Intermediate Power Electronics",
-      "Introduction to Motors and Drives",
+      "Electrical Theory (Fundamentals)",
+      "Intermediate Electrical Theory",
+      "Solar Power",
+      "Energy Storage",
       "Hazardous Voltages",
     ],
   },
@@ -29,8 +29,6 @@ export const courses = [
     description: "Complete hydrogen technology and energy storage pathway",
     modules: [
       "Hydrogen Fundamentals",
-      "Energy Storage",
-      "Solar Power",
       "Wind Energy",
     ],
   },
