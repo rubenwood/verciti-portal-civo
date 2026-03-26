@@ -218,11 +218,23 @@ export function WorkforceStats() {
                     </td>
                     <td className="text-center py-3 px-4">
                       {row.expiringSoon > 0 ? (
-                        <span className="px-2 py-1 rounded text-xs bg-warning/20 text-warning">
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          // Color based on ratio of expiring to trained
+                          // Higher ratio = more red, lower ratio = more green
+                          row.trained > 0 
+                            ? (row.expiringSoon / row.trained) >= 0.75 
+                              ? "bg-destructive/20 text-destructive" 
+                              : (row.expiringSoon / row.trained) >= 0.5 
+                                ? "bg-orange-500/20 text-orange-400" 
+                                : (row.expiringSoon / row.trained) >= 0.25 
+                                  ? "bg-warning/20 text-warning" 
+                                  : "bg-success/20 text-success"
+                            : "bg-warning/20 text-warning"
+                        }`}>
                           {row.expiringSoon}
                         </span>
                       ) : (
-                        <span className="text-muted-foreground">0</span>
+                        <span className="text-success">0</span>
                       )}
                     </td>
                   </tr>
