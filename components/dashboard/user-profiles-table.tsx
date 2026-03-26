@@ -43,11 +43,14 @@ import {
   BookOpen,
   ExternalLink,
   AlertTriangle,
+  Link2,
+  LinkIcon,
 } from "lucide-react";
 import { 
   userProfiles, 
   courses, 
-  modules, 
+  modules,
+  type LinkedProvider, 
   trainingProviders,
   type UserProfile, 
   type UserStatus, 
@@ -251,11 +254,13 @@ function ExternalTrainingDetailsModal({
   open,
   onOpenChange,
   onDelete,
+  linkedProviders,
 }: {
   training: Training;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onDelete: () => void;
+  linkedProviders: LinkedProvider[];
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedDeadline, setEditedDeadline] = useState(training.deadline);
@@ -282,7 +287,11 @@ function ExternalTrainingDetailsModal({
     setDocuments([...documents, newDoc]);
   };
 
-  const providerName = trainingProviders.find(p => p.id === training.provider)?.name || training.provider;
+  const provider = trainingProviders.find(p => p.id === training.provider);
+  const providerName = provider?.name || training.provider;
+  const supportsLinking = provider?.supportsAccountLinking ?? false;
+  const linkedProvider = linkedProviders.find(lp => lp.providerId === training.provider);
+  const isLinked = !!linkedProvider;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -313,6 +322,43 @@ function ExternalTrainingDetailsModal({
               <span className="text-sm">{new Date(training.assignedDate).toLocaleDateString("en-GB")}</span>
             </div>
           </div>
+
+          {/* Account Linking Status */}
+          {supportsLinking && (
+            <div className="pt-3 border-t border-border">
+              {isLinked ? (
+                <div className="bg-primary/10 border border-primary/20 rounded-md p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Link2 className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-medium text-primary">Account Linked</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Connected to {providerName} as <span className="font-medium">{linkedProvider.accountEmail}</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Linked on {new Date(linkedProvider.linkedAt).toLocaleDateString("en-GB")}
+                  </p>
+                  <p className="text-xs text-primary mt-2">
+                    Training completion will be synced automatically.
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-muted/30 border border-border rounded-md p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <LinkIcon className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Account Not Linked</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Link your {providerName} account to automatically sync training completion status.
+                  </p>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Link2 className="h-4 w-4" />
+                    Link {providerName} Account
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Editable Fields */}
           <div className="space-y-3 pt-3 border-t border-border">
@@ -371,36 +417,38 @@ function ExternalTrainingDetailsModal({
             )}
           </div>
 
-          {/* Supporting Documents */}
-          <div className="space-y-3 pt-3 border-t border-border">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">Supporting Documents</label>
-              <Button variant="outline" size="sm" className="gap-2" onClick={handleUploadDocument}>
-                <Upload className="h-4 w-4" />
-                Upload
-              </Button>
-            </div>
-            
-            {documents.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4 bg-muted/20 rounded-md">
-                No documents uploaded yet. Upload evidence of completion.
-              </p>
-            ) : (
-              <div className="space-y-2">
-                {documents.map((doc, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2 bg-muted/20 rounded-md">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{doc.name}</span>
-                    </div>
-                    <Button variant="ghost" size="sm" className="gap-1 text-info">
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
+          {/* Supporting Documents - Only show if not linked */}
+          {(!supportsLinking || !isLinked) && (
+            <div className="space-y-3 pt-3 border-t border-border">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">Supporting Documents</label>
+                <Button variant="outline" size="sm" className="gap-2" onClick={handleUploadDocument}>
+                  <Upload className="h-4 w-4" />
+                  Upload
+                </Button>
               </div>
-            )}
-          </div>
+              
+              {documents.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4 bg-muted/20 rounded-md">
+                  No documents uploaded yet. Upload evidence of completion.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {documents.map((doc, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-2 bg-muted/20 rounded-md">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{doc.name}</span>
+                      </div>
+                      <Button variant="ghost" size="sm" className="gap-1 text-info">
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Delete Section */}
           <div className="pt-3 border-t border-border">
@@ -816,9 +864,15 @@ function UserProfileModal({ user, open, onOpenChange }: {
                             </p>
                           ) : (
                             <>
-                              <p className="text-xs text-muted-foreground">
-                                Provider: {training.provider}
-                              </p>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <span>Provider: {trainingProviders.find(p => p.id === training.provider)?.name || training.provider}</span>
+                                {user.linkedProviders.some(lp => lp.providerId === training.provider) && (
+                                  <span className="inline-flex items-center gap-1 text-primary text-[10px] bg-primary/10 px-1.5 py-0.5 rounded">
+                                    <Link2 className="h-3 w-3" />
+                                    Linked
+                                  </span>
+                                )}
+                              </div>
                               {training.description && (
                                 <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                                   {training.description}
@@ -958,6 +1012,7 @@ function UserProfileModal({ user, open, onOpenChange }: {
           open={!!selectedExternalTraining}
           onOpenChange={(open) => !open && setSelectedExternalTraining(null)}
           onDelete={handleDeleteTraining}
+          linkedProviders={user.linkedProviders}
         />
       )}
     </>
