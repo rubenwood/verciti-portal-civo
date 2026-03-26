@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, GraduationCap, Award, AlertTriangle } from "lucide-react";
+import { Users, GraduationCap, Award, AlertTriangle, Clock } from "lucide-react";
 import { userProfiles } from "@/lib/mock-data";
 import {
   PieChart,
@@ -12,17 +12,31 @@ import {
   Legend,
 } from "recharts";
 
+// Helper to check if a date is within N days from now
+function isExpiringSoon(expiryDate: string, daysThreshold: number = 60): boolean {
+  const expiry = new Date(expiryDate);
+  const now = new Date();
+  const diffTime = expiry.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays > 0 && diffDays <= daysThreshold;
+}
+
 export function WorkforceStats() {
   // Calculate workforce statistics
   const totalUsers = userProfiles.length;
   
-  // Calculate job role breakdown
-  const jobRoleCounts: Record<string, { total: number; trained: number; certified: number }> = {};
+  // Calculate job role breakdown with expiring soon tracking
+  const jobRoleCounts: Record<string, { 
+    total: number; 
+    trained: number; 
+    certified: number;
+    expiringSoon: number;
+  }> = {};
   
   userProfiles.forEach(user => {
     const role = user.jobTitle;
     if (!jobRoleCounts[role]) {
-      jobRoleCounts[role] = { total: 0, trained: 0, certified: 0 };
+      jobRoleCounts[role] = { total: 0, trained: 0, certified: 0, expiringSoon: 0 };
     }
     jobRoleCounts[role].total++;
     
@@ -34,6 +48,14 @@ export function WorkforceStats() {
     // Consider "certified" if they have at least one certification
     if (user.certifications.length > 0) {
       jobRoleCounts[role].certified++;
+    }
+    
+    // Check if any certification is expiring soon (within 60 days)
+    const hasExpiringSoon = user.certifications.some(cert => 
+      isExpiringSoon(cert.expiryDate, 60)
+    );
+    if (hasExpiringSoon) {
+      jobRoleCounts[role].expiringSoon++;
     }
   });
   
@@ -51,6 +73,7 @@ export function WorkforceStats() {
     total: data.total,
     trained: data.trained,
     certified: data.certified,
+    expiringSoon: data.expiringSoon,
     trainingRate: Math.round((data.trained / data.total) * 100),
     certificationRate: Math.round((data.certified / data.total) * 100),
   }));
@@ -62,11 +85,16 @@ export function WorkforceStats() {
   
   const usersWithCertifications = userProfiles.filter(u => u.certifications.length > 0).length;
   const trainedStaff = userProfiles.filter(u => u.completedActivities.length > 0).length;
+  
+  // Count users with expiring certifications
+  const usersWithExpiringSoon = userProfiles.filter(u => 
+    u.certifications.some(cert => isExpiringSoon(cert.expiryDate, 60))
+  ).length;
 
   return (
     <div className="space-y-6">
       {/* Top Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="rounded-lg border border-border bg-card p-4">
           <Users className="h-5 w-5 text-muted-foreground mb-3" />
           <p className="text-2xl font-bold text-foreground">{totalUsers}</p>
@@ -83,6 +111,12 @@ export function WorkforceStats() {
           <Award className="h-5 w-5 text-primary mb-3" />
           <p className="text-2xl font-bold text-foreground">{usersWithCertifications}</p>
           <p className="text-sm text-muted-foreground">Certified Staff</p>
+        </div>
+        
+        <div className="rounded-lg border border-border bg-card p-4">
+          <Clock className="h-5 w-5 text-warning mb-3" />
+          <p className="text-2xl font-bold text-foreground">{usersWithExpiringSoon}</p>
+          <p className="text-sm text-muted-foreground">Expiring Soon</p>
         </div>
         
         <div className="rounded-lg border border-border bg-card p-4">
@@ -154,6 +188,7 @@ export function WorkforceStats() {
                   <th className="text-center py-3 px-4 text-muted-foreground font-normal">Training Rate</th>
                   <th className="text-center py-3 px-4 text-muted-foreground font-normal">Certified</th>
                   <th className="text-center py-3 px-4 text-muted-foreground font-normal">Certification Rate</th>
+                  <th className="text-center py-3 px-4 text-muted-foreground font-normal">Expiring Soon</th>
                 </tr>
               </thead>
               <tbody>
@@ -180,6 +215,15 @@ export function WorkforceStats() {
                       }`}>
                         {row.certificationRate}%
                       </span>
+                    </td>
+                    <td className="text-center py-3 px-4">
+                      {row.expiringSoon > 0 ? (
+                        <span className="px-2 py-1 rounded text-xs bg-warning/20 text-warning">
+                          {row.expiringSoon}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">0</span>
+                      )}
                     </td>
                   </tr>
                 ))}

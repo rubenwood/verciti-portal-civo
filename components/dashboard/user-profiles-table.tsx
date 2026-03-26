@@ -240,8 +240,12 @@ function CertificationQRModal({
           activityName={certification.activityName}
           userEmail={userEmail}
         />
-        <div className="text-center text-xs text-muted-foreground">
-          Earned on {new Date(certification.earnedDate).toLocaleDateString("en-GB")} with {certification.score}% score
+        <div className="text-center text-xs text-muted-foreground space-y-1">
+          <p>Earned on {new Date(certification.earnedDate).toLocaleDateString("en-GB")} with {certification.score}% score</p>
+          <p className={new Date(certification.expiryDate) <= new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) ? "text-warning" : ""}>
+            Expires: {new Date(certification.expiryDate).toLocaleDateString("en-GB")}
+            {new Date(certification.expiryDate) <= new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) && " (Expiring soon)"}
+          </p>
         </div>
       </DialogContent>
     </Dialog>
@@ -975,12 +979,16 @@ function UserProfileModal({ user, open, onOpenChange }: {
                         <p className="text-xs text-muted-foreground">
                           Achieved {cert.score}% score
                         </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Earned: {new Date(cert.earnedDate).toLocaleDateString("en-GB")}
-                        </p>
-                        <p className="text-xs text-primary mt-2">
-                          Click to view verification QR code
-                        </p>
+<p className="text-xs text-muted-foreground mt-1">
+                                  Earned: {new Date(cert.earnedDate).toLocaleDateString("en-GB")}
+                                  </p>
+                                  <p className={`text-xs mt-1 ${new Date(cert.expiryDate) <= new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) ? "text-warning" : "text-muted-foreground"}`}>
+                                  Expires: {new Date(cert.expiryDate).toLocaleDateString("en-GB")}
+                                  {new Date(cert.expiryDate) <= new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) && " (Soon)"}
+                                  </p>
+                                  <p className="text-xs text-primary mt-2">
+                                  Click to view verification QR code
+                                  </p>
                       </div>
                     </button>
                   ))}
