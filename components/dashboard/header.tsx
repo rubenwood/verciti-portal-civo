@@ -3,6 +3,7 @@
 import { Bell, Settings, Download, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LearningPathwayModal } from "./learning-pathway-modal";
+import { IntegrationsModal } from "./integrations-modal";
 import { cn } from "@/lib/utils";
 
 interface HeaderProps {
@@ -26,6 +27,7 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-3">
+          <IntegrationsModal />
           <LearningPathwayModal />
           
           <Button className="bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-4 text-sm">
