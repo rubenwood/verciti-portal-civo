@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { X, Users, MapPin, GraduationCap, Building2, Briefcase, ChevronRight, Search, ExternalLink } from "lucide-react";
+import { X, Users, MapPin, GraduationCap, Building2, Briefcase, ChevronRight, Search, ExternalLink, Plus, Check, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { userProfiles } from "@/lib/mock-data";
+import { userProfiles, modules } from "@/lib/mock-data";
 
 // Dynamically import map components to avoid SSR issues
 const MapContainer = dynamic(
@@ -229,12 +231,43 @@ function MapContent({
   );
 }
 
+// UK Cities for location selection
+const ukLocations = [
+  { name: "London", coordinates: [51.51, -0.12] as [number, number] },
+  { name: "Manchester", coordinates: [53.48, -2.24] as [number, number] },
+  { name: "Birmingham", coordinates: [52.48, -1.89] as [number, number] },
+  { name: "Glasgow", coordinates: [55.86, -4.25] as [number, number] },
+  { name: "Edinburgh", coordinates: [55.95, -3.19] as [number, number] },
+  { name: "Liverpool", coordinates: [53.41, -2.98] as [number, number] },
+  { name: "Bristol", coordinates: [51.45, -2.59] as [number, number] },
+  { name: "Leeds", coordinates: [53.8, -1.55] as [number, number] },
+  { name: "Sheffield", coordinates: [53.38, -1.47] as [number, number] },
+  { name: "Newcastle", coordinates: [54.97, -1.61] as [number, number] },
+  { name: "Cardiff", coordinates: [51.48, -3.18] as [number, number] },
+  { name: "Belfast", coordinates: [54.6, -5.93] as [number, number] },
+  { name: "Aberdeen", coordinates: [57.15, -2.1] as [number, number] },
+  { name: "Nottingham", coordinates: [52.95, -1.15] as [number, number] },
+  { name: "Southampton", coordinates: [50.9, -1.4] as [number, number] },
+];
+
 export function SkillsMap() {
   const [selectedWorkplace, setSelectedWorkplace] = useState<Workplace | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [showTalentSources, setShowTalentSources] = useState(false);
   const [highlightedSkill, setHighlightedSkill] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [allWorkplaces, setAllWorkplaces] = useState(workplaces);
+  
+  // New workplace form state
+  const [newWorkplaceName, setNewWorkplaceName] = useState("");
+  const [newWorkplaceType, setNewWorkplaceType] = useState<"workplace" | "project">("project");
+  const [newWorkplaceLocation, setNewWorkplaceLocation] = useState(ukLocations[0]);
+  const [selectedSkills, setSelectedSkills] = useState<{ name: string; need: number }[]>([]);
+  const [assignedWorkers, setAssignedWorkers] = useState<string[]>([]);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [skillSearch, setSkillSearch] = useState("");
+  const [workerSearch, setWorkerSearch] = useState("");
 
   useEffect(() => {
     setIsClient(true);
@@ -281,6 +314,59 @@ export function SkillsMap() {
     ? getTalentSourcesForSkill(highlightedSkill)
     : [];
 
+  // Filter skills based on search
+  const filteredSkills = modules.filter(skill => 
+    skill.toLowerCase().includes(skillSearch.toLowerCase()) &&
+    !selectedSkills.some(s => s.name === skill)
+  );
+
+  // Filter workers based on search and selected skills
+  const availableWorkers = userProfiles.filter(user => {
+    const matchesSearch = user.fullName.toLowerCase().includes(workerSearch.toLowerCase()) ||
+      user.email.toLowerCase().includes(workerSearch.toLowerCase());
+    const hasRelevantSkills = selectedSkills.length === 0 || selectedSkills.some(skill =>
+      user.completedActivities.includes(skill.name) ||
+      user.certifications.some(cert => cert.activityName === skill.name)
+    );
+    return matchesSearch && hasRelevantSkills && !assignedWorkers.includes(user.id);
+  });
+
+  // Reset modal state
+  const resetModal = () => {
+    setNewWorkplaceName("");
+    setNewWorkplaceType("project");
+    setNewWorkplaceLocation(ukLocations[0]);
+    setSelectedSkills([]);
+    setAssignedWorkers([]);
+    setStep(1);
+    setSkillSearch("");
+    setWorkerSearch("");
+  };
+
+  // Add new workplace
+  const handleCreateWorkplace = () => {
+    const newWorkplace: Workplace = {
+      id: `wp${allWorkplaces.length + 1}`,
+      name: newWorkplaceName,
+      type: newWorkplaceType,
+      coordinates: newWorkplaceLocation.coordinates,
+      staffAssigned: assignedWorkers.length,
+      staffRequired: selectedSkills.reduce((sum, s) => sum + s.need, 0),
+      skills: selectedSkills.map(s => ({
+        name: s.name,
+        have: assignedWorkers.filter(workerId => {
+          const worker = userProfiles.find(u => u.id === workerId);
+          return worker?.completedActivities.includes(s.name) ||
+            worker?.certifications.some(cert => cert.activityName === s.name);
+        }).length,
+        need: s.need,
+      })),
+    };
+    setAllWorkplaces([...allWorkplaces, newWorkplace]);
+    setShowAddModal(false);
+    resetModal();
+  };
+
   return (
     <div className="relative h-[calc(100vh-180px)] bg-card rounded-lg border border-border overflow-hidden">
       {/* Map Container */}
@@ -303,7 +389,7 @@ export function SkillsMap() {
               style={{ background: "#1a1a2e" }}
             >
               <MapContent
-                workplaces={workplaces}
+                workplaces={allWorkplaces}
                 talentSources={talentSources}
                 selectedWorkplace={selectedWorkplace}
                 showTalentSources={showTalentSources}
@@ -357,6 +443,14 @@ export function SkillsMap() {
             </div>
           </>
         )}
+        <Button 
+          size="sm" 
+          className="w-full mt-3"
+          onClick={() => setShowAddModal(true)}
+        >
+          <Plus className="h-3 w-3 mr-1" />
+          Add Workplace
+        </Button>
       </div>
 
       {/* Workplace/Project Panel */}
@@ -628,6 +722,292 @@ export function SkillsMap() {
           </div>
         </div>
       )}
+
+      {/* Add Workplace Modal */}
+      <Dialog open={showAddModal} onOpenChange={(open) => {
+        setShowAddModal(open);
+        if (!open) resetModal();
+      }}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Add New Workplace or Project</DialogTitle>
+            <DialogDescription>
+              {step === 1 && "Enter basic details for your new workplace or project"}
+              {step === 2 && "Select the skills required for this location"}
+              {step === 3 && "Assign workers to this location"}
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Step Indicator */}
+          <div className="flex items-center gap-2 py-4">
+            {[1, 2, 3].map((s) => (
+              <div key={s} className="flex items-center gap-2 flex-1">
+                <div className={cn(
+                  "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium",
+                  step >= s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                )}>
+                  {step > s ? <Check className="h-4 w-4" /> : s}
+                </div>
+                <span className={cn(
+                  "text-sm hidden sm:block",
+                  step >= s ? "text-foreground" : "text-muted-foreground"
+                )}>
+                  {s === 1 ? "Details" : s === 2 ? "Skills" : "Workers"}
+                </span>
+                {s < 3 && <div className={cn("flex-1 h-0.5", step > s ? "bg-primary" : "bg-muted")} />}
+              </div>
+            ))}
+          </div>
+
+          <div className="flex-1 overflow-y-auto">
+            {/* Step 1: Basic Details */}
+            {step === 1 && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Name</label>
+                  <Input
+                    placeholder="e.g., Birmingham Solar Farm"
+                    value={newWorkplaceName}
+                    onChange={(e) => setNewWorkplaceName(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Type</label>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={newWorkplaceType === "project" ? "default" : "outline"}
+                      className="flex-1"
+                      onClick={() => setNewWorkplaceType("project")}
+                    >
+                      <Briefcase className="h-4 w-4 mr-2" />
+                      Project
+                    </Button>
+                    <Button
+                      variant={newWorkplaceType === "workplace" ? "default" : "outline"}
+                      className="flex-1"
+                      onClick={() => setNewWorkplaceType("workplace")}
+                    >
+                      <Building2 className="h-4 w-4 mr-2" />
+                      Workplace
+                    </Button>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Location</label>
+                  <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                    {ukLocations.map((loc) => (
+                      <Button
+                        key={loc.name}
+                        variant={newWorkplaceLocation.name === loc.name ? "default" : "outline"}
+                        size="sm"
+                        className="justify-start"
+                        onClick={() => setNewWorkplaceLocation(loc)}
+                      >
+                        <MapPin className="h-3 w-3 mr-1" />
+                        {loc.name}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Select Skills */}
+            {step === 2 && (
+              <div className="space-y-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search skills..."
+                    className="pl-9"
+                    value={skillSearch}
+                    onChange={(e) => setSkillSearch(e.target.value)}
+                  />
+                </div>
+
+                {/* Selected Skills */}
+                {selectedSkills.length > 0 && (
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">
+                      Selected Skills ({selectedSkills.length})
+                    </label>
+                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                      {selectedSkills.map((skill) => (
+                        <div key={skill.name} className="flex items-center justify-between p-2 rounded-lg bg-primary/10 border border-primary/20">
+                          <span className="text-sm font-medium">{skill.name}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">Need:</span>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => setSelectedSkills(skills => 
+                                skills.map(s => s.name === skill.name ? { ...s, need: Math.max(1, s.need - 1) } : s)
+                              )}
+                            >
+                              <Minus className="h-3 w-3" />
+                            </Button>
+                            <span className="w-8 text-center text-sm font-medium">{skill.need}</span>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => setSelectedSkills(skills => 
+                                skills.map(s => s.name === skill.name ? { ...s, need: s.need + 1 } : s)
+                              )}
+                            >
+                              <Plus className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-destructive hover:text-destructive"
+                              onClick={() => setSelectedSkills(skills => skills.filter(s => s.name !== skill.name))}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Available Skills */}
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">Available Skills</label>
+                  <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+                    {filteredSkills.map((skill) => (
+                      <Button
+                        key={skill}
+                        variant="outline"
+                        size="sm"
+                        className="justify-start"
+                        onClick={() => setSelectedSkills([...selectedSkills, { name: skill, need: 10 }])}
+                      >
+                        <Plus className="h-3 w-3 mr-1" />
+                        {skill}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Assign Workers */}
+            {step === 3 && (
+              <div className="space-y-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search workers..."
+                    className="pl-9"
+                    value={workerSearch}
+                    onChange={(e) => setWorkerSearch(e.target.value)}
+                  />
+                </div>
+
+                {/* Assigned Workers */}
+                {assignedWorkers.length > 0 && (
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">
+                      Assigned Workers ({assignedWorkers.length})
+                    </label>
+                    <div className="space-y-1 max-h-28 overflow-y-auto">
+                      {assignedWorkers.map((workerId) => {
+                        const worker = userProfiles.find(u => u.id === workerId);
+                        if (!worker) return null;
+                        return (
+                          <div key={workerId} className="flex items-center justify-between p-2 rounded-lg bg-primary/10 border border-primary/20">
+                            <div>
+                              <p className="text-sm font-medium">{worker.fullName}</p>
+                              <p className="text-xs text-muted-foreground">{worker.jobTitle}</p>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-destructive hover:text-destructive"
+                              onClick={() => setAssignedWorkers(workers => workers.filter(id => id !== workerId))}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Available Workers */}
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    Available Workers {selectedSkills.length > 0 && "(filtered by selected skills)"}
+                  </label>
+                  <div className="space-y-1 max-h-48 overflow-y-auto">
+                    {availableWorkers.slice(0, 20).map((worker) => {
+                      const matchingSkills = selectedSkills.filter(skill =>
+                        worker.completedActivities.includes(skill.name) ||
+                        worker.certifications.some(cert => cert.activityName === skill.name)
+                      );
+                      return (
+                        <button
+                          key={worker.id}
+                          className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors text-left"
+                          onClick={() => setAssignedWorkers([...assignedWorkers, worker.id])}
+                        >
+                          <div>
+                            <p className="text-sm font-medium">{worker.fullName}</p>
+                            <p className="text-xs text-muted-foreground">{worker.jobTitle}</p>
+                            {matchingSkills.length > 0 && (
+                              <p className="text-xs text-primary mt-0.5">
+                                {matchingSkills.length} matching skill{matchingSkills.length > 1 ? "s" : ""}
+                              </p>
+                            )}
+                          </div>
+                          <Plus className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      );
+                    })}
+                    {availableWorkers.length === 0 && (
+                      <p className="text-sm text-muted-foreground text-center py-4">No matching workers found</p>
+                    )}
+                    {availableWorkers.length > 20 && (
+                      <p className="text-xs text-muted-foreground text-center py-2">
+                        Showing 20 of {availableWorkers.length} workers. Use search to filter.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Footer Actions */}
+          <div className="flex justify-between pt-4 border-t border-border mt-4">
+            <Button
+              variant="outline"
+              onClick={() => step > 1 ? setStep((step - 1) as 1 | 2 | 3) : setShowAddModal(false)}
+            >
+              {step === 1 ? "Cancel" : "Back"}
+            </Button>
+            {step < 3 ? (
+              <Button
+                onClick={() => setStep((step + 1) as 1 | 2 | 3)}
+                disabled={step === 1 && !newWorkplaceName.trim()}
+              >
+                Next
+              </Button>
+            ) : (
+              <Button
+                onClick={handleCreateWorkplace}
+                disabled={selectedSkills.length === 0}
+              >
+                Create {newWorkplaceType === "project" ? "Project" : "Workplace"}
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
