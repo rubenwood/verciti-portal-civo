@@ -728,7 +728,7 @@ export function SkillsMap() {
         setShowAddModal(open);
         if (!open) resetModal();
       }}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col z-[9999]">
           <DialogHeader>
             <DialogTitle>Add New Workplace or Project</DialogTitle>
             <DialogDescription>
