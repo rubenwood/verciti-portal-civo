@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { X, Users, MapPin, GraduationCap, Building2, Briefcase, ChevronRight, Search, ExternalLink, Plus, Check, Minus } from "lucide-react";
+import { X, Users, MapPin, GraduationCap, Building2, Briefcase, ChevronRight, Search, ExternalLink, Plus, Check, Minus, FileText, Link2, Clock } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -156,6 +158,43 @@ type Workplace = typeof workplaces[0];
 type Skill = Workplace["skills"][0];
 type TalentSource = typeof talentSources[0];
 
+// Mock candidates for talent sources
+interface Candidate {
+  id: string;
+  anonymousId: string;
+  skills: string[];
+  experienceYears: number;
+  qualification: string;
+  cvUrl: string;
+  portfolioUrl?: string;
+  availability: "immediate" | "2-weeks" | "1-month" | "3-months";
+  location: string;
+}
+
+const generateCandidates = (source: TalentSource): Candidate[] => {
+  const count = source.type === "jobboard" ? (source.candidates || 50) : (source.graduates || 30);
+  const displayCount = Math.min(count, 15); // Show max 15 candidates
+  
+  const qualifications = source.type === "jobboard" 
+    ? ["BSc Engineering", "MSc Energy Systems", "HND Electrical", "BEng Mechanical", "PhD Renewable Energy", "NVQ Level 3", "City & Guilds"]
+    : ["BSc (Expected)", "MSc (Expected)", "PhD Candidate", "Final Year", "Graduate 2024", "Graduate 2025"];
+  
+  const locations = ["London", "Manchester", "Glasgow", "Edinburgh", "Birmingham", "Bristol", "Cardiff", "Leeds", "Newcastle", "Belfast"];
+  const availabilities: Candidate["availability"][] = ["immediate", "2-weeks", "1-month", "3-months"];
+  
+  return Array.from({ length: displayCount }, (_, i) => ({
+    id: `${source.id}-c${i + 1}`,
+    anonymousId: `Candidate ${String(i + 1).padStart(3, "0")}`,
+    skills: source.skills.slice(0, Math.floor(Math.random() * source.skills.length) + 1),
+    experienceYears: source.type === "jobboard" ? Math.floor(Math.random() * 10) + 1 : 0,
+    qualification: qualifications[Math.floor(Math.random() * qualifications.length)],
+    cvUrl: `#cv-${source.id}-${i + 1}`,
+    portfolioUrl: Math.random() > 0.4 ? `#portfolio-${source.id}-${i + 1}` : undefined,
+    availability: availabilities[Math.floor(Math.random() * availabilities.length)],
+    location: locations[Math.floor(Math.random() * locations.length)],
+  }));
+};
+
 function MapContent({
   workplaces,
   talentSources,
@@ -257,6 +296,8 @@ export function SkillsMap() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [allWorkplaces, setAllWorkplaces] = useState(workplaces);
   const [placedCoordinates, setPlacedCoordinates] = useState<[number, number] | null>(null);
+  const [selectedTalentSource, setSelectedTalentSource] = useState<TalentSource | null>(null);
+  const [candidateSearch, setCandidateSearch] = useState("");
   
   // New workplace form state
   const [newWorkplaceName, setNewWorkplaceName] = useState("");
@@ -669,8 +710,13 @@ export function SkillsMap() {
                           <p className="text-xs text-muted-foreground capitalize">{source.type}</p>
                           <p className="text-xs text-primary mt-1">{source.graduates} graduates/year</p>
                         </div>
-                        <Button variant="outline" size="sm" className="h-7 text-xs">
-                          <ExternalLink className="h-3 w-3 mr-1" />
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="h-7 text-xs"
+                          onClick={() => setSelectedTalentSource(source)}
+                        >
+                          <Users className="h-3 w-3 mr-1" />
                           Contact
                         </Button>
                       </div>
@@ -699,9 +745,14 @@ export function SkillsMap() {
                           <p className="text-xs text-muted-foreground">Job board</p>
                           <p className="text-xs text-primary mt-1">{(source as typeof talentSources[0] & { candidates?: number }).candidates || 0} candidates available</p>
                         </div>
-                        <Button variant="outline" size="sm" className="h-7 text-xs">
-                          <ExternalLink className="h-3 w-3 mr-1" />
-                          Search
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="h-7 text-xs"
+                          onClick={() => setSelectedTalentSource(source)}
+                        >
+                          <Users className="h-3 w-3 mr-1" />
+                          View Candidates
                         </Button>
                       </div>
                     </div>
@@ -1010,6 +1061,176 @@ export function SkillsMap() {
               </Button>
             )}
           </div>
+</DialogContent>
+      </Dialog>
+
+      {/* Talent Source Contact Modal */}
+      <Dialog open={!!selectedTalentSource} onOpenChange={(open) => {
+        if (!open) {
+          setSelectedTalentSource(null);
+          setCandidateSearch("");
+        }
+      }}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col z-[9999]">
+          {selectedTalentSource && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  {selectedTalentSource.type === "university" ? (
+                    <GraduationCap className="h-5 w-5 text-info" />
+                  ) : selectedTalentSource.type === "college" ? (
+                    <GraduationCap className="h-5 w-5 text-purple-400" />
+                  ) : (
+                    <Briefcase className="h-5 w-5 text-pink-400" />
+                  )}
+                  {selectedTalentSource.name}
+                </DialogTitle>
+                <DialogDescription>
+                  {selectedTalentSource.type === "jobboard" 
+                    ? `Browse ${selectedTalentSource.candidates || 0} available candidates`
+                    : `Connect with ${selectedTalentSource.graduates || 0} graduates/year`
+                  }
+                </DialogDescription>
+              </DialogHeader>
+
+              {/* Institution Info */}
+              <div className="p-4 rounded-lg bg-muted/50 border border-border space-y-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-foreground capitalize">{selectedTalentSource.type}</p>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                      <MapPin className="h-3 w-3" />
+                      {selectedTalentSource.coordinates[0].toFixed(2)}°N, {Math.abs(selectedTalentSource.coordinates[1]).toFixed(2)}°W
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-primary">
+                      {selectedTalentSource.type === "jobboard" 
+                        ? selectedTalentSource.candidates || 0
+                        : selectedTalentSource.graduates || 0
+                      }
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {selectedTalentSource.type === "jobboard" ? "candidates" : "graduates/year"}
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1.5">Relevant skills offered:</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedTalentSource.skills.map((skill) => (
+                      <span key={skill} className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-xs">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search candidates by skill or location..."
+                  className="pl-9"
+                  value={candidateSearch}
+                  onChange={(e) => setCandidateSearch(e.target.value)}
+                />
+              </div>
+
+              {/* Candidates List */}
+              <div className="flex-1 overflow-auto space-y-2">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-medium text-sm text-foreground">
+                    {selectedTalentSource.type === "jobboard" ? "Available Candidates" : "Recent Graduates"}
+                  </h4>
+                  <span className="text-xs text-muted-foreground">Anonymized profiles</span>
+                </div>
+                
+                {generateCandidates(selectedTalentSource)
+                  .filter(c => 
+                    candidateSearch === "" ||
+                    c.skills.some(s => s.toLowerCase().includes(candidateSearch.toLowerCase())) ||
+                    c.location.toLowerCase().includes(candidateSearch.toLowerCase())
+                  )
+                  .map((candidate) => (
+                    <div key={candidate.id} className="p-3 rounded-lg bg-muted/30 border border-border hover:bg-muted/50 transition-colors">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                              <Users className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-foreground">{candidate.anonymousId}</p>
+                              <p className="text-xs text-muted-foreground">{candidate.qualification}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {candidate.skills.map((skill) => (
+                              <span key={skill} className="px-1.5 py-0.5 rounded bg-primary/10 text-primary text-xs">
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                          
+                          <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {candidate.location}
+                            </span>
+                            {candidate.experienceYears > 0 && (
+                              <span>{candidate.experienceYears} yr{candidate.experienceYears > 1 ? "s" : ""} exp</span>
+                            )}
+                            <span className={cn(
+                              "flex items-center gap-1",
+                              candidate.availability === "immediate" && "text-success",
+                              candidate.availability === "2-weeks" && "text-primary",
+                              candidate.availability === "1-month" && "text-warning",
+                              candidate.availability === "3-months" && "text-muted-foreground"
+                            )}>
+                              <Clock className="h-3 w-3" />
+                              {candidate.availability === "immediate" ? "Immediate" : 
+                               candidate.availability === "2-weeks" ? "2 weeks" :
+                               candidate.availability === "1-month" ? "1 month" : "3 months"}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-col gap-1.5">
+                          <Button variant="outline" size="sm" className="h-7 text-xs" asChild>
+                            <a href={candidate.cvUrl} target="_blank" rel="noopener noreferrer">
+                              <FileText className="h-3 w-3 mr-1" />
+                              CV
+                            </a>
+                          </Button>
+                          {candidate.portfolioUrl && (
+                            <Button variant="outline" size="sm" className="h-7 text-xs" asChild>
+                              <a href={candidate.portfolioUrl} target="_blank" rel="noopener noreferrer">
+                                <Link2 className="h-3 w-3 mr-1" />
+                                Portfolio
+                              </a>
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+
+              {/* Footer */}
+              <div className="flex justify-between pt-4 border-t border-border mt-2">
+                <Button variant="outline" onClick={() => setSelectedTalentSource(null)}>
+                  Close
+                </Button>
+                <Button>
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Visit {selectedTalentSource.type === "jobboard" ? "Job Board" : "Institution"}
+                </Button>
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>
