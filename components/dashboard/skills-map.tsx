@@ -22,6 +22,18 @@ const CircleMarker = dynamic(
   () => import("react-leaflet").then((mod) => mod.CircleMarker),
   { ssr: false }
 );
+const Tooltip = dynamic(
+  () => import("react-leaflet").then((mod) => mod.Tooltip),
+  { ssr: false }
+);
+const TileLayer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.TileLayer),
+  { ssr: false }
+);
+const CircleMarker = dynamic(
+  () => import("react-leaflet").then((mod) => mod.CircleMarker),
+  { ssr: false }
+);
 const Popup = dynamic(
   () => import("react-leaflet").then((mod) => mod.Popup),
   { ssr: false }
@@ -142,14 +154,32 @@ type Workplace = typeof workplaces[0];
 type Skill = Workplace["skills"][0];
 type TalentSource = typeof talentSources[0];
 
-function MapContent({ 
-  workplaces, 
-  talentSources, 
-  selectedWorkplace, 
-  showTalentSources, 
+// Map click handler component
+function MapClickHandler({ onMapClick, isPlacingMode }: { onMapClick: (lat: number, lng: number) => void; isPlacingMode: boolean }) {
+  // We need to import useMapEvents inside the component since it's a hook
+  const { useMapEvents } = require("react-leaflet");
+  
+  useMapEvents({
+    click: (e: { latlng: { lat: number; lng: number } }) => {
+      if (isPlacingMode) {
+        onMapClick(e.latlng.lat, e.latlng.lng);
+      }
+    },
+  });
+  
+  return null;
+}
+
+function MapContent({
+  workplaces,
+  talentSources,
+  selectedWorkplace,
+  showTalentSources,
   highlightedSkill,
   onWorkplaceClick,
-  relevantTalentSources
+  relevantTalentSources,
+  onMapClick,
+  isPlacingMode,
 }: {
   workplaces: Workplace[];
   talentSources: TalentSource[];
@@ -158,9 +188,12 @@ function MapContent({
   highlightedSkill: string | null;
   onWorkplaceClick: (workplace: Workplace) => void;
   relevantTalentSources: TalentSource[];
+  onMapClick: (lat: number, lng: number) => void;
+  isPlacingMode: boolean;
 }) {
   return (
     <>
+      <MapClickHandler onMapClick={onMapClick} isPlacingMode={isPlacingMode} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -231,25 +264,6 @@ function MapContent({
   );
 }
 
-// UK Cities for location selection
-const ukLocations = [
-  { name: "London", coordinates: [51.51, -0.12] as [number, number] },
-  { name: "Manchester", coordinates: [53.48, -2.24] as [number, number] },
-  { name: "Birmingham", coordinates: [52.48, -1.89] as [number, number] },
-  { name: "Glasgow", coordinates: [55.86, -4.25] as [number, number] },
-  { name: "Edinburgh", coordinates: [55.95, -3.19] as [number, number] },
-  { name: "Liverpool", coordinates: [53.41, -2.98] as [number, number] },
-  { name: "Bristol", coordinates: [51.45, -2.59] as [number, number] },
-  { name: "Leeds", coordinates: [53.8, -1.55] as [number, number] },
-  { name: "Sheffield", coordinates: [53.38, -1.47] as [number, number] },
-  { name: "Newcastle", coordinates: [54.97, -1.61] as [number, number] },
-  { name: "Cardiff", coordinates: [51.48, -3.18] as [number, number] },
-  { name: "Belfast", coordinates: [54.6, -5.93] as [number, number] },
-  { name: "Aberdeen", coordinates: [57.15, -2.1] as [number, number] },
-  { name: "Nottingham", coordinates: [52.95, -1.15] as [number, number] },
-  { name: "Southampton", coordinates: [50.9, -1.4] as [number, number] },
-];
-
 export function SkillsMap() {
   const [selectedWorkplace, setSelectedWorkplace] = useState<Workplace | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
@@ -258,11 +272,12 @@ export function SkillsMap() {
   const [isClient, setIsClient] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [allWorkplaces, setAllWorkplaces] = useState(workplaces);
+  const [isPlacingMode, setIsPlacingMode] = useState(false);
+  const [placedCoordinates, setPlacedCoordinates] = useState<[number, number] | null>(null);
   
   // New workplace form state
   const [newWorkplaceName, setNewWorkplaceName] = useState("");
   const [newWorkplaceType, setNewWorkplaceType] = useState<"workplace" | "project">("project");
-  const [newWorkplaceLocation, setNewWorkplaceLocation] = useState(ukLocations[0]);
   const [selectedSkills, setSelectedSkills] = useState<{ name: string; need: number }[]>([]);
   const [assignedWorkers, setAssignedWorkers] = useState<string[]>([]);
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -304,10 +319,32 @@ export function SkillsMap() {
   };
 
   const handleWorkplaceClick = (workplace: Workplace) => {
+    if (isPlacingMode) return; // Ignore workplace clicks while placing
     setSelectedWorkplace(workplace);
     setSelectedSkill(null);
     setShowTalentSources(false);
     setHighlightedSkill(null);
+  };
+
+  const handleMapClick = (lat: number, lng: number) => {
+    if (isPlacingMode) {
+      setPlacedCoordinates([lat, lng]);
+      setIsPlacingMode(false);
+      setShowAddModal(true);
+    }
+  };
+
+  const handleStartPlacing = () => {
+    setIsPlacingMode(true);
+    setSelectedWorkplace(null);
+    setSelectedSkill(null);
+    setShowTalentSources(false);
+    setHighlightedSkill(null);
+  };
+
+  const handleCancelPlacing = () => {
+    setIsPlacingMode(false);
+    setPlacedCoordinates(null);
   };
 
   const relevantTalentSources = highlightedSkill 
@@ -335,21 +372,22 @@ export function SkillsMap() {
   const resetModal = () => {
     setNewWorkplaceName("");
     setNewWorkplaceType("project");
-    setNewWorkplaceLocation(ukLocations[0]);
     setSelectedSkills([]);
     setAssignedWorkers([]);
     setStep(1);
     setSkillSearch("");
     setWorkerSearch("");
+    setPlacedCoordinates(null);
   };
 
-  // Add new workplace
+// Add new workplace
   const handleCreateWorkplace = () => {
-    const newWorkplace: Workplace = {
-      id: `wp${allWorkplaces.length + 1}`,
-      name: newWorkplaceName,
-      type: newWorkplaceType,
-      coordinates: newWorkplaceLocation.coordinates,
+  if (!placedCoordinates) return;
+  const newWorkplace: Workplace = {
+  id: `wp${allWorkplaces.length + 1}`,
+  name: newWorkplaceName,
+  type: newWorkplaceType,
+  coordinates: placedCoordinates,
       staffAssigned: assignedWorkers.length,
       staffRequired: selectedSkills.reduce((sum, s) => sum + s.need, 0),
       skills: selectedSkills.map(s => ({
@@ -385,7 +423,7 @@ export function SkillsMap() {
               minZoom={5}
               maxZoom={12}
               scrollWheelZoom={true}
-              className="h-full w-full"
+              className={cn("h-full w-full", isPlacingMode && "cursor-crosshair")}
               style={{ background: "#1a1a2e" }}
             >
               <MapContent
@@ -396,8 +434,26 @@ export function SkillsMap() {
                 highlightedSkill={highlightedSkill}
                 onWorkplaceClick={handleWorkplaceClick}
                 relevantTalentSources={relevantTalentSources}
+                onMapClick={handleMapClick}
+                isPlacingMode={isPlacingMode}
               />
             </MapContainer>
+            
+            {/* Placing Mode Instruction Banner */}
+            {isPlacingMode && (
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-6 py-3 rounded-lg shadow-lg z-[1001] flex items-center gap-3">
+                <MapPin className="h-5 w-5 animate-bounce" />
+                <span className="font-medium">Click on the map to place your workplace</span>
+                <Button 
+                  size="sm" 
+                  variant="secondary" 
+                  className="ml-2"
+                  onClick={handleCancelPlacing}
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
           </>
         ) : (
           <div className="h-full w-full flex items-center justify-center bg-muted/20">
@@ -443,14 +499,26 @@ export function SkillsMap() {
             </div>
           </>
         )}
-        <Button 
-          size="sm" 
-          className="w-full mt-3"
-          onClick={() => setShowAddModal(true)}
-        >
-          <Plus className="h-3 w-3 mr-1" />
-          Add Workplace
-        </Button>
+        {isPlacingMode ? (
+          <Button 
+            size="sm" 
+            variant="outline"
+            className="w-full mt-3"
+            onClick={handleCancelPlacing}
+          >
+            <X className="h-3 w-3 mr-1" />
+            Cancel
+          </Button>
+        ) : (
+          <Button 
+            size="sm" 
+            className="w-full mt-3"
+            onClick={handleStartPlacing}
+          >
+            <Plus className="h-3 w-3 mr-1" />
+            Add Workplace
+          </Button>
+        )}
       </div>
 
       {/* Workplace/Project Panel */}
@@ -792,23 +860,18 @@ export function SkillsMap() {
                     </Button>
                   </div>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Location</label>
-                  <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
-                    {ukLocations.map((loc) => (
-                      <Button
-                        key={loc.name}
-                        variant={newWorkplaceLocation.name === loc.name ? "default" : "outline"}
-                        size="sm"
-                        className="justify-start"
-                        onClick={() => setNewWorkplaceLocation(loc)}
-                      >
-                        <MapPin className="h-3 w-3 mr-1" />
-                        {loc.name}
-                      </Button>
-                    ))}
+                {placedCoordinates && (
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Location</label>
+                    <div className="p-3 rounded-lg bg-primary/10 border border-primary/20 flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-primary" />
+                      <span className="text-sm">
+                        {placedCoordinates[0].toFixed(4)}°N, {Math.abs(placedCoordinates[1]).toFixed(4)}°{placedCoordinates[1] < 0 ? "W" : "E"}
+                      </span>
+                      <span className="text-xs text-muted-foreground ml-auto">Placed on map</span>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
