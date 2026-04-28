@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { X, Users, MapPin, GraduationCap, Building2, Briefcase, ChevronRight, Search, ExternalLink, Plus, Check, Minus, FileText, Link2, Clock } from "lucide-react";
+import { X, Users, MapPin, GraduationCap, Building2, Briefcase, ChevronRight, Search, ExternalLink, Plus, Check, Minus, FileText, Link2, Clock, Phone, Mail, Globe, BookOpen } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -136,20 +136,20 @@ const workplaces = [
 
 // Talent source locations (universities, colleges, job boards)
 const talentSources = [
-  { id: "ts1", name: "University of Strathclyde", type: "university", coordinates: [55.86, -4.25] as [number, number], skills: ["Hydrogen Fundamentals", "Electrolyser(s)", "FCEV"], graduates: 120 },
-  { id: "ts2", name: "Imperial College London", type: "university", coordinates: [51.5, -0.17] as [number, number], skills: ["Electrical Theory (Fundamentals)", "Energy Storage", "Solar Power"], graduates: 250 },
-  { id: "ts3", name: "University of Manchester", type: "university", coordinates: [53.47, -2.23] as [number, number], skills: ["Wind Energy", "Marine", "Electrical Theory (Fundamentals)"], graduates: 180 },
-  { id: "ts4", name: "Cardiff University", type: "university", coordinates: [51.49, -3.18] as [number, number], skills: ["Solar Power", "Energy Storage", "Hazardous Voltages"], graduates: 95 },
-  { id: "ts5", name: "University of Edinburgh", type: "university", coordinates: [55.94, -3.19] as [number, number], skills: ["Hydrogen Fundamentals", "R&D Interactive Laboratories", "Hydrogen Production"], graduates: 140 },
-  { id: "ts6", name: "Newcastle College", type: "college", coordinates: [54.97, -1.61] as [number, number], skills: ["Plant & Machinery", "Hazardous Voltages", "Storage Tanks"], graduates: 65 },
-  { id: "ts7", name: "Birmingham City University", type: "university", coordinates: [52.48, -1.89] as [number, number], skills: ["Electrical Theory (Fundamentals)", "Intermediate Electrical Theory", "Solar Power"], graduates: 110 },
-  { id: "ts8", name: "Liverpool John Moores", type: "university", coordinates: [53.41, -2.98] as [number, number], skills: ["Marine", "Wind Energy", "Storage Tanks"], graduates: 85 },
-  { id: "ts9", name: "Leeds College of Building", type: "college", coordinates: [53.8, -1.55] as [number, number], skills: ["Hazardous Voltages", "Plant & Machinery", "Electrical Theory (Fundamentals)"], graduates: 45 },
-  { id: "ts10", name: "Indeed - Glasgow", type: "jobboard", coordinates: [55.86, -4.25] as [number, number], skills: ["Hydrogen Fundamentals", "Electrolyser(s)", "Plant & Machinery"], candidates: 340 },
-  { id: "ts11", name: "LinkedIn Jobs - Bristol", type: "jobboard", coordinates: [51.45, -2.59] as [number, number], skills: ["Solar Power", "Energy Storage", "Wind Energy"], candidates: 520 },
-  { id: "ts12", name: "Reed - Sheffield", type: "jobboard", coordinates: [53.38, -1.47] as [number, number], skills: ["Hazardous Voltages", "Electrical Theory (Fundamentals)", "Plant & Machinery"], candidates: 280 },
-  { id: "ts13", name: "Totaljobs - Nottingham", type: "jobboard", coordinates: [52.95, -1.15] as [number, number], skills: ["Energy Storage", "Solar Power", "Wind Energy"], candidates: 195 },
-  { id: "ts14", name: "Queen's University Belfast", type: "university", coordinates: [54.58, -5.94] as [number, number], skills: ["Marine", "Wind Energy", "Hydrogen Fundamentals"], graduates: 75 },
+  { id: "ts1", name: "University of Strathclyde", type: "university", coordinates: [55.86, -4.25] as [number, number], skills: ["Hydrogen Fundamentals", "Electrolyser(s)", "FCEV"], graduates: 120, address: "16 Richmond Street, Glasgow G1 1XQ", phone: "+44 141 548 2814", email: "engineering@strath.ac.uk", website: "www.strath.ac.uk", courses: ["MSc Hydrogen & Fuel Cell Technology", "BEng Energy Engineering", "MSc Advanced Energy Systems"] },
+  { id: "ts2", name: "Imperial College London", type: "university", coordinates: [51.5, -0.17] as [number, number], skills: ["Electrical Theory (Fundamentals)", "Energy Storage", "Solar Power"], graduates: 250, address: "South Kensington Campus, London SW7 2AZ", phone: "+44 20 7589 5111", email: "electrical.engineering@imperial.ac.uk", website: "www.imperial.ac.uk", courses: ["MEng Electrical & Electronic Engineering", "MSc Sustainable Energy Futures", "MSc Energy Technology"] },
+  { id: "ts3", name: "University of Manchester", type: "university", coordinates: [53.47, -2.23] as [number, number], skills: ["Wind Energy", "Marine", "Electrical Theory (Fundamentals)"], graduates: 180, address: "Oxford Road, Manchester M13 9PL", phone: "+44 161 306 6000", email: "eng.admissions@manchester.ac.uk", website: "www.manchester.ac.uk", courses: ["BEng Renewable Energy Engineering", "MSc Electrical Power Systems", "MEng Mechanical Engineering"] },
+  { id: "ts4", name: "Cardiff University", type: "university", coordinates: [51.49, -3.18] as [number, number], skills: ["Solar Power", "Energy Storage", "Hazardous Voltages"], graduates: 95, address: "The Parade, Cardiff CF24 3AA", phone: "+44 29 2087 4000", email: "engineering@cardiff.ac.uk", website: "www.cardiff.ac.uk", courses: ["BEng Electrical & Electronic Engineering", "MSc Sustainable Energy & Environment", "MSc Electrical Energy Systems"] },
+  { id: "ts5", name: "University of Edinburgh", type: "university", coordinates: [55.94, -3.19] as [number, number], skills: ["Hydrogen Fundamentals", "R&D Interactive Laboratories", "Hydrogen Production"], graduates: 140, address: "Old College, South Bridge, Edinburgh EH8 9YL", phone: "+44 131 650 1000", email: "eng.school@ed.ac.uk", website: "www.ed.ac.uk", courses: ["MSc Sustainable Energy Systems", "BEng Chemical Engineering", "PhD Hydrogen Energy Research"] },
+  { id: "ts6", name: "Newcastle College", type: "college", coordinates: [54.97, -1.61] as [number, number], skills: ["Plant & Machinery", "Hazardous Voltages", "Storage Tanks"], graduates: 65, address: "Rye Hill Campus, Scotswood Road, Newcastle NE4 7SA", phone: "+44 191 200 4000", email: "enquiries@ncl-coll.ac.uk", website: "www.ncl-coll.ac.uk", courses: ["HNC Electrical & Electronic Engineering", "Level 3 Diploma in Engineering", "HND Mechanical Engineering"] },
+  { id: "ts7", name: "Birmingham City University", type: "university", coordinates: [52.48, -1.89] as [number, number], skills: ["Electrical Theory (Fundamentals)", "Intermediate Electrical Theory", "Solar Power"], graduates: 110, address: "Millennium Point, Curzon Street, Birmingham B4 7XG", phone: "+44 121 331 5000", email: "engineering@bcu.ac.uk", website: "www.bcu.ac.uk", courses: ["BEng Electrical Engineering", "MSc Renewable Energy Engineering", "BEng Electronic Engineering"] },
+  { id: "ts8", name: "Liverpool John Moores", type: "university", coordinates: [53.41, -2.98] as [number, number], skills: ["Marine", "Wind Energy", "Storage Tanks"], graduates: 85, address: "Byrom Street, Liverpool L3 3AF", phone: "+44 151 231 2121", email: "courses@ljmu.ac.uk", website: "www.ljmu.ac.uk", courses: ["BEng Maritime Engineering", "MSc Offshore & Ocean Technology", "BEng Mechanical & Marine Engineering"] },
+  { id: "ts9", name: "Leeds College of Building", type: "college", coordinates: [53.8, -1.55] as [number, number], skills: ["Hazardous Voltages", "Plant & Machinery", "Electrical Theory (Fundamentals)"], graduates: 45, address: "North Street, Leeds LS2 7QT", phone: "+44 113 222 6000", email: "info@lcb.ac.uk", website: "www.lcb.ac.uk", courses: ["Level 3 Electrical Installation", "HNC Building Services Engineering", "Level 2 Diploma in Electrical Installations"] },
+  { id: "ts10", name: "Indeed - Glasgow", type: "jobboard", coordinates: [55.86, -4.25] as [number, number], skills: ["Hydrogen Fundamentals", "Electrolyser(s)", "Plant & Machinery"], candidates: 340, address: "Online Platform", phone: "", email: "support@indeed.com", website: "www.indeed.co.uk" },
+  { id: "ts11", name: "LinkedIn Jobs - Bristol", type: "jobboard", coordinates: [51.45, -2.59] as [number, number], skills: ["Solar Power", "Energy Storage", "Wind Energy"], candidates: 520, address: "Online Platform", phone: "", email: "support@linkedin.com", website: "www.linkedin.com/jobs" },
+  { id: "ts12", name: "Reed - Sheffield", type: "jobboard", coordinates: [53.38, -1.47] as [number, number], skills: ["Hazardous Voltages", "Electrical Theory (Fundamentals)", "Plant & Machinery"], candidates: 280, address: "Online Platform", phone: "", email: "support@reed.co.uk", website: "www.reed.co.uk" },
+  { id: "ts13", name: "Totaljobs - Nottingham", type: "jobboard", coordinates: [52.95, -1.15] as [number, number], skills: ["Energy Storage", "Solar Power", "Wind Energy"], candidates: 195, address: "Online Platform", phone: "", email: "support@totaljobs.com", website: "www.totaljobs.com" },
+  { id: "ts14", name: "Queen's University Belfast", type: "university", coordinates: [54.58, -5.94] as [number, number], skills: ["Marine", "Wind Energy", "Hydrogen Fundamentals"], graduates: 75, address: "University Road, Belfast BT7 1NN", phone: "+44 28 9024 5133", email: "engineering@qub.ac.uk", website: "www.qub.ac.uk", courses: ["MEng Mechanical Engineering", "MSc Advanced Marine Engineering", "BEng Aerospace Engineering"] },
 ];
 
 type Workplace = typeof workplaces[0];
@@ -1094,11 +1094,33 @@ export function SkillsMap() {
               {/* Institution Info */}
               <div className="p-4 rounded-lg bg-muted/50 border border-border space-y-3">
                 <div className="flex items-start justify-between">
-                  <div>
+                  <div className="space-y-2 flex-1">
                     <p className="text-sm font-medium text-foreground capitalize">{selectedTalentSource.type}</p>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                      <MapPin className="h-3 w-3" />
-                      {selectedTalentSource.coordinates[0].toFixed(2)}°N, {Math.abs(selectedTalentSource.coordinates[1]).toFixed(2)}°W
+                    
+                    {/* Address */}
+                    <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                      <MapPin className="h-3 w-3 shrink-0" />
+                      {(selectedTalentSource as typeof selectedTalentSource & { address?: string }).address || "Address not available"}
+                    </p>
+                    
+                    {/* Contact Details */}
+                    {(selectedTalentSource as typeof selectedTalentSource & { phone?: string }).phone && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <Phone className="h-3 w-3 shrink-0" />
+                        {(selectedTalentSource as typeof selectedTalentSource & { phone?: string }).phone}
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                      <Mail className="h-3 w-3 shrink-0" />
+                      <a href={`mailto:${(selectedTalentSource as typeof selectedTalentSource & { email?: string }).email}`} className="text-primary hover:underline">
+                        {(selectedTalentSource as typeof selectedTalentSource & { email?: string }).email}
+                      </a>
+                    </p>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                      <Globe className="h-3 w-3 shrink-0" />
+                      <a href={`https://${(selectedTalentSource as typeof selectedTalentSource & { website?: string }).website}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        {(selectedTalentSource as typeof selectedTalentSource & { website?: string }).website}
+                      </a>
                     </p>
                   </div>
                   <div className="text-right">
@@ -1113,16 +1135,23 @@ export function SkillsMap() {
                     </p>
                   </div>
                 </div>
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1.5">Relevant skills offered:</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {selectedTalentSource.skills.map((skill) => (
-                      <span key={skill} className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-xs">
-                        {skill}
-                      </span>
-                    ))}
+                
+                {/* Courses (for universities/colleges only) */}
+                {selectedTalentSource.type !== "jobboard" && (selectedTalentSource as typeof selectedTalentSource & { courses?: string[] }).courses && (
+                  <div className="pt-2 border-t border-border">
+                    <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5">
+                      <BookOpen className="h-3 w-3" />
+                      Relevant courses:
+                    </p>
+                    <div className="space-y-1">
+                      {(selectedTalentSource as typeof selectedTalentSource & { courses?: string[] }).courses?.map((course) => (
+                        <p key={course} className="text-xs text-foreground pl-4 py-1 border-l-2 border-primary/30">
+                          {course}
+                        </p>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Search */}
