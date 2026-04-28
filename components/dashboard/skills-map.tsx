@@ -6,8 +6,6 @@ import { X, Users, MapPin, GraduationCap, Building2, Briefcase, ChevronRight, Se
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { userProfiles, modules } from "@/lib/mock-data";
 
