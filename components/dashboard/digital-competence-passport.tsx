@@ -34,6 +34,8 @@ import {
   Plus,
   
   AlertCircle,
+  FolderKanban,
+  Hammer,
 } from "lucide-react";
 import { 
   type UserProfile, 
@@ -43,6 +45,8 @@ import {
   type EvidenceStatus,
   type AuditEventType,
   type Training,
+  type ProjectRequirement,
+  type ProjectHistoryEntry,
 } from "@/lib/mock-data";
 import { anonymizeEmail, getAvatarInitials, cn } from "@/lib/utils";
 
@@ -246,6 +250,8 @@ export function DigitalCompetencePassport({ user, onBack }: DigitalCompetencePas
   const eligibleProjects = user.eligibleProjects || [];
   const ineligibleProjects = user.ineligibleProjects || [];
   const currentProjects = user.currentProjects || [];
+  const projectRequirements = user.projectRequirements || [];
+  const projectHistory = user.projectHistory || [];
 
   // Calculate stats
   const totalEvidence = evidence.length;
@@ -451,6 +457,8 @@ export function DigitalCompetencePassport({ user, onBack }: DigitalCompetencePas
           pendingEvidence={pendingEvidence}
           rejectedEvidence={rejectedEvidence}
           auditTrail={auditTrail}
+          projectRequirements={projectRequirements}
+          projectHistory={projectHistory}
         />
       )}
       {activeTab === "training" && (
@@ -484,6 +492,8 @@ function OverviewTab({
   pendingEvidence,
   rejectedEvidence,
   auditTrail,
+  projectRequirements,
+  projectHistory,
 }: {
   user: UserProfile;
   displayEmail: string;
@@ -501,6 +511,8 @@ function OverviewTab({
   pendingEvidence: number;
   rejectedEvidence: number;
   auditTrail: AuditEvent[];
+  projectRequirements: ProjectRequirement[];
+  projectHistory: ProjectHistoryEntry[];
 }) {
   const [trainingFilter, setTrainingFilter] = useState<"all" | "overdue" | "due_soon" | "in_progress">("all");
   
@@ -673,6 +685,127 @@ function OverviewTab({
                 </div>
               </div>
             </>
+          )}
+        </div>
+
+        {/* Project Requirement Checklist */}
+        <div className="p-4 rounded-xl bg-muted/30 border border-border">
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className="font-medium text-sm">Project Requirement Checklist</h3>
+            <Info className="h-3.5 w-3.5 text-muted-foreground" />
+          </div>
+          
+          {projectRequirements.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">No project requirements defined</p>
+          ) : (
+            <>
+              <div className="space-y-1">
+                <div className="grid grid-cols-[1fr_auto_auto] gap-2 text-[10px] text-muted-foreground pb-1 border-b border-border">
+                  <span>Requirement</span>
+                  <span>Category</span>
+                  <span className="text-right">Status</span>
+                </div>
+                {projectRequirements.map((req) => (
+                  <div key={req.id} className="grid grid-cols-[1fr_auto_auto] gap-2 items-center py-1.5 text-sm">
+                    <div className="flex items-center gap-2">
+                      {req.met ? (
+                        <CheckCircle className="h-4 w-4 text-success shrink-0" />
+                      ) : (
+                        <XCircle className="h-4 w-4 text-destructive shrink-0" />
+                      )}
+                      <span className="truncate">{req.name}</span>
+                    </div>
+                    <Badge variant="outline" className="text-[10px] capitalize">{req.category}</Badge>
+                    {req.met ? (
+                      req.expiryDate ? (
+                        <span className={cn(
+                          "text-[10px] text-right",
+                          new Date(req.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) 
+                            ? "text-warning" 
+                            : "text-muted-foreground"
+                        )}>
+                          Exp: {new Date(req.expiryDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "2-digit" })}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-success text-right">Complete</span>
+                      )
+                    ) : (
+                      <span className="text-[10px] text-destructive text-right">Required</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-4 pt-3 border-t border-border">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Project Readiness</span>
+                  <span className="text-sm text-muted-foreground">
+                    {projectRequirements.filter(r => r.met).length} / {projectRequirements.length} ({Math.round((projectRequirements.filter(r => r.met).length / projectRequirements.length) * 100)}%)
+                  </span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className={cn(
+                      "h-full rounded-full transition-all",
+                      projectRequirements.filter(r => r.met).length === projectRequirements.length ? "bg-success" : "bg-primary"
+                    )}
+                    style={{ width: `${(projectRequirements.filter(r => r.met).length / projectRequirements.length) * 100}%` }}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Project History */}
+        <div className="p-4 rounded-xl bg-muted/30 border border-border">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <h3 className="font-medium text-sm">Project History</h3>
+              <FolderKanban className="h-3.5 w-3.5 text-muted-foreground" />
+            </div>
+            <button className="text-xs text-primary hover:underline">View all</button>
+          </div>
+          
+          {projectHistory.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">No project history</p>
+          ) : (
+            <div className="space-y-3">
+              {projectHistory.slice(0, 4).map((project) => (
+                <div key={project.id} className="flex items-start gap-3 py-2 border-b border-border last:border-0">
+                  <div className={cn(
+                    "mt-0.5 p-1.5 rounded-lg shrink-0",
+                    project.status === "active" ? "bg-success/10" : "bg-muted"
+                  )}>
+                    <Hammer className={cn(
+                      "h-3.5 w-3.5",
+                      project.status === "active" ? "text-success" : "text-muted-foreground"
+                    )} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="font-medium text-sm truncate">{project.projectName}</span>
+                      {project.status === "active" && (
+                        <Badge className="text-[9px] px-1.5 py-0 bg-success/10 text-success border-success/20">Active</Badge>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{project.role}</p>
+                    <div className="flex items-center gap-2 mt-1 text-[10px] text-muted-foreground">
+                      <span>{new Date(project.startDate).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}</span>
+                      <span>-</span>
+                      <span>{project.endDate ? new Date(project.endDate).toLocaleDateString("en-GB", { month: "short", year: "numeric" }) : "Present"}</span>
+                      {project.location && (
+                        <>
+                          <span className="mx-1">|</span>
+                          <MapPin className="h-3 w-3" />
+                          <span>{project.location}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
 

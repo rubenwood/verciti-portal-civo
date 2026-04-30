@@ -602,6 +602,26 @@ export interface RoleRequirement {
   expiryDate?: string;
 }
 
+// Project requirement for Digital Competence Passport
+export interface ProjectRequirement {
+  id: string;
+  name: string;
+  category: "safety" | "technical" | "compliance" | "site-specific";
+  met: boolean;
+  expiryDate?: string;
+}
+
+// Project history for Digital Competence Passport
+export interface ProjectHistoryEntry {
+  id: string;
+  projectName: string;
+  role: string;
+  startDate: string;
+  endDate?: string;
+  status: "active" | "completed" | "transferred";
+  location?: string;
+}
+
 // Deployment context for Digital Competence Passport
 export interface DeploymentContext {
   currentProject?: string;
@@ -683,6 +703,8 @@ export interface UserProfile {
   eligibleProjects?: string[];
   ineligibleProjects?: { name: string; missingRequirements: string[] }[];
   currentProjects?: string[];
+  projectRequirements?: ProjectRequirement[];
+  projectHistory?: ProjectHistoryEntry[];
 }
 
 export const userProfiles: UserProfile[] = [
@@ -772,6 +794,19 @@ training: [
       { name: "Offshore Wind Installation", missingRequirements: ["Offshore Survival Training", "Working at Heights (Advanced)"] },
     ],
     currentProjects: ["Aberdeen Hydrogen Facility"],
+    projectRequirements: [
+      { id: "pr1", name: "Hydrogen Safety Level 2", category: "safety", met: true, expiryDate: "2025-06-15" },
+      { id: "pr2", name: "Site Induction - Aberdeen", category: "site-specific", met: true, expiryDate: "2025-02-15" },
+      { id: "pr3", name: "Electrolyser Operations", category: "technical", met: false },
+      { id: "pr4", name: "ATEX Certification", category: "compliance", met: true, expiryDate: "2025-08-20" },
+      { id: "pr5", name: "Emergency Response Training", category: "safety", met: true, expiryDate: "2025-04-10" },
+      { id: "pr6", name: "Permit to Work", category: "compliance", met: false },
+    ],
+    projectHistory: [
+      { id: "ph1", projectName: "Aberdeen Hydrogen Facility", role: "Electrical Engineer", startDate: "2024-01-16", status: "active", location: "Aberdeen, UK" },
+      { id: "ph2", projectName: "Manchester Solar Farm", role: "Junior Engineer", startDate: "2023-06-01", endDate: "2024-01-15", status: "completed", location: "Manchester, UK" },
+      { id: "ph3", projectName: "Leeds Wind Turbine Installation", role: "Trainee Engineer", startDate: "2023-01-15", endDate: "2023-05-31", status: "completed", location: "Leeds, UK" },
+    ],
   },
   {
     id: "up2",
