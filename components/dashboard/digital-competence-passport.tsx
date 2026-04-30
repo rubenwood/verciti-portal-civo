@@ -517,9 +517,11 @@ function OverviewTab({
     inProgressTraining;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+    <div className="space-y-4">
+      {/* Top Row: 4 column grid for main cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Column 1: Role & Deployment Context + Contact */}
-      <div className="space-y-4">
+      <div className="space-y-4 lg:col-span-1">
         {/* Role & Deployment Context */}
         <div className="p-4 rounded-xl bg-muted/30 border border-border">
           <div className="flex items-center gap-2 mb-4">
@@ -879,30 +881,7 @@ function OverviewTab({
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="p-4 rounded-xl bg-muted/30 border border-border">
-          <h3 className="font-medium text-sm mb-3">Quick Actions</h3>
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" size="sm" className="text-xs h-8 justify-start gap-1.5">
-              <BookOpen className="h-3.5 w-3.5" />
-              Assign Training
-            </Button>
-            <Button variant="outline" size="sm" className="text-xs h-8 justify-start gap-1.5">
-              <Upload className="h-3.5 w-3.5" />
-              Upload Evidence
-            </Button>
-            <Button variant="outline" size="sm" className="text-xs h-8 justify-start gap-1.5">
-              <FileCheck className="h-3.5 w-3.5" />
-              Verify Document
-            </Button>
-            <Button variant="outline" size="sm" className="text-xs h-8 justify-start gap-1.5">
-              <Download className="h-3.5 w-3.5" />
-              Generate Report
-            </Button>
-          </div>
-        </div>
-
-        {/* Notes */}
+{/* Notes */}
         <div className="p-4 rounded-xl bg-muted/30 border border-border">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-medium text-sm">Notes</h3>
@@ -915,9 +894,10 @@ function OverviewTab({
           <p className="text-[10px] text-muted-foreground mt-2">- Sarah Ahmed, {new Date().toLocaleDateString("en-GB")}</p>
         </div>
       </div>
+      </div>
 
       {/* Audit Trail (Full Width at Bottom) */}
-      <div className="col-span-full p-4 rounded-xl bg-muted/30 border border-border">
+      <div className="p-4 rounded-xl bg-muted/30 border border-border">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-medium text-sm">Audit Trail (Recent Activity)</h3>
           <button className="text-xs text-primary hover:underline flex items-center gap-1">
