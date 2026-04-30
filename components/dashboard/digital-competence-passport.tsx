@@ -32,7 +32,7 @@ import {
   Info,
   MoreHorizontal,
   Plus,
-  TrendingUp,
+  
   AlertCircle,
 } from "lucide-react";
 import { 
@@ -108,9 +108,7 @@ function CircularProgress({ value, size = 80, strokeWidth = 8, color = "primary"
           className={colorClasses[color]}
         />
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <CheckCircle className="h-6 w-6 text-success" />
-      </div>
+      
     </div>
   );
 }
@@ -338,10 +336,6 @@ export function DigitalCompetencePassport({ user, onBack }: DigitalCompetencePas
               <CircularProgress value={readinessScore} size={50} strokeWidth={5} color="success" />
               <div>
                 <p className="text-2xl font-bold">{readinessScore}%</p>
-                <p className="text-[10px] text-success flex items-center gap-0.5">
-                  <TrendingUp className="h-3 w-3" />
-                  +6pp vs last 30 days
-                </p>
               </div>
             </div>
           </div>
@@ -603,6 +597,19 @@ function OverviewTab({
               <span>12 Union Street, Aberdeen, AB10 1XX, UK</span>
             </div>
           </div>
+        </div>
+
+        {/* Notes */}
+        <div className="p-4 rounded-xl bg-muted/30 border border-border">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-medium text-sm">Notes</h3>
+            <button className="text-xs text-primary hover:underline">Add note</button>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Engineer on {deploymentContext.currentProject || "project"} since {new Date(deploymentContext.startDate).toLocaleDateString("en-GB")}. 
+            Requires Electrical Safety Fundamentals completion to achieve full deployability.
+          </p>
+          <p className="text-[10px] text-muted-foreground mt-2">- Sarah Ahmed, {new Date().toLocaleDateString("en-GB")}</p>
         </div>
       </div>
 
@@ -881,60 +888,7 @@ function OverviewTab({
           </div>
         </div>
 
-{/* Notes */}
-        <div className="p-4 rounded-xl bg-muted/30 border border-border">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium text-sm">Notes</h3>
-            <button className="text-xs text-primary hover:underline">Add note</button>
-          </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Engineer on {deploymentContext.currentProject || "project"} since {new Date(deploymentContext.startDate).toLocaleDateString("en-GB")}. 
-            Requires Electrical Safety Fundamentals completion to achieve full deployability.
-          </p>
-          <p className="text-[10px] text-muted-foreground mt-2">- Sarah Ahmed, {new Date().toLocaleDateString("en-GB")}</p>
-        </div>
-      </div>
-      </div>
-
-      {/* Audit Trail (Full Width at Bottom) */}
-      <div className="p-4 rounded-xl bg-muted/30 border border-border">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-medium text-sm">Audit Trail (Recent Activity)</h3>
-          <button className="text-xs text-primary hover:underline flex items-center gap-1">
-            View full audit trail
-            <ExternalLink className="h-3 w-3" />
-          </button>
-        </div>
-        
-        <div className="overflow-x-auto">
-          <div className="flex gap-4 min-w-max pb-2">
-            {[...auditTrail].reverse().slice(0, 5).map((event) => (
-              <div key={event.id} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-background border border-border min-w-[280px]">
-                <div className="text-xs text-muted-foreground whitespace-nowrap">
-                  <p>{new Date(event.timestamp).toLocaleDateString("en-GB")}</p>
-                  <p>{new Date(event.timestamp).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</p>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <AuditEventIcon type={event.type} />
-                  <Badge variant="outline" className="text-[10px]">{getAuditEventLabel(event.type)}</Badge>
-                </div>
-                <p className="text-xs truncate flex-1">{event.metadata?.trainingId || event.description.split(":")[1]?.trim() || ""}</p>
-                {event.performedBy && (
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] text-muted-foreground">by</span>
-                    <div className="h-5 w-5 rounded-full bg-[#4a5d23] flex items-center justify-center text-[8px] font-medium text-white">
-                      {event.performedBy.split(" ").map(n => n[0]).join("")}
-                    </div>
-                    <span className="text-xs">{event.performedBy}</span>
-                  </div>
-                )}
-              </div>
-            ))}
-            {auditTrail.length === 0 && (
-              <p className="text-sm text-muted-foreground">No activity recorded</p>
-            )}
-          </div>
-        </div>
+</div>
       </div>
     </div>
   );
