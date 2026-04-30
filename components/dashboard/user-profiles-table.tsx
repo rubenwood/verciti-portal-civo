@@ -1523,45 +1523,44 @@ function UserProfileModal({ user, open, onOpenChange }: {
   );
 }
 
-function UserProfileRow({ user }: { user: UserProfile }) {
-  const [modalOpen, setModalOpen] = useState(false);
+function UserProfileRow({ user, onViewUser }: { user: UserProfile; onViewUser?: (user: UserProfile) => void }) {
   const displayEmail = anonymizeEmail(user.email);
 
   return (
-    <>
-      <TableRow 
-        className="border-border hover:bg-muted/20 cursor-pointer"
-        onClick={() => setModalOpen(true)}
-      >
-        <TableCell>
-          <div className="flex items-center gap-3">
-            <UserAvatar email={user.email} />
-            <span className="text-foreground">{displayEmail}</span>
-          </div>
-        </TableCell>
-        <TableCell className="text-muted-foreground">
-          {user.department}
-        </TableCell>
-        <TableCell className="text-muted-foreground">
-          {user.jobTitle}
-        </TableCell>
-        <TableCell>
-          <StatusBadge status={user.status} />
-        </TableCell>
-        <TableCell className="text-muted-foreground text-right">
-          {user.lastLogin 
-            ? new Date(user.lastLogin).toLocaleDateString("en-GB")
-            : "-"
-          }
-        </TableCell>
-      </TableRow>
-
-      <UserProfileModal user={user} open={modalOpen} onOpenChange={setModalOpen} />
-    </>
+    <TableRow 
+      className="border-border hover:bg-muted/20 cursor-pointer"
+      onClick={() => onViewUser?.(user)}
+    >
+      <TableCell>
+        <div className="flex items-center gap-3">
+          <UserAvatar email={user.email} />
+          <span className="text-foreground">{displayEmail}</span>
+        </div>
+      </TableCell>
+      <TableCell className="text-muted-foreground">
+        {user.department}
+      </TableCell>
+      <TableCell className="text-muted-foreground">
+        {user.jobTitle}
+      </TableCell>
+      <TableCell>
+        <StatusBadge status={user.status} />
+      </TableCell>
+      <TableCell className="text-muted-foreground text-right">
+        {user.lastLogin 
+          ? new Date(user.lastLogin).toLocaleDateString("en-GB")
+          : "-"
+        }
+      </TableCell>
+    </TableRow>
   );
 }
 
-export function UserProfilesTable() {
+interface UserProfilesTableProps {
+  onViewUser?: (user: UserProfile) => void;
+}
+
+export function UserProfilesTable({ onViewUser }: UserProfilesTableProps) {
   return (
     <div className="rounded-lg border border-border bg-card">
       <div className="p-4">
@@ -1582,7 +1581,7 @@ export function UserProfilesTable() {
         </TableHeader>
         <TableBody>
           {userProfiles.map((user) => (
-            <UserProfileRow key={user.id} user={user} />
+            <UserProfileRow key={user.id} user={user} onViewUser={onViewUser} />
           ))}
         </TableBody>
       </Table>
