@@ -45,6 +45,28 @@ import {
   AlertTriangle,
   Link2,
   LinkIcon,
+  User,
+  Phone,
+  Mail,
+  Briefcase,
+  Building2,
+  Shield,
+  Heart,
+  FolderCheck,
+  FolderX,
+  FolderOpen,
+  History,
+  Image,
+  Video,
+  Globe,
+  CheckCircle2,
+  XCircle as XCircleIcon,
+  ClockIcon,
+  UserCheck,
+  FileCheck,
+  FilePlus,
+  Lock,
+  Activity,
 } from "lucide-react";
 import { 
   userProfiles, 
@@ -56,6 +78,11 @@ import {
   type UserStatus, 
   type Certification,
   type Training,
+  type Evidence,
+  type AuditEvent,
+  type RoleRequirement,
+  type EvidenceStatus,
+  type AuditEventType,
 } from "@/lib/mock-data";
 import { anonymizeEmail, getAvatarInitials, cn } from "@/lib/utils";
 
@@ -772,6 +799,57 @@ function AssignTrainingWizard({
   );
 }
 
+// Evidence status badge component
+function EvidenceStatusBadge({ status }: { status: EvidenceStatus }) {
+  const config = {
+    verified: {
+      label: "Verified",
+      icon: CheckCircle2,
+      className: "bg-success/10 text-success border-success/20",
+    },
+    pending: {
+      label: "Pending",
+      icon: Clock,
+      className: "bg-warning/10 text-warning border-warning/20",
+    },
+    failed: {
+      label: "Failed",
+      icon: XCircle,
+      className: "bg-destructive/10 text-destructive border-destructive/20",
+    },
+  };
+
+  const { label, icon: Icon, className } = config[status];
+
+  return (
+    <Badge variant="outline" className={cn("gap-1", className)}>
+      <Icon className="h-3 w-3" />
+      {label}
+    </Badge>
+  );
+}
+
+// Audit event icon component
+function AuditEventIcon({ type }: { type: AuditEventType }) {
+  const icons: Record<AuditEventType, React.ElementType> = {
+    profile_created: User,
+    profile_updated: UserCheck,
+    training_assigned: BookOpen,
+    training_completed: Award,
+    training_started: Activity,
+    document_uploaded: FilePlus,
+    evidence_verified: FileCheck,
+    evidence_failed: XCircle,
+    qualification_added: FileText,
+    certification_earned: Award,
+    login: User,
+    password_changed: Lock,
+  };
+
+  const Icon = icons[type] || Activity;
+  return <Icon className="h-4 w-4" />;
+}
+
 function UserProfileModal({ user, open, onOpenChange }: { 
   user: UserProfile; 
   open: boolean; 
@@ -783,22 +861,76 @@ function UserProfileModal({ user, open, onOpenChange }: {
   const [selectedExternalTraining, setSelectedExternalTraining] = useState<Training | null>(null);
 
   const handleDeleteTraining = () => {
-    // Here you would delete the training from the user's training list
     setSelectedExternalTraining(null);
   };
+
+  // Default values for optional DCP fields
+  const anonymizedUsername = user.anonymizedUsername || `Worker-${user.id.toUpperCase()}`;
+  const employeeId = user.employeeId || `EMP-${user.id.slice(-3).toUpperCase()}`;
+  const evidence = user.evidence || [];
+  const auditTrail = user.auditTrail || [];
+  const roleRequirements = user.roleRequirements || [];
+  const deploymentContext = user.deploymentContext || {
+    department: user.department,
+    reportingTo: "Not Assigned",
+    startDate: user.dateSignedUp || user.dateInvited,
+    medicalClearance: "pending" as const,
+    securityClearance: "none" as const,
+    fitnessForWork: "pending" as const,
+  };
+  const eligibleProjects = user.eligibleProjects || [];
+  const ineligibleProjects = user.ineligibleProjects || [];
+  const currentProjects = user.currentProjects || [];
+
+  // Calculate role requirement stats
+  const requiredRequirements = roleRequirements.filter(r => r.required);
+  const metRequirements = requiredRequirements.filter(r => r.met);
+  const requirementProgress = requiredRequirements.length > 0 
+    ? Math.round((metRequirements.length / requiredRequirements.length) * 100) 
+    : 100;
+
+  // Group role requirements by category
+  const groupedRequirements = roleRequirements.reduce((acc, req) => {
+    if (!acc[req.category]) acc[req.category] = [];
+    acc[req.category].push(req);
+    return acc;
+  }, {} as Record<string, RoleRequirement[]>);
 
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto bg-card border-border">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-border">
           <DialogHeader>
-            <div className="flex items-center gap-4">
+            <div className="flex items-start gap-4">
               <UserAvatar email={user.email} size="lg" />
-              <div>
-                <DialogTitle className="text-xl">{displayEmail}</DialogTitle>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <DialogTitle className="text-xl">{anonymizedUsername}</DialogTitle>
+                  <Badge variant="outline" className="text-xs">{employeeId}</Badge>
+                </div>
                 <DialogDescription className="text-muted-foreground">
-                  {user.jobTitle} - {user.department}
+                  Digital Competence Passport
                 </DialogDescription>
+                <div className="flex flex-wrap items-center gap-3 mt-3">
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Briefcase className="h-4 w-4" />
+                    <span>{user.jobTitle}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Building2 className="h-4 w-4" />
+                    <span>{user.department}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Mail className="h-4 w-4" />
+                    <span>{displayEmail}</span>
+                  </div>
+                  {user.phoneNumber && (
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <Phone className="h-4 w-4" />
+                      <span>{user.phoneNumber}</span>
+                    </div>
+                  )}
+                </div>
                 <div className="mt-2">
                   <StatusBadge status={user.status} />
                 </div>
@@ -806,11 +938,255 @@ function UserProfileModal({ user, open, onOpenChange }: {
             </div>
           </DialogHeader>
 
-          <Tabs defaultValue="training" className="mt-4">
-            <TabsList className="grid w-full grid-cols-2 bg-muted/50">
+          <Tabs defaultValue="overview" className="mt-4">
+            <TabsList className="grid w-full grid-cols-4 bg-muted/50">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="training">Training</TabsTrigger>
-              <TabsTrigger value="qualifications">Qualifications</TabsTrigger>
+              <TabsTrigger value="evidence">Evidence</TabsTrigger>
+              <TabsTrigger value="audit">Audit Trail</TabsTrigger>
             </TabsList>
+
+            {/* OVERVIEW TAB */}
+            <TabsContent value="overview" className="mt-4 space-y-6">
+              {/* Projects Section */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Current Projects */}
+                <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+                  <div className="flex items-center gap-2 mb-3">
+                    <FolderOpen className="h-5 w-5 text-primary" />
+                    <h4 className="font-medium text-sm">Current Projects</h4>
+                  </div>
+                  {currentProjects.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No active projects</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {currentProjects.map((project, idx) => (
+                        <div key={idx} className="text-sm text-foreground flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                          {project}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Eligible Projects */}
+                <div className="p-4 rounded-lg bg-success/5 border border-success/20">
+                  <div className="flex items-center gap-2 mb-3">
+                    <FolderCheck className="h-5 w-5 text-success" />
+                    <h4 className="font-medium text-sm">Eligible Projects</h4>
+                  </div>
+                  {eligibleProjects.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No eligible projects</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {eligibleProjects.map((project, idx) => (
+                        <div key={idx} className="text-sm text-foreground flex items-center gap-2">
+                          <CheckCircle className="h-3 w-3 text-success" />
+                          {project}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Ineligible Projects */}
+                <div className="p-4 rounded-lg bg-destructive/5 border border-destructive/20">
+                  <div className="flex items-center gap-2 mb-3">
+                    <FolderX className="h-5 w-5 text-destructive" />
+                    <h4 className="font-medium text-sm">Ineligible Projects</h4>
+                  </div>
+                  {ineligibleProjects.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">Eligible for all projects</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {ineligibleProjects.map((project, idx) => (
+                        <div key={idx}>
+                          <p className="text-sm text-foreground font-medium">{project.name}</p>
+                          <p className="text-xs text-destructive mt-0.5">
+                            Missing: {project.missingRequirements.join(", ")}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Role & Deployment Context */}
+              <div className="p-4 rounded-lg bg-muted/30 border border-border">
+                <div className="flex items-center gap-2 mb-4">
+                  <Shield className="h-5 w-5 text-primary" />
+                  <h4 className="font-medium">Role & Deployment Context</h4>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Department</p>
+                    <p className="text-sm font-medium">{deploymentContext.department}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Reporting To</p>
+                    <p className="text-sm font-medium">{deploymentContext.reportingTo}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Current Project</p>
+                    <p className="text-sm font-medium">{deploymentContext.currentProject || "Not Assigned"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Start Date</p>
+                    <p className="text-sm font-medium">{new Date(deploymentContext.startDate).toLocaleDateString("en-GB")}</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-border">
+                  {/* Medical Clearance */}
+                  <div className="flex items-center gap-3">
+                    <div className={cn(
+                      "p-2 rounded-lg",
+                      deploymentContext.medicalClearance === "valid" ? "bg-success/10" :
+                      deploymentContext.medicalClearance === "expired" ? "bg-destructive/10" :
+                      deploymentContext.medicalClearance === "pending" ? "bg-warning/10" : "bg-muted"
+                    )}>
+                      <Heart className={cn(
+                        "h-5 w-5",
+                        deploymentContext.medicalClearance === "valid" ? "text-success" :
+                        deploymentContext.medicalClearance === "expired" ? "text-destructive" :
+                        deploymentContext.medicalClearance === "pending" ? "text-warning" : "text-muted-foreground"
+                      )} />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Medical Clearance</p>
+                      <p className="text-sm font-medium capitalize">{deploymentContext.medicalClearance.replace("_", " ")}</p>
+                      {deploymentContext.medicalClearanceExpiry && (
+                        <p className="text-xs text-muted-foreground">
+                          Expires: {new Date(deploymentContext.medicalClearanceExpiry).toLocaleDateString("en-GB")}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Security Clearance */}
+                  <div className="flex items-center gap-3">
+                    <div className={cn(
+                      "p-2 rounded-lg",
+                      deploymentContext.securityClearance === "high" ? "bg-primary/10" :
+                      deploymentContext.securityClearance === "enhanced" ? "bg-info/10" :
+                      deploymentContext.securityClearance === "basic" ? "bg-success/10" : "bg-muted"
+                    )}>
+                      <Lock className={cn(
+                        "h-5 w-5",
+                        deploymentContext.securityClearance === "high" ? "text-primary" :
+                        deploymentContext.securityClearance === "enhanced" ? "text-info" :
+                        deploymentContext.securityClearance === "basic" ? "text-success" : "text-muted-foreground"
+                      )} />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Security Clearance</p>
+                      <p className="text-sm font-medium capitalize">{deploymentContext.securityClearance}</p>
+                      {deploymentContext.securityClearanceExpiry && (
+                        <p className="text-xs text-muted-foreground">
+                          Expires: {new Date(deploymentContext.securityClearanceExpiry).toLocaleDateString("en-GB")}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Fitness for Work */}
+                  <div className="flex items-center gap-3">
+                    <div className={cn(
+                      "p-2 rounded-lg",
+                      deploymentContext.fitnessForWork === "fit" ? "bg-success/10" :
+                      deploymentContext.fitnessForWork === "restricted" ? "bg-warning/10" :
+                      deploymentContext.fitnessForWork === "unfit" ? "bg-destructive/10" : "bg-muted"
+                    )}>
+                      <Activity className={cn(
+                        "h-5 w-5",
+                        deploymentContext.fitnessForWork === "fit" ? "text-success" :
+                        deploymentContext.fitnessForWork === "restricted" ? "text-warning" :
+                        deploymentContext.fitnessForWork === "unfit" ? "text-destructive" : "text-muted-foreground"
+                      )} />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Fitness for Work</p>
+                      <p className="text-sm font-medium capitalize">{deploymentContext.fitnessForWork}</p>
+                      {deploymentContext.fitnessNotes && (
+                        <p className="text-xs text-muted-foreground">{deploymentContext.fitnessNotes}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Role Requirement Checklist */}
+              <div className="p-4 rounded-lg bg-muted/30 border border-border">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <FileCheck className="h-5 w-5 text-primary" />
+                    <h4 className="font-medium">Role Requirement Checklist</h4>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">
+                      {metRequirements.length}/{requiredRequirements.length} required
+                    </span>
+                    <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className={cn(
+                          "h-full rounded-full transition-all",
+                          requirementProgress === 100 ? "bg-success" : 
+                          requirementProgress >= 70 ? "bg-primary" : "bg-warning"
+                        )}
+                        style={{ width: `${requirementProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {Object.keys(groupedRequirements).length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">No role requirements defined</p>
+                ) : (
+                  <div className="space-y-4">
+                    {Object.entries(groupedRequirements).map(([category, requirements]) => (
+                      <div key={category}>
+                        <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">{category}</p>
+                        <div className="space-y-2">
+                          {requirements.map((req) => (
+                            <div 
+                              key={req.id} 
+                              className={cn(
+                                "flex items-center justify-between p-2 rounded-lg border",
+                                req.met ? "bg-success/5 border-success/20" : "bg-destructive/5 border-destructive/20"
+                              )}
+                            >
+                              <div className="flex items-center gap-2">
+                                {req.met ? (
+                                  <CheckCircle className="h-4 w-4 text-success" />
+                                ) : (
+                                  <XCircle className="h-4 w-4 text-destructive" />
+                                )}
+                                <span className="text-sm">{req.name}</span>
+                                {req.required && (
+                                  <Badge variant="outline" className="text-[10px] px-1.5 py-0">Required</Badge>
+                                )}
+                              </div>
+                              {req.expiryDate && (
+                                <span className={cn(
+                                  "text-xs",
+                                  new Date(req.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) 
+                                    ? "text-warning" 
+                                    : "text-muted-foreground"
+                                )}>
+                                  Expires: {new Date(req.expiryDate).toLocaleDateString("en-GB")}
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
 
             <TabsContent value="training" className="mt-4 space-y-4">
               <div className="flex items-center justify-between">
@@ -945,48 +1321,174 @@ function UserProfileModal({ user, open, onOpenChange }: {
               )}
             </TabsContent>
 
-            <TabsContent value="qualifications" className="mt-4 space-y-3">
-              <div className="flex justify-end mb-2">
+            {/* EVIDENCE TAB */}
+            <TabsContent value="evidence" className="mt-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Supporting evidence for training and qualifications
+                </p>
                 <Button variant="outline" size="sm" className="gap-2">
                   <Upload className="h-4 w-4" />
-                  Upload Document
+                  Upload Evidence
                 </Button>
               </div>
-              {user.qualifications.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">No qualifications recorded yet</p>
+
+              {evidence.length === 0 ? (
+                <div className="text-center py-8">
+                  <FileText className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
+                  <p className="text-sm text-muted-foreground">No evidence uploaded</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Upload certificates, documents, or other evidence to support competency claims
+                  </p>
+                </div>
               ) : (
-                user.qualifications.map((qual) => (
-                  <div key={qual.id} className="p-4 rounded-lg bg-muted/20 border border-border">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium">{qual.name}</span>
+                <div className="space-y-3">
+                  {evidence.map((ev) => (
+                    <div 
+                      key={ev.id}
+                      className={cn(
+                        "p-4 rounded-lg border",
+                        ev.status === "verified" ? "bg-success/5 border-success/20" :
+                        ev.status === "failed" ? "bg-destructive/5 border-destructive/20" :
+                        "bg-warning/5 border-warning/20"
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-3 flex-1">
+                          <div className={cn(
+                            "p-2 rounded-lg",
+                            ev.status === "verified" ? "bg-success/10" :
+                            ev.status === "failed" ? "bg-destructive/10" : "bg-warning/10"
+                          )}>
+                            {ev.type === "certificate" && <Award className="h-5 w-5" />}
+                            {ev.type === "document" && <FileText className="h-5 w-5" />}
+                            {ev.type === "photo" && <Image className="h-5 w-5" />}
+                            {ev.type === "video" && <Video className="h-5 w-5" />}
+                            {ev.type === "link" && <Globe className="h-5 w-5" />}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-medium text-sm">{ev.title}</span>
+                              <EvidenceStatusBadge status={ev.status} />
+                            </div>
+                            <p className="text-xs text-muted-foreground">{ev.description}</p>
+                            {ev.relatedTraining && (
+                              <p className="text-xs text-primary mt-1">
+                                Related: {ev.relatedTraining}
+                              </p>
+                            )}
+                            <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                              <span>Uploaded: {new Date(ev.uploadedDate).toLocaleDateString("en-GB")}</span>
+                              {ev.verifiedDate && (
+                                <span>
+                                  {ev.status === "verified" ? "Verified" : "Reviewed"}: {new Date(ev.verifiedDate).toLocaleDateString("en-GB")}
+                                  {ev.verifiedBy && ` by ${ev.verifiedBy}`}
+                                </span>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {qual.issuingBody} - {new Date(qual.dateObtained).toLocaleDateString("en-GB")}
-                        </p>
-                        {qual.expiryDate && (
-                          <p className="text-xs text-muted-foreground">
-                            Expires: {new Date(qual.expiryDate).toLocaleDateString("en-GB")}
-                          </p>
+                        {ev.fileName && (
+                          <Button variant="ghost" size="sm" className="gap-1 text-info hover:text-info shrink-0">
+                            <Download className="h-4 w-4" />
+                            <span className="text-xs max-w-[100px] truncate">{ev.fileName}</span>
+                          </Button>
                         )}
                       </div>
-                      {qual.documentName && (
-                        <Button variant="ghost" size="sm" className="gap-1 text-info hover:text-info">
-                          <Download className="h-4 w-4" />
-                          <span className="text-xs">{qual.documentName}</span>
-                        </Button>
-                      )}
-                      {!qual.documentName && (
-                        <Button variant="outline" size="sm" className="gap-1">
-                          <Upload className="h-4 w-4" />
-                          Upload
-                        </Button>
-                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Evidence Summary */}
+              {evidence.length > 0 && (
+                <div className="p-4 rounded-lg bg-muted/30 border border-border">
+                  <h4 className="font-medium text-sm mb-3">Evidence Summary</h4>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center p-3 rounded-lg bg-success/10">
+                      <p className="text-2xl font-bold text-success">{evidence.filter(e => e.status === "verified").length}</p>
+                      <p className="text-xs text-muted-foreground">Verified</p>
+                    </div>
+                    <div className="text-center p-3 rounded-lg bg-warning/10">
+                      <p className="text-2xl font-bold text-warning">{evidence.filter(e => e.status === "pending").length}</p>
+                      <p className="text-xs text-muted-foreground">Pending</p>
+                    </div>
+                    <div className="text-center p-3 rounded-lg bg-destructive/10">
+                      <p className="text-2xl font-bold text-destructive">{evidence.filter(e => e.status === "failed").length}</p>
+                      <p className="text-xs text-muted-foreground">Failed</p>
                     </div>
                   </div>
-                ))
+                </div>
+              )}
+            </TabsContent>
+
+            {/* AUDIT TRAIL TAB */}
+            <TabsContent value="audit" className="mt-4 space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <History className="h-5 w-5 text-primary" />
+                <h4 className="font-medium">Activity History</h4>
+                <span className="text-xs text-muted-foreground">({auditTrail.length} events)</span>
+              </div>
+
+              {auditTrail.length === 0 ? (
+                <div className="text-center py-8">
+                  <History className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
+                  <p className="text-sm text-muted-foreground">No activity recorded</p>
+                </div>
+              ) : (
+                <div className="relative">
+                  {/* Timeline line */}
+                  <div className="absolute left-5 top-0 bottom-0 w-px bg-border" />
+                  
+                  <div className="space-y-4">
+                    {[...auditTrail].reverse().map((event, idx) => (
+                      <div key={event.id} className="relative flex gap-4 pl-2">
+                        {/* Timeline dot */}
+                        <div className={cn(
+                          "relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2 bg-card",
+                          event.type.includes("completed") || event.type.includes("verified") || event.type.includes("earned")
+                            ? "border-success text-success" :
+                          event.type.includes("failed") || event.type.includes("overdue")
+                            ? "border-destructive text-destructive" :
+                          event.type.includes("assigned") || event.type.includes("started")
+                            ? "border-info text-info" :
+                          "border-muted-foreground text-muted-foreground"
+                        )}>
+                          <AuditEventIcon type={event.type} />
+                        </div>
+                        
+                        <div className="flex-1 pb-4">
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <p className="text-sm font-medium">{event.description}</p>
+                              {event.performedBy && (
+                                <p className="text-xs text-muted-foreground">By: {event.performedBy}</p>
+                              )}
+                              {event.metadata && (
+                                <div className="mt-1 flex flex-wrap gap-1">
+                                  {Object.entries(event.metadata).map(([key, value]) => (
+                                    <Badge key={key} variant="outline" className="text-[10px]">
+                                      {key}: {value}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            <span className="text-xs text-muted-foreground whitespace-nowrap">
+                              {new Date(event.timestamp).toLocaleDateString("en-GB", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit"
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
             </TabsContent>
           </Tabs>

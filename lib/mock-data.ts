@@ -549,7 +549,72 @@ export interface Certification {
   expiryDate: string; // Typically 1 year after earnedDate
   score: number; // 100 means they achieved 100% to earn this
   verificationCode: string; // Unique code for QR verification
-  }
+}
+
+// Evidence types for Digital Competence Passport
+export type EvidenceStatus = "verified" | "pending" | "failed";
+
+export interface Evidence {
+  id: string;
+  title: string;
+  type: "certificate" | "document" | "photo" | "video" | "link";
+  description: string;
+  uploadedDate: string;
+  status: EvidenceStatus;
+  verifiedDate?: string;
+  verifiedBy?: string;
+  relatedTraining?: string;
+  fileUrl?: string;
+  fileName?: string;
+}
+
+// Audit trail event types
+export type AuditEventType = 
+  | "profile_created" 
+  | "profile_updated" 
+  | "training_assigned" 
+  | "training_completed" 
+  | "training_started"
+  | "document_uploaded" 
+  | "evidence_verified" 
+  | "evidence_failed"
+  | "qualification_added"
+  | "certification_earned"
+  | "login"
+  | "password_changed";
+
+export interface AuditEvent {
+  id: string;
+  type: AuditEventType;
+  timestamp: string;
+  description: string;
+  metadata?: Record<string, string>;
+  performedBy?: string;
+}
+
+// Role requirements for Digital Competence Passport
+export interface RoleRequirement {
+  id: string;
+  category: string;
+  name: string;
+  required: boolean;
+  met: boolean;
+  expiryDate?: string;
+}
+
+// Deployment context for Digital Competence Passport
+export interface DeploymentContext {
+  currentProject?: string;
+  department: string;
+  reportingTo: string;
+  startDate: string;
+  medicalClearance: "valid" | "expired" | "pending" | "not_required";
+  medicalClearanceExpiry?: string;
+  securityClearance: "none" | "basic" | "enhanced" | "high";
+  securityClearanceExpiry?: string;
+  fitnessForWork: "fit" | "restricted" | "unfit" | "pending";
+  fitnessNotes?: string;
+}
 
 // Training types
 export type TrainingStatus = "not_started" | "in_progress" | "completed" | "overdue";
@@ -607,6 +672,17 @@ export interface UserProfile {
   linkedProviders: LinkedProvider[];
   completedActivities: string[];
   totalTimeSpent: string;
+  // Digital Competence Passport fields (optional - with defaults)
+  anonymizedUsername?: string;
+  phoneNumber?: string;
+  employeeId?: string;
+  evidence?: Evidence[];
+  auditTrail?: AuditEvent[];
+  roleRequirements?: RoleRequirement[];
+  deploymentContext?: DeploymentContext;
+  eligibleProjects?: string[];
+  ineligibleProjects?: { name: string; missingRequirements: string[] }[];
+  currentProjects?: string[];
 }
 
 export const userProfiles: UserProfile[] = [
@@ -645,10 +721,57 @@ training: [
       { id: "t2", title: "Energy Storage", isVerciti: true, courseName: "Hydrogen", moduleName: "Energy Storage", deadline: "2024-04-30", assignedDate: "2024-03-05", status: "not_started" },
       { id: "t3", title: "Electrical Safety Fundamentals", isVerciti: false, provider: "udemy", description: "Complete the electrical safety course on Udemy covering basic principles and regulations.", deadline: "2024-03-20", assignedDate: "2024-02-15", status: "overdue" },
     ],
+    anonymizedUsername: "Worker-7X4K9",
+    phoneNumber: "+44 7XXX XXX XXX",
+    employeeId: "EMP-001",
     linkedProviders: [
       { providerId: "udemy", linkedAt: "2024-02-10", accountEmail: "ruben.wood1@gmail.com" },
     ],
     completedActivities: ["Hydrogen Fundamentals", "Solar Power", "Energy Storage"],
+    evidence: [
+      { id: "ev1", title: "Hydrogen Safety Training Certificate", type: "certificate", description: "Completed advanced hydrogen safety training at Aberdeen facility", uploadedDate: "2024-03-01", status: "verified", verifiedDate: "2024-03-02", verifiedBy: "Training Admin", relatedTraining: "Hydrogen Fundamentals", fileName: "hydrogen_safety_cert.pdf" },
+      { id: "ev2", title: "Site Induction Completion", type: "document", description: "Site-specific induction for North Sea Platform", uploadedDate: "2024-02-15", status: "verified", verifiedDate: "2024-02-16", verifiedBy: "Site Manager", fileName: "induction_form.pdf" },
+      { id: "ev3", title: "Practical Assessment Video", type: "video", description: "Video evidence of electrolyser maintenance procedure", uploadedDate: "2024-03-10", status: "pending", relatedTraining: "Electrolyser(s)", fileName: "practical_assessment.mp4" },
+      { id: "ev4", title: "External Course Certificate", type: "certificate", description: "Udemy course completion for electrical safety", uploadedDate: "2024-02-20", status: "failed", verifiedDate: "2024-02-22", verifiedBy: "Training Admin", relatedTraining: "Electrical Safety Fundamentals", fileName: "udemy_cert.pdf" },
+    ],
+    auditTrail: [
+      { id: "at1", type: "profile_created", timestamp: "2024-01-15T09:00:00", description: "Profile created and invitation sent" },
+      { id: "at2", type: "login", timestamp: "2024-01-16T10:30:00", description: "First login to platform" },
+      { id: "at3", type: "training_assigned", timestamp: "2024-02-01T14:00:00", description: "Training assigned: Wind Energy", metadata: { trainingId: "t1", assignedBy: "Training Admin" } },
+      { id: "at4", type: "training_assigned", timestamp: "2024-02-15T09:30:00", description: "Training assigned: Electrical Safety Fundamentals", metadata: { trainingId: "t3", assignedBy: "Training Admin" } },
+      { id: "at5", type: "document_uploaded", timestamp: "2024-02-15T11:00:00", description: "Document uploaded: Site Induction Completion" },
+      { id: "at6", type: "evidence_verified", timestamp: "2024-02-16T09:00:00", description: "Evidence verified: Site Induction Completion", performedBy: "Site Manager" },
+      { id: "at7", type: "training_completed", timestamp: "2024-03-10T15:30:00", description: "Training completed: Hydrogen Fundamentals", metadata: { score: "100%" } },
+      { id: "at8", type: "certification_earned", timestamp: "2024-03-10T15:31:00", description: "Certification earned: Hydrogen Fundamentals" },
+      { id: "at9", type: "document_uploaded", timestamp: "2024-03-10T16:00:00", description: "Document uploaded: Practical Assessment Video" },
+      { id: "at10", type: "login", timestamp: "2024-03-15T14:32:00", description: "User logged in" },
+    ],
+    roleRequirements: [
+      { id: "rr1", category: "Safety", name: "Hazardous Voltages Training", required: true, met: false },
+      { id: "rr2", category: "Safety", name: "Working at Heights", required: true, met: true, expiryDate: "2025-06-15" },
+      { id: "rr3", category: "Technical", name: "Hydrogen Fundamentals", required: true, met: true, expiryDate: "2025-03-10" },
+      { id: "rr4", category: "Technical", name: "Electrolyser Operations", required: true, met: false },
+      { id: "rr5", category: "Technical", name: "Electrical Theory (Fundamentals)", required: true, met: true, expiryDate: "2025-01-20" },
+      { id: "rr6", category: "Compliance", name: "GDPR Training", required: true, met: true, expiryDate: "2025-02-01" },
+      { id: "rr7", category: "Compliance", name: "Manual Handling", required: false, met: true, expiryDate: "2024-12-01" },
+    ],
+    deploymentContext: {
+      currentProject: "Aberdeen Hydrogen Facility",
+      department: "Engineering",
+      reportingTo: "James Morrison",
+      startDate: "2024-01-16",
+      medicalClearance: "valid",
+      medicalClearanceExpiry: "2025-01-16",
+      securityClearance: "enhanced",
+      securityClearanceExpiry: "2026-01-16",
+      fitnessForWork: "fit",
+    },
+    eligibleProjects: ["Manchester Solar Farm", "Edinburgh Wind Project"],
+    ineligibleProjects: [
+      { name: "London Underground Power Upgrade", missingRequirements: ["Hazardous Voltages Training", "Confined Spaces"] },
+      { name: "Offshore Wind Installation", missingRequirements: ["Offshore Survival Training", "Working at Heights (Advanced)"] },
+    ],
+    currentProjects: ["Aberdeen Hydrogen Facility"],
   },
   {
     id: "up2",
@@ -689,6 +812,30 @@ training: [
       { providerId: "linkedin", linkedAt: "2024-02-05", accountEmail: "chris.shay@linkedin.com" },
     ],
     completedActivities: ["Wind Energy", "Energy Storage", "Solar Power", "Hydrogen Fundamentals"],
+    anonymizedUsername: "Worker-3M8P2",
+    employeeId: "EMP-002",
+    evidence: [],
+    auditTrail: [
+      { id: "at20", type: "profile_created", timestamp: "2024-01-10T09:00:00", description: "Profile created and invitation sent" },
+      { id: "at21", type: "login", timestamp: "2024-01-12T08:00:00", description: "First login to platform" },
+    ],
+    roleRequirements: [
+      { id: "rr10", category: "Technical", name: "Wind Energy", required: true, met: true, expiryDate: "2025-03-15" },
+      { id: "rr11", category: "Technical", name: "Energy Storage", required: true, met: true, expiryDate: "2025-02-28" },
+    ],
+    deploymentContext: {
+      currentProject: "Manchester Wind Farm",
+      department: "Operations",
+      reportingTo: "Sarah Collins",
+      startDate: "2024-01-12",
+      medicalClearance: "valid",
+      medicalClearanceExpiry: "2025-01-12",
+      securityClearance: "basic",
+      fitnessForWork: "fit",
+    },
+    eligibleProjects: ["Aberdeen Hydrogen Facility", "Edinburgh Wind Project", "London Solar Installation"],
+    ineligibleProjects: [],
+    currentProjects: ["Manchester Wind Farm"],
   },
   {
     id: "up3",
@@ -720,6 +867,24 @@ training: [
     ],
     linkedProviders: [],
     completedActivities: [],
+    anonymizedUsername: "Worker-9K2L5",
+    employeeId: "EMP-003",
+    evidence: [],
+    auditTrail: [
+      { id: "at30", type: "profile_created", timestamp: "2024-02-01T09:00:00", description: "Profile created and invitation sent" },
+    ],
+    roleRequirements: [],
+    deploymentContext: {
+      department: "Training",
+      reportingTo: "HR Department",
+      startDate: "2024-02-05",
+      medicalClearance: "pending",
+      securityClearance: "none",
+      fitnessForWork: "pending",
+    },
+    eligibleProjects: [],
+    ineligibleProjects: [{ name: "All Projects", missingRequirements: ["Training Not Started"] }],
+    currentProjects: [],
   },
   {
     id: "up4",
@@ -737,6 +902,24 @@ training: [
     training: [],
     linkedProviders: [],
     completedActivities: [],
+    anonymizedUsername: "Worker-4R7T8",
+    employeeId: "EMP-004",
+    evidence: [],
+    auditTrail: [
+      { id: "at40", type: "profile_created", timestamp: "2024-03-01T09:00:00", description: "Profile created and invitation sent" },
+    ],
+    roleRequirements: [],
+    deploymentContext: {
+      department: "Maintenance",
+      reportingTo: "Maintenance Lead",
+      startDate: "2024-03-01",
+      medicalClearance: "not_required",
+      securityClearance: "none",
+      fitnessForWork: "pending",
+    },
+    eligibleProjects: [],
+    ineligibleProjects: [],
+    currentProjects: [],
   },
   {
     id: "up5",
@@ -766,6 +949,23 @@ training: [
       { providerId: "pluralsight", linkedAt: "2024-03-01", accountEmail: "test1@verciti.com" },
     ],
     completedActivities: ["Introduction to Power Electronics", "Introduction to Motors and Drives"],
+    anonymizedUsername: "Worker-5H3N7",
+    employeeId: "EMP-005",
+    evidence: [],
+    auditTrail: [],
+    roleRequirements: [],
+    deploymentContext: {
+      department: "Engineering",
+      reportingTo: "Engineering Lead",
+      startDate: "2024-01-21",
+      medicalClearance: "valid",
+      medicalClearanceExpiry: "2025-01-21",
+      securityClearance: "basic",
+      fitnessForWork: "fit",
+    },
+    eligibleProjects: ["Edinburgh Wind Project"],
+    ineligibleProjects: [],
+    currentProjects: [],
   },
   {
     id: "up6",
@@ -802,18 +1002,35 @@ training: [
       { providerId: "linkedin", linkedAt: "2024-02-28", accountEmail: "test2@verciti.com" },
     ],
     completedActivities: ["Hazardous Voltages", "Introduction to Motors and Drives"],
+    anonymizedUsername: "Worker-6W9Q1",
+    employeeId: "EMP-006",
+    evidence: [],
+    auditTrail: [],
+    roleRequirements: [],
+    deploymentContext: {
+      department: "Safety",
+      reportingTo: "Safety Manager",
+      startDate: "2024-01-26",
+      medicalClearance: "valid",
+      medicalClearanceExpiry: "2025-01-26",
+      securityClearance: "enhanced",
+      fitnessForWork: "fit",
+    },
+    eligibleProjects: ["All Projects"],
+    ineligibleProjects: [],
+    currentProjects: ["Aberdeen Hydrogen Facility"],
   },
   // Additional Engineers
-  { id: "up7", email: "emma.chen@example.com", fullName: "Emma Chen", department: "Engineering", jobTitle: "Senior Engineer", status: "active", dateInvited: "2024-01-05", dateSignedUp: "2024-01-06", lastLogin: "2024-03-18T09:00:00", overallProgress: 92, totalTimeSpent: "68h 15m", skills: [{ id: "sk11", name: "Hydrogen Systems", level: "expert", progress: 100 }], qualifications: [{ id: "qual9", name: "CEng", issuingBody: "Engineering Council", dateObtained: "2022-05-15" }], certifications: [{ id: "c6", activityName: "Hydrogen Fundamentals", earnedDate: "2025-04-30", expiryDate: "2026-04-30", score: 100, verificationCode: "GS-HF-UP7-2024021F" }], training: [], linkedProviders: [], completedActivities: ["Hydrogen Fundamentals", "Electrolyser(s)", "Hydrogen Production"] },
-  { id: "up8", email: "james.wilson@example.com", fullName: "James Wilson", department: "Engineering", jobTitle: "Senior Engineer", status: "active", dateInvited: "2024-01-08", dateSignedUp: "2024-01-09", lastLogin: "2024-03-17T14:30:00", overallProgress: 78, totalTimeSpent: "52h 30m", skills: [{ id: "sk12", name: "Energy Storage", level: "advanced", progress: 85 }], qualifications: [], certifications: [{ id: "c7", activityName: "Energy Storage", earnedDate: "2024-03-01", expiryDate: "2025-03-01", score: 100, verificationCode: "GS-ES-UP8-2024030G" }], training: [{ id: "t10", title: "Solar Power", isVerciti: true, courseName: "Electrification", moduleName: "Solar Power", deadline: "2024-04-25", assignedDate: "2024-03-10", status: "in_progress" }], linkedProviders: [], completedActivities: ["Energy Storage", "Electrical Theory (Fundamentals)"] },
-  { id: "up9", email: "sarah.jones@example.com", fullName: "Sarah Jones", department: "Engineering", jobTitle: "Senior Engineer", status: "active", dateInvited: "2024-01-10", dateSignedUp: "2024-01-11", lastLogin: "2024-03-16T11:00:00", overallProgress: 65, totalTimeSpent: "45h 10m", skills: [], qualifications: [], certifications: [], training: [{ id: "t11", title: "FCEV", isVerciti: true, courseName: "Hydrogen", moduleName: "FCEV", deadline: "2024-04-30", assignedDate: "2024-03-01", status: "in_progress" }], linkedProviders: [], completedActivities: ["Hydrogen Fundamentals"] },
-  { id: "up10", email: "michael.brown@example.com", fullName: "Michael Brown", department: "Engineering", jobTitle: "Senior Engineer", status: "active", dateInvited: "2024-01-12", dateSignedUp: "2024-01-13", lastLogin: "2024-03-15T16:45:00", overallProgress: 88, totalTimeSpent: "61h 20m", skills: [{ id: "sk13", name: "Wind Energy", level: "expert", progress: 100 }], qualifications: [{ id: "qual10", name: "IEng", issuingBody: "Engineering Council", dateObtained: "2021-08-20" }], certifications: [{ id: "c8", activityName: "Wind Energy", earnedDate: "2025-05-05", expiryDate: "2026-05-05", score: 100, verificationCode: "GS-WE-UP10-2024022H" }, { id: "c9", activityName: "Marine", earnedDate: "2025-05-18", expiryDate: "2026-05-18", score: 100, verificationCode: "GS-MA-UP10-2024030I" }], training: [], linkedProviders: [{ providerId: "udemy", linkedAt: "2024-02-01", accountEmail: "michael.brown@example.com" }], completedActivities: ["Wind Energy", "Marine", "Storage Tanks"] },
-  { id: "up11", email: "lisa.taylor@example.com", fullName: "Lisa Taylor", department: "Engineering", jobTitle: "Senior Engineer", status: "signed_up_not_logged_in", dateInvited: "2024-02-01", dateSignedUp: "2024-02-02", overallProgress: 0, totalTimeSpent: "0m", skills: [], qualifications: [], certifications: [], training: [{ id: "t12", title: "Electrical Theory (Fundamentals)", isVerciti: true, courseName: "Electrification", moduleName: "Electrical Theory (Fundamentals)", deadline: "2024-03-15", assignedDate: "2024-02-05", status: "overdue" }], linkedProviders: [], completedActivities: [] },
-  { id: "up12", email: "david.martinez@example.com", fullName: "David Martinez", department: "Engineering", jobTitle: "Senior Engineer", status: "active", dateInvited: "2024-01-15", dateSignedUp: "2024-01-16", lastLogin: "2024-03-18T08:30:00", overallProgress: 72, totalTimeSpent: "48h 45m", skills: [{ id: "sk14", name: "Power Electronics", level: "advanced", progress: 80 }], qualifications: [], certifications: [{ id: "c10", activityName: "Intermediate Electrical Theory", earnedDate: "2024-03-10", expiryDate: "2025-03-10", score: 100, verificationCode: "GS-IE-UP12-2024031J" }], training: [], linkedProviders: [], completedActivities: ["Electrical Theory (Fundamentals)", "Intermediate Electrical Theory"] },
+  { id: "up7", email: "emma.chen@example.com", fullName: "Emma Chen", department: "Engineering", jobTitle: "Senior Engineer", status: "active", dateInvited: "2024-01-05", dateSignedUp: "2024-01-06", lastLogin: "2024-03-18T09:00:00", overallProgress: 92, totalTimeSpent: "68h 15m", skills: [{ id: "sk11", name: "Hydrogen Systems", level: "expert", progress: 100 }], qualifications: [{ id: "qual9", name: "CEng", issuingBody: "Engineering Council", dateObtained: "2022-05-15" }], certifications: [{ id: "c6", activityName: "Hydrogen Fundamentals", earnedDate: "2025-04-30", expiryDate: "2026-04-30", score: 100, verificationCode: "GS-HF-UP7-2024021F" }], training: [], linkedProviders: [], completedActivities: ["Hydrogen Fundamentals", "Electrolyser(s)", "Hydrogen Production"], anonymizedUsername: "Worker-7A2B3", employeeId: "EMP-007", evidence: [], auditTrail: [], roleRequirements: [], deploymentContext: { department: "Engineering", reportingTo: "Engineering Lead", startDate: "2024-01-06", medicalClearance: "valid", securityClearance: "basic", fitnessForWork: "fit" }, eligibleProjects: [], ineligibleProjects: [], currentProjects: [] },
+  { id: "up8", email: "james.wilson@example.com", fullName: "James Wilson", department: "Engineering", jobTitle: "Senior Engineer", status: "active", dateInvited: "2024-01-08", dateSignedUp: "2024-01-09", lastLogin: "2024-03-17T14:30:00", overallProgress: 78, totalTimeSpent: "52h 30m", skills: [{ id: "sk12", name: "Energy Storage", level: "advanced", progress: 85 }], qualifications: [], certifications: [{ id: "c7", activityName: "Energy Storage", earnedDate: "2024-03-01", expiryDate: "2025-03-01", score: 100, verificationCode: "GS-ES-UP8-2024030G" }], training: [{ id: "t10", title: "Solar Power", isVerciti: true, courseName: "Electrification", moduleName: "Solar Power", deadline: "2024-04-25", assignedDate: "2024-03-10", status: "in_progress" }], linkedProviders: [], completedActivities: ["Energy Storage", "Electrical Theory (Fundamentals)"], anonymizedUsername: "Worker-8C4D5", employeeId: "EMP-008", evidence: [], auditTrail: [], roleRequirements: [], deploymentContext: { department: "Engineering", reportingTo: "Engineering Lead", startDate: "2024-01-09", medicalClearance: "valid", securityClearance: "basic", fitnessForWork: "fit" }, eligibleProjects: [], ineligibleProjects: [], currentProjects: [] },
+  { id: "up9", email: "sarah.jones@example.com", fullName: "Sarah Jones", department: "Engineering", jobTitle: "Senior Engineer", status: "active", dateInvited: "2024-01-10", dateSignedUp: "2024-01-11", lastLogin: "2024-03-16T11:00:00", overallProgress: 65, totalTimeSpent: "45h 10m", skills: [], qualifications: [], certifications: [], training: [{ id: "t11", title: "FCEV", isVerciti: true, courseName: "Hydrogen", moduleName: "FCEV", deadline: "2024-04-30", assignedDate: "2024-03-01", status: "in_progress" }], linkedProviders: [], completedActivities: ["Hydrogen Fundamentals"], anonymizedUsername: "Worker-9E6F7", employeeId: "EMP-009", evidence: [], auditTrail: [], roleRequirements: [], deploymentContext: { department: "Engineering", reportingTo: "Engineering Lead", startDate: "2024-01-11", medicalClearance: "valid", securityClearance: "basic", fitnessForWork: "fit" }, eligibleProjects: [], ineligibleProjects: [], currentProjects: [] },
+  { id: "up10", email: "michael.brown@example.com", fullName: "Michael Brown", department: "Engineering", jobTitle: "Senior Engineer", status: "active", dateInvited: "2024-01-12", dateSignedUp: "2024-01-13", lastLogin: "2024-03-15T16:45:00", overallProgress: 88, totalTimeSpent: "61h 20m", skills: [{ id: "sk13", name: "Wind Energy", level: "expert", progress: 100 }], qualifications: [{ id: "qual10", name: "IEng", issuingBody: "Engineering Council", dateObtained: "2021-08-20" }], certifications: [{ id: "c8", activityName: "Wind Energy", earnedDate: "2025-05-05", expiryDate: "2026-05-05", score: 100, verificationCode: "GS-WE-UP10-2024022H" }, { id: "c9", activityName: "Marine", earnedDate: "2025-05-18", expiryDate: "2026-05-18", score: 100, verificationCode: "GS-MA-UP10-2024030I" }], training: [], linkedProviders: [{ providerId: "udemy", linkedAt: "2024-02-01", accountEmail: "michael.brown@example.com" }], completedActivities: ["Wind Energy", "Marine", "Storage Tanks"], anonymizedUsername: "Worker-10G8H9", employeeId: "EMP-010", evidence: [], auditTrail: [], roleRequirements: [], deploymentContext: { department: "Engineering", reportingTo: "Engineering Lead", startDate: "2024-01-13", medicalClearance: "valid", securityClearance: "basic", fitnessForWork: "fit" }, eligibleProjects: [], ineligibleProjects: [], currentProjects: [] },
+  { id: "up11", email: "lisa.taylor@example.com", fullName: "Lisa Taylor", department: "Engineering", jobTitle: "Senior Engineer", status: "signed_up_not_logged_in", dateInvited: "2024-02-01", dateSignedUp: "2024-02-02", overallProgress: 0, totalTimeSpent: "0m", skills: [], qualifications: [], certifications: [], training: [{ id: "t12", title: "Electrical Theory (Fundamentals)", isVerciti: true, courseName: "Electrification", moduleName: "Electrical Theory (Fundamentals)", deadline: "2024-03-15", assignedDate: "2024-02-05", status: "overdue" }], linkedProviders: [], completedActivities: [], anonymizedUsername: "Worker-11I0J1", employeeId: "EMP-011", evidence: [], auditTrail: [], roleRequirements: [], deploymentContext: { department: "Engineering", reportingTo: "Engineering Lead", startDate: "2024-02-02", medicalClearance: "pending", securityClearance: "none", fitnessForWork: "pending" }, eligibleProjects: [], ineligibleProjects: [], currentProjects: [] },
+  { id: "up12", email: "david.martinez@example.com", fullName: "David Martinez", department: "Engineering", jobTitle: "Senior Engineer", status: "active", dateInvited: "2024-01-15", dateSignedUp: "2024-01-16", lastLogin: "2024-03-18T08:30:00", overallProgress: 72, totalTimeSpent: "48h 45m", skills: [{ id: "sk14", name: "Power Electronics", level: "advanced", progress: 80 }], qualifications: [], certifications: [{ id: "c10", activityName: "Intermediate Electrical Theory", earnedDate: "2024-03-10", expiryDate: "2025-03-10", score: 100, verificationCode: "GS-IE-UP12-2024031J" }], training: [], linkedProviders: [], completedActivities: ["Electrical Theory (Fundamentals)", "Intermediate Electrical Theory"], anonymizedUsername: "Worker-12K2L3", employeeId: "EMP-012", evidence: [], auditTrail: [], roleRequirements: [], deploymentContext: { department: "Engineering", reportingTo: "Engineering Lead", startDate: "2024-01-16", medicalClearance: "valid", securityClearance: "basic", fitnessForWork: "fit" }, eligibleProjects: [], ineligibleProjects: [], currentProjects: [] },
   // Additional Junior Engineers
-  { id: "up13", email: "amy.wang@example.com", fullName: "Amy Wang", department: "Engineering", jobTitle: "Junior Engineer", status: "active", dateInvited: "2024-02-01", dateSignedUp: "2024-02-02", lastLogin: "2024-03-17T10:15:00", overallProgress: 45, totalTimeSpent: "28h 30m", skills: [{ id: "sk15", name: "Solar Power", level: "intermediate", progress: 55 }], qualifications: [], certifications: [{ id: "c11", activityName: "Solar Power", earnedDate: "2024-03-12", expiryDate: "2025-03-12", score: 100, verificationCode: "GS-SP-UP13-2024031K" }], training: [{ id: "t13", title: "Energy Storage", isVerciti: true, courseName: "Electrification", moduleName: "Energy Storage", deadline: "2024-05-01", assignedDate: "2024-03-15", status: "not_started" }], linkedProviders: [], completedActivities: ["Solar Power", "Electrical Theory (Fundamentals)"] },
-  { id: "up14", email: "tom.harris@example.com", fullName: "Tom Harris", department: "Engineering", jobTitle: "Junior Engineer", status: "active", dateInvited: "2024-02-05", dateSignedUp: "2024-02-06", lastLogin: "2024-03-16T14:00:00", overallProgress: 35, totalTimeSpent: "22h 15m", skills: [], qualifications: [], certifications: [], training: [{ id: "t14", title: "Hydrogen Fundamentals", isVerciti: true, courseName: "Hydrogen", moduleName: "Hydrogen Fundamentals", deadline: "2024-04-15", assignedDate: "2024-02-10", status: "in_progress" }], linkedProviders: [], completedActivities: ["Electrical Theory (Fundamentals)"] },
-  { id: "up15", email: "rachel.green@example.com", fullName: "Rachel Green", department: "Engineering", jobTitle: "Junior Engineer", status: "active", dateInvited: "2024-02-08", dateSignedUp: "2024-02-09", lastLogin: "2024-03-18T11:30:00", overallProgress: 52, totalTimeSpent: "34h 40m", skills: [{ id: "sk16", name: "Hydrogen Systems", level: "beginner", progress: 40 }], qualifications: [], certifications: [{ id: "c12", activityName: "Hydrogen Fundamentals", earnedDate: "2024-03-08", expiryDate: "2025-03-08", score: 100, verificationCode: "GS-HF-UP15-2024030L" }], training: [], linkedProviders: [], completedActivities: ["Hydrogen Fundamentals", "Electrolyser(s)"] },
+  { id: "up13", email: "amy.wang@example.com", fullName: "Amy Wang", department: "Engineering", jobTitle: "Junior Engineer", status: "active", dateInvited: "2024-02-01", dateSignedUp: "2024-02-02", lastLogin: "2024-03-17T10:15:00", overallProgress: 45, totalTimeSpent: "28h 30m", skills: [{ id: "sk15", name: "Solar Power", level: "intermediate", progress: 55 }], qualifications: [], certifications: [{ id: "c11", activityName: "Solar Power", earnedDate: "2024-03-12", expiryDate: "2025-03-12", score: 100, verificationCode: "GS-SP-UP13-2024031K" }], training: [{ id: "t13", title: "Energy Storage", isVerciti: true, courseName: "Electrification", moduleName: "Energy Storage", deadline: "2024-05-01", assignedDate: "2024-03-15", status: "not_started" }], linkedProviders: [], completedActivities: ["Solar Power", "Electrical Theory (Fundamentals)"], anonymizedUsername: "Worker-13M4N5", employeeId: "EMP-013", evidence: [], auditTrail: [], roleRequirements: [], deploymentContext: { department: "Engineering", reportingTo: "Engineering Lead", startDate: "2024-02-02", medicalClearance: "valid", securityClearance: "basic", fitnessForWork: "fit" }, eligibleProjects: [], ineligibleProjects: [], currentProjects: [] },
+  { id: "up14", email: "tom.harris@example.com", fullName: "Tom Harris", department: "Engineering", jobTitle: "Junior Engineer", status: "active", dateInvited: "2024-02-05", dateSignedUp: "2024-02-06", lastLogin: "2024-03-16T14:00:00", overallProgress: 35, totalTimeSpent: "22h 15m", skills: [], qualifications: [], certifications: [], training: [{ id: "t14", title: "Hydrogen Fundamentals", isVerciti: true, courseName: "Hydrogen", moduleName: "Hydrogen Fundamentals", deadline: "2024-04-15", assignedDate: "2024-02-10", status: "in_progress" }], linkedProviders: [], completedActivities: ["Electrical Theory (Fundamentals)"], anonymizedUsername: "Worker-14O6P7", employeeId: "EMP-014", evidence: [], auditTrail: [], roleRequirements: [], deploymentContext: { department: "Engineering", reportingTo: "Engineering Lead", startDate: "2024-02-06", medicalClearance: "valid", securityClearance: "basic", fitnessForWork: "fit" }, eligibleProjects: [], ineligibleProjects: [], currentProjects: [] },
+  { id: "up15", email: "rachel.green@example.com", fullName: "Rachel Green", department: "Engineering", jobTitle: "Junior Engineer", status: "active", dateInvited: "2024-02-08", dateSignedUp: "2024-02-09", lastLogin: "2024-03-18T11:30:00", overallProgress: 52, totalTimeSpent: "34h 40m", skills: [{ id: "sk16", name: "Hydrogen Systems", level: "beginner", progress: 40 }], qualifications: [], certifications: [{ id: "c12", activityName: "Hydrogen Fundamentals", earnedDate: "2024-03-08", expiryDate: "2025-03-08", score: 100, verificationCode: "GS-HF-UP15-2024030L" }], training: [], linkedProviders: [], completedActivities: ["Hydrogen Fundamentals", "Electrolyser(s)"], anonymizedUsername: "Worker-15Q8R9", employeeId: "EMP-015", evidence: [], auditTrail: [], roleRequirements: [], deploymentContext: { department: "Engineering", reportingTo: "Engineering Lead", startDate: "2024-02-09", medicalClearance: "valid", securityClearance: "basic", fitnessForWork: "fit" }, eligibleProjects: [], ineligibleProjects: [], currentProjects: [] },
   { id: "up16", email: "kevin.lee@example.com", fullName: "Kevin Lee", department: "Engineering", jobTitle: "Junior Engineer", status: "signed_up_not_logged_in", dateInvited: "2024-02-10", dateSignedUp: "2024-02-11", overallProgress: 0, totalTimeSpent: "0m", skills: [], qualifications: [], certifications: [], training: [{ id: "t15", title: "Electrical Theory (Fundamentals)", isVerciti: true, courseName: "Electrification", moduleName: "Electrical Theory (Fundamentals)", deadline: "2024-04-01", assignedDate: "2024-02-15", status: "overdue" }], linkedProviders: [], completedActivities: [] },
   { id: "up17", email: "jennifer.clark@example.com", fullName: "Jennifer Clark", department: "Engineering", jobTitle: "Junior Engineer", status: "active", dateInvited: "2024-02-12", dateSignedUp: "2024-02-13", lastLogin: "2024-03-17T09:45:00", overallProgress: 28, totalTimeSpent: "18h 20m", skills: [], qualifications: [], certifications: [], training: [], linkedProviders: [], completedActivities: ["Electrical Theory (Fundamentals)"] },
   { id: "up18", email: "alex.robinson@example.com", fullName: "Alex Robinson", department: "Engineering", jobTitle: "Junior Engineer", status: "active", dateInvited: "2024-02-15", dateSignedUp: "2024-02-16", lastLogin: "2024-03-18T13:00:00", overallProgress: 42, totalTimeSpent: "26h 50m", skills: [{ id: "sk17", name: "Energy Storage", level: "beginner", progress: 35 }], qualifications: [], certifications: [], training: [{ id: "t16", title: "Wind Energy", isVerciti: true, courseName: "Hydrogen", moduleName: "Wind Energy", deadline: "2024-04-20", assignedDate: "2024-03-01", status: "in_progress" }], linkedProviders: [], completedActivities: ["Hydrogen Fundamentals"] },
