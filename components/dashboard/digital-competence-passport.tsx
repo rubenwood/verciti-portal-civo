@@ -36,6 +36,11 @@ import {
   AlertCircle,
   FolderKanban,
   Hammer,
+  Key,
+  QrCode,
+  Fingerprint,
+  ShieldCheck,
+  Copy,
 } from "lucide-react";
 import { 
   type UserProfile, 
@@ -47,6 +52,8 @@ import {
   type Training,
   type ProjectRequirement,
   type ProjectHistoryEntry,
+  type VerifiableCredential,
+  type CredentialStatus,
 } from "@/lib/mock-data";
 import { anonymizeEmail, getAvatarInitials, cn } from "@/lib/utils";
 
@@ -252,6 +259,7 @@ export function DigitalCompetencePassport({ user, onBack }: DigitalCompetencePas
   const currentProjects = user.currentProjects || [];
   const projectRequirements = user.projectRequirements || [];
   const projectHistory = user.projectHistory || [];
+  const verifiableCredentials = user.verifiableCredentials || [];
 
   // Calculate stats
   const totalEvidence = evidence.length;
@@ -409,6 +417,12 @@ export function DigitalCompetencePassport({ user, onBack }: DigitalCompetencePas
               Qualifications & Evidence
             </TabsTrigger>
             <TabsTrigger 
+              value="credentials" 
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-3"
+            >
+              Credentials
+            </TabsTrigger>
+            <TabsTrigger 
               value="audit" 
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-3"
             >
@@ -464,8 +478,11 @@ export function DigitalCompetencePassport({ user, onBack }: DigitalCompetencePas
       {activeTab === "training" && (
         <TrainingTab user={user} />
       )}
-      {activeTab === "qualifications" && (
+{activeTab === "qualifications" && (
         <QualificationsTab user={user} evidence={evidence} />
+      )}
+      {activeTab === "credentials" && (
+        <CredentialsTab credentials={verifiableCredentials} userName={anonymizedUsername} />
       )}
       {activeTab === "audit" && (
         <AuditTab auditTrail={auditTrail} />
@@ -1144,6 +1161,343 @@ function QualificationsTab({ user, evidence }: { user: UserProfile; evidence: Ev
 }
 
 // Audit Tab Component
+// Credentials Tab Component
+function CredentialsTab({ credentials, userName }: { credentials: VerifiableCredential[]; userName: string }) {
+  const [selectedCredential, setSelectedCredential] = useState<VerifiableCredential | null>(null);
+  const [filterStatus, setFilterStatus] = useState<"all" | CredentialStatus>("all");
+  const [filterCategory, setFilterCategory] = useState<"all" | string>("all");
+
+  const filteredCredentials = credentials.filter(c => {
+    if (filterStatus !== "all" && c.status !== filterStatus) return false;
+    if (filterCategory !== "all" && c.category !== filterCategory) return false;
+    return true;
+  });
+
+  const activeCount = credentials.filter(c => c.status === "active").length;
+  const expiredCount = credentials.filter(c => c.status === "expired").length;
+  const revokedCount = credentials.filter(c => c.status === "revoked").length;
+
+  const getStatusColor = (status: CredentialStatus) => {
+    switch (status) {
+      case "active": return "bg-success/10 text-success border-success/20";
+      case "expired": return "bg-destructive/10 text-destructive border-destructive/20";
+      case "revoked": return "bg-destructive/10 text-destructive border-destructive/20";
+      case "suspended": return "bg-warning/10 text-warning border-warning/20";
+    }
+  };
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case "training": return BookOpen;
+      case "qualification": return Award;
+      case "certification": return FileCheck;
+      case "competency": return Fingerprint;
+      case "clearance": return ShieldCheck;
+      default: return FileText;
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header with Stats */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h3 className="font-medium text-lg">W3C Verifiable Credentials</h3>
+          <p className="text-sm text-muted-foreground mt-1">
+            Cryptographically secured digital credentials for {userName}
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4 px-4 py-2 rounded-lg bg-muted/30 border border-border">
+            <div className="text-center">
+              <p className="text-lg font-bold text-success">{activeCount}</p>
+              <p className="text-[10px] text-muted-foreground">Active</p>
+            </div>
+            <div className="w-px h-8 bg-border" />
+            <div className="text-center">
+              <p className="text-lg font-bold text-destructive">{expiredCount}</p>
+              <p className="text-[10px] text-muted-foreground">Expired</p>
+            </div>
+            <div className="w-px h-8 bg-border" />
+            <div className="text-center">
+              <p className="text-lg font-bold text-muted-foreground">{revokedCount}</p>
+              <p className="text-[10px] text-muted-foreground">Revoked</p>
+            </div>
+          </div>
+          <Button variant="outline" size="sm" className="gap-1.5">
+            <Plus className="h-4 w-4" />
+            Issue Credential
+          </Button>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-sm text-muted-foreground">Filter:</span>
+        <div className="flex gap-1">
+          {["all", "active", "expired", "revoked"].map((status) => (
+            <Button
+              key={status}
+              variant={filterStatus === status ? "default" : "outline"}
+              size="sm"
+              className="text-xs h-7 px-2.5"
+              onClick={() => setFilterStatus(status as "all" | CredentialStatus)}
+            >
+              {status === "all" ? "All" : status.charAt(0).toUpperCase() + status.slice(1)}
+            </Button>
+          ))}
+        </div>
+        <div className="w-px h-6 bg-border mx-2" />
+        <div className="flex gap-1">
+          {["all", "training", "qualification", "certification", "clearance"].map((cat) => (
+            <Button
+              key={cat}
+              variant={filterCategory === cat ? "default" : "outline"}
+              size="sm"
+              className="text-xs h-7 px-2.5"
+              onClick={() => setFilterCategory(cat)}
+            >
+              {cat === "all" ? "All Types" : cat.charAt(0).toUpperCase() + cat.slice(1)}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Credentials Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {filteredCredentials.map((credential) => {
+          const CategoryIcon = getCategoryIcon(credential.category);
+          return (
+            <div 
+              key={credential.id}
+              className={cn(
+                "p-4 rounded-xl border cursor-pointer transition-all hover:shadow-md",
+                credential.status === "active" ? "bg-muted/30 border-border hover:border-primary/50" : "bg-muted/10 border-border/50"
+              )}
+              onClick={() => setSelectedCredential(credential)}
+            >
+              <div className="flex items-start gap-3">
+                <div className={cn(
+                  "p-2.5 rounded-lg shrink-0",
+                  credential.status === "active" ? "bg-primary/10" : "bg-muted"
+                )}>
+                  <CategoryIcon className={cn(
+                    "h-5 w-5",
+                    credential.status === "active" ? "text-primary" : "text-muted-foreground"
+                  )} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <h4 className="font-medium text-sm truncate">{credential.displayName}</h4>
+                    <Badge variant="outline" className={cn("text-[10px] shrink-0", getStatusColor(credential.status))}>
+                      {credential.status}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{credential.description}</p>
+                  
+                  <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <span className="font-medium">Issuer:</span>
+                      <span>{credential.issuer.name}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="font-medium">Issued:</span>
+                      <span>{new Date(credential.issuanceDate).toLocaleDateString("en-GB")}</span>
+                    </div>
+                    {credential.expirationDate && (
+                      <div className="flex items-center gap-1">
+                        <span className="font-medium">Expires:</span>
+                        <span className={new Date(credential.expirationDate) < new Date() ? "text-destructive" : ""}>
+                          {new Date(credential.expirationDate).toLocaleDateString("en-GB")}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                  <ShieldCheck className="h-3 w-3 text-success" />
+                  <span>Cryptographically Verified</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={(e) => { e.stopPropagation(); }}>
+                    <QrCode className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={(e) => { e.stopPropagation(); }}>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={(e) => { e.stopPropagation(); }}>
+                    <MoreHorizontal className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        
+        {filteredCredentials.length === 0 && (
+          <div className="col-span-full text-center py-12">
+            <ShieldCheck className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
+            <p className="text-sm text-muted-foreground">No credentials found</p>
+            <p className="text-xs text-muted-foreground mt-1">Try adjusting your filters or issue a new credential</p>
+          </div>
+        )}
+      </div>
+
+      {/* Credential Detail Modal */}
+      {selectedCredential && (
+        <Dialog open={!!selectedCredential} onOpenChange={() => setSelectedCredential(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-primary" />
+                Verifiable Credential Details
+              </DialogTitle>
+              <DialogDescription>
+                W3C compliant digital credential with cryptographic proof
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 mt-4">
+              {/* Credential Header */}
+              <div className="p-4 rounded-lg bg-muted/30 border border-border">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h4 className="font-semibold text-lg">{selectedCredential.displayName}</h4>
+                    <p className="text-sm text-muted-foreground mt-1">{selectedCredential.description}</p>
+                  </div>
+                  <Badge variant="outline" className={cn("text-xs", getStatusColor(selectedCredential.status))}>
+                    {selectedCredential.status}
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs text-success">
+                  <ShieldCheck className="h-4 w-4" />
+                  <span>Cryptographically Verified Credential</span>
+                </div>
+              </div>
+
+              {/* Credential Details Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 rounded-lg bg-muted/20 border border-border">
+                  <p className="text-[10px] text-muted-foreground mb-1">Credential Type</p>
+                  <p className="text-sm font-medium">{selectedCredential.type.join(", ")}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/20 border border-border">
+                  <p className="text-[10px] text-muted-foreground mb-1">Category</p>
+                  <p className="text-sm font-medium capitalize">{selectedCredential.category}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/20 border border-border">
+                  <p className="text-[10px] text-muted-foreground mb-1">Issuance Date</p>
+                  <p className="text-sm font-medium">{new Date(selectedCredential.issuanceDate).toLocaleDateString("en-GB")}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/20 border border-border">
+                  <p className="text-[10px] text-muted-foreground mb-1">Expiration Date</p>
+                  <p className="text-sm font-medium">
+                    {selectedCredential.expirationDate 
+                      ? new Date(selectedCredential.expirationDate).toLocaleDateString("en-GB")
+                      : "No Expiration"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Issuer */}
+              <div className="p-4 rounded-lg bg-muted/20 border border-border">
+                <p className="text-[10px] text-muted-foreground mb-2">Issuer</p>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
+                    {selectedCredential.issuer.logo || selectedCredential.issuer.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-medium">{selectedCredential.issuer.name}</p>
+                    <p className="text-xs text-muted-foreground font-mono">{selectedCredential.issuer.id}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Subject */}
+              <div className="p-4 rounded-lg bg-muted/20 border border-border">
+                <p className="text-[10px] text-muted-foreground mb-2">Credential Subject</p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Subject ID (DID)</span>
+                    <span className="text-sm font-mono">{selectedCredential.credentialSubject.id}</span>
+                  </div>
+                  {selectedCredential.credentialSubject.achievement && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Achievement</span>
+                      <span className="text-sm">{selectedCredential.credentialSubject.achievement}</span>
+                    </div>
+                  )}
+                  {selectedCredential.credentialSubject.competency && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Competency</span>
+                      <span className="text-sm">{selectedCredential.credentialSubject.competency}</span>
+                    </div>
+                  )}
+                  {selectedCredential.credentialSubject.level && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Level</span>
+                      <span className="text-sm">{selectedCredential.credentialSubject.level}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Proof */}
+              <div className="p-4 rounded-lg bg-muted/20 border border-border">
+                <div className="flex items-center gap-2 mb-2">
+                  <Key className="h-4 w-4 text-primary" />
+                  <p className="text-[10px] text-muted-foreground">Cryptographic Proof</p>
+                </div>
+                <div className="space-y-2 font-mono text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Type</span>
+                    <span>{selectedCredential.proof.type}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Created</span>
+                    <span>{new Date(selectedCredential.proof.created).toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Purpose</span>
+                    <span>{selectedCredential.proof.proofPurpose}</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-muted-foreground">Verification Method</span>
+                    <span className="break-all bg-muted/50 p-2 rounded text-[10px]">{selectedCredential.proof.verificationMethod}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2 pt-2">
+                <Button variant="outline" size="sm" className="gap-1.5 flex-1">
+                  <QrCode className="h-4 w-4" />
+                  Show QR Code
+                </Button>
+                <Button variant="outline" size="sm" className="gap-1.5 flex-1">
+                  <Copy className="h-4 w-4" />
+                  Copy JSON-LD
+                </Button>
+                <Button variant="outline" size="sm" className="gap-1.5 flex-1">
+                  <Download className="h-4 w-4" />
+                  Export
+                </Button>
+                <Button variant="outline" size="sm" className="gap-1.5 flex-1">
+                  <ExternalLink className="h-4 w-4" />
+                  Verify
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </div>
+  );
+}
+
 function AuditTab({ auditTrail }: { auditTrail: AuditEvent[] }) {
   return (
     <div className="p-4 rounded-xl bg-muted/30 border border-border">

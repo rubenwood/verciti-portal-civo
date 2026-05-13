@@ -602,6 +602,40 @@ export interface RoleRequirement {
   expiryDate?: string;
 }
 
+// W3C Verifiable Credential types
+export type CredentialStatus = "active" | "revoked" | "expired" | "suspended";
+
+export interface VerifiableCredential {
+  id: string;
+  type: string[]; // e.g., ["VerifiableCredential", "TrainingCredential"]
+  credentialSubject: {
+    id: string; // DID of the holder
+    name: string;
+    achievement?: string;
+    competency?: string;
+    level?: string;
+  };
+  issuer: {
+    id: string; // DID of the issuer
+    name: string;
+    logo?: string;
+  };
+  issuanceDate: string;
+  expirationDate?: string;
+  status: CredentialStatus;
+  proof: {
+    type: string; // e.g., "Ed25519Signature2020"
+    created: string;
+    verificationMethod: string;
+    proofPurpose: string;
+  };
+  // Display metadata
+  displayName: string;
+  description: string;
+  category: "training" | "qualification" | "certification" | "competency" | "clearance";
+  relatedEvidence?: string[];
+}
+
 // Project requirement for Digital Competence Passport
 export interface ProjectRequirement {
   id: string;
@@ -705,6 +739,7 @@ export interface UserProfile {
   currentProjects?: string[];
   projectRequirements?: ProjectRequirement[];
   projectHistory?: ProjectHistoryEntry[];
+  verifiableCredentials?: VerifiableCredential[];
 }
 
 export const userProfiles: UserProfile[] = [
@@ -806,6 +841,72 @@ training: [
       { id: "ph1", projectName: "Aberdeen Hydrogen Facility", role: "Electrical Engineer", startDate: "2024-01-16", status: "active", location: "Aberdeen, UK" },
       { id: "ph2", projectName: "Manchester Solar Farm", role: "Junior Engineer", startDate: "2023-06-01", endDate: "2024-01-15", status: "completed", location: "Manchester, UK" },
       { id: "ph3", projectName: "Leeds Wind Turbine Installation", role: "Trainee Engineer", startDate: "2023-01-15", endDate: "2023-05-31", status: "completed", location: "Leeds, UK" },
+    ],
+    verifiableCredentials: [
+      {
+        id: "vc1",
+        type: ["VerifiableCredential", "TrainingCredential"],
+        credentialSubject: { id: "did:example:worker7x4k9", name: "Worker-7X4K9", achievement: "Hydrogen Fundamentals", competency: "Hydrogen Systems", level: "Foundation" },
+        issuer: { id: "did:example:verciti", name: "Verciti", logo: "V" },
+        issuanceDate: "2024-03-10",
+        expirationDate: "2025-03-10",
+        status: "active",
+        proof: { type: "Ed25519Signature2020", created: "2024-03-10T15:31:00Z", verificationMethod: "did:example:verciti#key-1", proofPurpose: "assertionMethod" },
+        displayName: "Hydrogen Fundamentals Certificate",
+        description: "Successfully completed the Hydrogen Fundamentals training module with 100% score.",
+        category: "training",
+      },
+      {
+        id: "vc2",
+        type: ["VerifiableCredential", "QualificationCredential"],
+        credentialSubject: { id: "did:example:worker7x4k9", name: "Worker-7X4K9", achievement: "City & Guilds Level 3 - Electrical Installation", level: "Level 3" },
+        issuer: { id: "did:example:cityandguilds", name: "City & Guilds", logo: "C&G" },
+        issuanceDate: "2022-06-15",
+        status: "active",
+        proof: { type: "Ed25519Signature2020", created: "2022-06-15T10:00:00Z", verificationMethod: "did:example:cityandguilds#key-1", proofPurpose: "assertionMethod" },
+        displayName: "City & Guilds Level 3 - Electrical Installation",
+        description: "Professional qualification in electrical installation and maintenance.",
+        category: "qualification",
+      },
+      {
+        id: "vc3",
+        type: ["VerifiableCredential", "CertificationCredential"],
+        credentialSubject: { id: "did:example:worker7x4k9", name: "Worker-7X4K9", achievement: "IOSH Managing Safely", competency: "Health & Safety Management" },
+        issuer: { id: "did:example:iosh", name: "IOSH", logo: "IOSH" },
+        issuanceDate: "2023-11-21",
+        expirationDate: "2026-11-21",
+        status: "active",
+        proof: { type: "Ed25519Signature2020", created: "2023-11-21T14:00:00Z", verificationMethod: "did:example:iosh#key-1", proofPurpose: "assertionMethod" },
+        displayName: "IOSH Managing Safely",
+        description: "Certified in health and safety management principles.",
+        category: "certification",
+      },
+      {
+        id: "vc4",
+        type: ["VerifiableCredential", "ClearanceCredential"],
+        credentialSubject: { id: "did:example:worker7x4k9", name: "Worker-7X4K9", achievement: "Enhanced Security Clearance", level: "Enhanced" },
+        issuer: { id: "did:example:ukgov", name: "UK Government", logo: "GOV" },
+        issuanceDate: "2024-01-16",
+        expirationDate: "2026-01-16",
+        status: "active",
+        proof: { type: "Ed25519Signature2020", created: "2024-01-16T09:00:00Z", verificationMethod: "did:example:ukgov#key-1", proofPurpose: "assertionMethod" },
+        displayName: "Enhanced Security Clearance",
+        description: "Government-issued enhanced security clearance for sensitive projects.",
+        category: "clearance",
+      },
+      {
+        id: "vc5",
+        type: ["VerifiableCredential", "TrainingCredential"],
+        credentialSubject: { id: "did:example:worker7x4k9", name: "Worker-7X4K9", achievement: "First Aid at Work", competency: "Emergency Response" },
+        issuer: { id: "did:example:stjohn", name: "St John Ambulance", logo: "SJA" },
+        issuanceDate: "2023-03-10",
+        expirationDate: "2024-03-10",
+        status: "expired",
+        proof: { type: "Ed25519Signature2020", created: "2023-03-10T11:00:00Z", verificationMethod: "did:example:stjohn#key-1", proofPurpose: "assertionMethod" },
+        displayName: "First Aid at Work",
+        description: "Certified first aider for workplace emergencies.",
+        category: "certification",
+      },
     ],
   },
   {
