@@ -364,7 +364,7 @@ export function MissionControl() {
                         <span className="h-1.5 w-1.5 rounded-full mr-1" style={{
                           backgroundColor: r.risk === "red" ? "var(--destructive)" : r.risk === "amber" ? "var(--warning)" : "var(--success)"
                         }} />
-                        {r.risk === "red" ? "Red" : r.risk === "amber" ? "Amber" : "Green"}
+                        {r.risk === "red" ? "High" : r.risk === "amber" ? "Medium" : "Low"}
                       </Badge>
                     </td>
                   </tr>
