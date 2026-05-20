@@ -7,8 +7,8 @@ import { IntegrationsModal } from "./integrations-modal";
 import { cn } from "@/lib/utils";
 
 interface HeaderProps {
-  activeTab: "analytics" | "workforce" | "skills-map";
-  onTabChange: (tab: "analytics" | "workforce" | "skills-map") => void;
+  activeTab: "analytics" | "workforce" | "skills-map" | "supply-chain";
+  onTabChange: (tab: "analytics" | "workforce" | "skills-map" | "supply-chain") => void;
 }
 
 export function Header({ activeTab, onTabChange }: HeaderProps) {
@@ -83,6 +83,17 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
           )}
         >
           Skills Map
+        </button>
+        <button
+          onClick={() => onTabChange("supply-chain")}
+          className={cn(
+            "px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors",
+            activeTab === "supply-chain"
+              ? "border-primary text-primary bg-primary/5"
+              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
+          )}
+        >
+          Supply Chain
         </button>
       </div>
     </header>

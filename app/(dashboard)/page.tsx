@@ -9,10 +9,11 @@ import { UserProfilesTable } from "@/components/dashboard/user-profiles-table";
 import { WorkforceStats } from "@/components/dashboard/workforce-stats";
 import { SkillsMap } from "@/components/dashboard/skills-map";
 import { DigitalCompetencePassport } from "@/components/dashboard/digital-competence-passport";
+import { WorkforceReadinessNetwork } from "@/components/dashboard/workforce-readiness-network";
 import { type UserProfile } from "@/lib/mock-data";
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<"analytics" | "workforce" | "skills-map">("analytics");
+  const [activeTab, setActiveTab] = useState<"analytics" | "workforce" | "skills-map" | "supply-chain">("analytics");
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
 
   // Handle viewing a user's Digital Competence Passport
@@ -60,6 +61,9 @@ export default function DashboardPage() {
         )}
         {activeTab === "skills-map" && (
           <SkillsMap />
+        )}
+        {activeTab === "supply-chain" && (
+          <WorkforceReadinessNetwork />
         )}
       </div>
     </div>
