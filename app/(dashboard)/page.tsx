@@ -57,7 +57,7 @@ export default function DashboardPage() {
       case "programmes":
         return <PlaceholderPage title="Programmes" description="Manage projects and programmes with workforce planning, timeline tracking, and resource allocation." />;
       case "mobilisation-map":
-        return <PlaceholderPage title="Mobilisation Map" description="Geographic view of workforce deployment, project sites, and regional readiness status." />;
+        return <SkillsMap />;
       case "mobilisation-timeline":
         return <PlaceholderPage title="Mobilisation Timeline" description="Gantt-style timeline showing workforce mobilisation schedules and milestone tracking." />;
       case "workforce-readiness":
