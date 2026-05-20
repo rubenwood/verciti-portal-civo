@@ -1,8 +1,7 @@
 "use client";
 
-import { Bell, Settings, Download, Leaf } from "lucide-react";
+import { Bell, Settings, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { LearningPathwayModal } from "./learning-pathway-modal";
 import { IntegrationsModal } from "./integrations-modal";
 import { cn } from "@/lib/utils";
 
@@ -49,12 +48,6 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
 
         <div className="flex items-center gap-3">
           <IntegrationsModal />
-          <LearningPathwayModal />
-          
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-4 text-sm">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
 
           <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-8 w-8">
             <Bell className="h-4 w-4" />
