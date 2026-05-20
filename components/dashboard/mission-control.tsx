@@ -326,11 +326,11 @@ export function MissionControl() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-xs text-muted-foreground border-b border-border">
-                <th className="text-left pb-2 font-normal">Role</th>
-                <th className="text-right pb-2 font-normal">Needed</th>
-                <th className="text-right pb-2 font-normal">Ready</th>
-                <th className="text-right pb-2 font-normal">Gap</th>
-                <th className="text-left pb-2 font-normal w-64">Distribution</th>
+                <th className="text-left pb-2 font-normal pr-2">Role</th>
+                <th className="text-right pb-2 font-normal px-1 w-12">Needed</th>
+                <th className="text-right pb-2 font-normal px-1 w-12">Ready</th>
+                <th className="text-right pb-2 font-normal pl-1 pr-6 w-12">Gap</th>
+                <th className="text-left pb-2 font-normal w-72">Distribution</th>
                 <th className="text-left pb-2 font-normal">Risk</th>
               </tr>
             </thead>
@@ -339,11 +339,11 @@ export function MissionControl() {
                 const gap = r.needed - r.ready;
                 return (
                   <tr key={i} className="border-b border-border/50 last:border-0">
-                    <td className="py-2.5 font-medium">{r.role}</td>
-                    <td className="py-2.5 text-right font-mono text-xs">{r.needed}</td>
-                    <td className="py-2.5 text-right font-mono text-xs text-success">{r.ready}</td>
+                    <td className="py-2.5 font-medium pr-2">{r.role}</td>
+                    <td className="py-2.5 text-right font-mono text-xs px-1">{r.needed}</td>
+                    <td className="py-2.5 text-right font-mono text-xs text-success px-1">{r.ready}</td>
                     <td className={cn(
-                      "py-2.5 text-right font-mono text-xs",
+                      "py-2.5 text-right font-mono text-xs pl-1 pr-6",
                       r.risk === "red" ? "text-destructive" : "text-warning"
                     )}>{gap}</td>
                     <td className="py-2.5">
