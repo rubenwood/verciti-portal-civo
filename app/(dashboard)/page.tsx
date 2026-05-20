@@ -10,10 +10,12 @@ import { WorkforceStats } from "@/components/dashboard/workforce-stats";
 import { SkillsMap } from "@/components/dashboard/skills-map";
 import { DigitalCompetencePassport } from "@/components/dashboard/digital-competence-passport";
 import { WorkforceReadinessNetwork } from "@/components/dashboard/workforce-readiness-network";
+import { MissionControl } from "@/components/dashboard/mission-control";
+import { ActionQueue } from "@/components/dashboard/action-queue";
 import { type UserProfile } from "@/lib/mock-data";
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<"analytics" | "workforce" | "skills-map" | "supply-chain">("analytics");
+  const [activeTab, setActiveTab] = useState<"mission-control" | "supply-chain" | "action-queue" | "workforce" | "skills-map">("mission-control");
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
 
   // Handle viewing a user's Digital Competence Passport
@@ -33,16 +35,14 @@ export default function DashboardPage() {
         setSelectedUser(null); // Clear selected user when changing tabs
       }} />
       <div className="flex-1 space-y-6 p-6">
-        {activeTab === "analytics" && (
-          <>
-            <div>
-              <StatsCards />
-            </div>
-            <div className="space-y-6">
-              <ActivityTable />
-              <AssessmentTable />
-            </div>
-          </>
+        {activeTab === "mission-control" && (
+          <MissionControl />
+        )}
+        {activeTab === "supply-chain" && (
+          <WorkforceReadinessNetwork />
+        )}
+        {activeTab === "action-queue" && (
+          <ActionQueue />
         )}
         {activeTab === "workforce" && (
           <>
@@ -61,9 +61,6 @@ export default function DashboardPage() {
         )}
         {activeTab === "skills-map" && (
           <SkillsMap />
-        )}
-        {activeTab === "supply-chain" && (
-          <WorkforceReadinessNetwork />
         )}
       </div>
     </div>

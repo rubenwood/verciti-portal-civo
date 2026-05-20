@@ -7,8 +7,8 @@ import { IntegrationsModal } from "./integrations-modal";
 import { cn } from "@/lib/utils";
 
 interface HeaderProps {
-  activeTab: "analytics" | "workforce" | "skills-map" | "supply-chain";
-  onTabChange: (tab: "analytics" | "workforce" | "skills-map" | "supply-chain") => void;
+  activeTab: "mission-control" | "supply-chain" | "action-queue" | "workforce" | "skills-map";
+  onTabChange: (tab: "mission-control" | "supply-chain" | "action-queue" | "workforce" | "skills-map") => void;
 }
 
 export function Header({ activeTab, onTabChange }: HeaderProps) {
@@ -50,22 +50,44 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex items-center gap-1 px-6 pb-0">
+      <div className="flex items-center gap-1 px-6 pb-0 overflow-x-auto">
         <button
-          onClick={() => onTabChange("analytics")}
+          onClick={() => onTabChange("mission-control")}
           className={cn(
-            "px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors",
-            activeTab === "analytics"
+            "px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors whitespace-nowrap",
+            activeTab === "mission-control"
               ? "border-primary text-primary bg-primary/5"
               : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
           )}
         >
-          App Analytics
+          Mission Control
+        </button>
+        <button
+          onClick={() => onTabChange("supply-chain")}
+          className={cn(
+            "px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors whitespace-nowrap",
+            activeTab === "supply-chain"
+              ? "border-primary text-primary bg-primary/5"
+              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
+          )}
+        >
+          Supply Chain
+        </button>
+        <button
+          onClick={() => onTabChange("action-queue")}
+          className={cn(
+            "px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors whitespace-nowrap",
+            activeTab === "action-queue"
+              ? "border-primary text-primary bg-primary/5"
+              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
+          )}
+        >
+          Action Queue
         </button>
         <button
           onClick={() => onTabChange("workforce")}
           className={cn(
-            "px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors",
+            "px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors whitespace-nowrap",
             activeTab === "workforce"
               ? "border-primary text-primary bg-primary/5"
               : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
@@ -76,24 +98,13 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
         <button
           onClick={() => onTabChange("skills-map")}
           className={cn(
-            "px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors",
+            "px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors whitespace-nowrap",
             activeTab === "skills-map"
               ? "border-primary text-primary bg-primary/5"
               : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
           )}
         >
           Skills Map
-        </button>
-        <button
-          onClick={() => onTabChange("supply-chain")}
-          className={cn(
-            "px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors",
-            activeTab === "supply-chain"
-              ? "border-primary text-primary bg-primary/5"
-              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
-          )}
-        >
-          Supply Chain
         </button>
       </div>
     </header>
