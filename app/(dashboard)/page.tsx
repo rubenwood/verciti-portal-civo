@@ -1,21 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Header } from "@/components/dashboard/header";
-import { StatsCards } from "@/components/dashboard/stats-cards";
-import { ActivityTable } from "@/components/dashboard/activity-table";
-import { AssessmentTable } from "@/components/dashboard/assessment-table";
-import { UserProfilesTable } from "@/components/dashboard/user-profiles-table";
+import { Header, type TabId } from "@/components/dashboard/header";
 import { WorkforceStats } from "@/components/dashboard/workforce-stats";
+import { UserProfilesTable } from "@/components/dashboard/user-profiles-table";
 import { SkillsMap } from "@/components/dashboard/skills-map";
 import { DigitalCompetencePassport } from "@/components/dashboard/digital-competence-passport";
 import { WorkforceReadinessNetwork } from "@/components/dashboard/workforce-readiness-network";
 import { MissionControl } from "@/components/dashboard/mission-control";
 import { ActionQueue } from "@/components/dashboard/action-queue";
+import { ReadinessRules } from "@/components/dashboard/readiness-rules";
+import { AssurancePack } from "@/components/dashboard/assurance-pack";
+import { CompetencyVerification } from "@/components/dashboard/competency-verification";
 import { type UserProfile } from "@/lib/mock-data";
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<"mission-control" | "supply-chain" | "action-queue" | "workforce" | "skills-map">("mission-control");
+  const [activeTab, setActiveTab] = useState<TabId>("mission-control");
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
 
   // Handle viewing a user's Digital Competence Passport
@@ -58,6 +58,15 @@ export default function DashboardPage() {
               </>
             )}
           </>
+        )}
+        {activeTab === "readiness-rules" && (
+          <ReadinessRules />
+        )}
+        {activeTab === "verification" && (
+          <CompetencyVerification />
+        )}
+        {activeTab === "assurance" && (
+          <AssurancePack />
         )}
         {activeTab === "skills-map" && (
           <SkillsMap />
