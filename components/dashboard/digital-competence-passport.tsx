@@ -319,6 +319,40 @@ export function DigitalCompetencePassport({ user, onBack }: DigitalCompetencePas
         <span className="text-foreground">Digital Competence Passport</span>
       </div>
 
+      {/* Readiness Logic Formula Strip */}
+      <div className="p-3 rounded-xl bg-gradient-to-r from-primary/5 via-muted/30 to-primary/5 border border-border">
+        <div className="flex items-center justify-center gap-2 text-xs">
+          <span className="text-muted-foreground font-medium">Readiness Logic:</span>
+          <div className="flex items-center gap-1.5">
+            <span className="px-2 py-1 rounded bg-primary/10 text-primary font-medium">Role Requirements</span>
+            <span className="text-muted-foreground">×</span>
+            <span className="font-semibold">{requirementPercentage}%</span>
+          </div>
+          <span className="text-muted-foreground">+</span>
+          <div className="flex items-center gap-1.5">
+            <span className="px-2 py-1 rounded bg-success/10 text-success font-medium">Evidence</span>
+            <span className="text-muted-foreground">×</span>
+            <span className="font-semibold">{evidencePercentage}%</span>
+          </div>
+          <span className="text-muted-foreground">+</span>
+          <div className="flex items-center gap-1.5">
+            <span className="px-2 py-1 rounded bg-warning/10 text-warning font-medium">Training</span>
+            <span className="text-muted-foreground">×</span>
+            <span className="font-semibold">{user.overallProgress}%</span>
+          </div>
+          <span className="text-muted-foreground">=</span>
+          <div className="flex items-center gap-1.5">
+            <span className={cn(
+              "px-3 py-1 rounded font-bold",
+              readinessScore >= 80 ? "bg-success/20 text-success" :
+              readinessScore >= 50 ? "bg-warning/20 text-warning" : "bg-destructive/20 text-destructive"
+            )}>
+              {readinessScore}% Readiness
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Main Header Section */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* User Info */}
@@ -473,6 +507,8 @@ export function DigitalCompetencePassport({ user, onBack }: DigitalCompetencePas
           auditTrail={auditTrail}
           projectRequirements={projectRequirements}
           projectHistory={projectHistory}
+          ineligibleProjects={ineligibleProjects}
+          readinessScore={readinessScore}
         />
       )}
       {activeTab === "training" && (
@@ -511,6 +547,8 @@ function OverviewTab({
   auditTrail,
   projectRequirements,
   projectHistory,
+  ineligibleProjects,
+  readinessScore,
 }: {
   user: UserProfile;
   displayEmail: string;
@@ -530,6 +568,8 @@ function OverviewTab({
   auditTrail: AuditEvent[];
   projectRequirements: ProjectRequirement[];
   projectHistory: ProjectHistoryEntry[];
+  ineligibleProjects: { name: string; missingRequirements: string[] }[];
+  readinessScore: number;
 }) {
   const [trainingFilter, setTrainingFilter] = useState<"all" | "overdue" | "due_soon" | "in_progress">("all");
   
@@ -541,6 +581,92 @@ function OverviewTab({
 
   return (
     <div className="space-y-4">
+      {/* Open Readiness Gaps - Highlighted Section */}
+      {(ineligibleProjects.length > 0 || overdueTraining.length > 0 || expiringItems.length > 0) && (
+        <div className="p-4 rounded-xl bg-destructive/5 border border-destructive/20">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-destructive/10">
+                <AlertCircle className="h-4 w-4 text-destructive" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm">Open Readiness Gaps</h3>
+                <p className="text-xs text-muted-foreground">Issues preventing full deployment readiness</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs bg-destructive/10 text-destructive border-destructive/20">
+                {(ineligibleProjects.reduce((acc, p) => acc + p.missingRequirements.length, 0) + overdueTraining.length + expiringItems.filter(e => new Date(e.expiryDate!) < new Date()).length)} total gaps
+              </Badge>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {/* Missing Requirements */}
+            {ineligibleProjects.length > 0 && (
+              <div className="p-3 rounded-lg bg-background border border-border">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="h-2 w-2 rounded-full bg-destructive" />
+                  <span className="text-xs font-medium">Missing Requirements</span>
+                </div>
+                <div className="space-y-1.5">
+                  {ineligibleProjects.flatMap(p => p.missingRequirements).slice(0, 3).map((req, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-xs">
+                      <XCircle className="h-3 w-3 text-destructive shrink-0" />
+                      <span className="truncate">{req}</span>
+                    </div>
+                  ))}
+                  {ineligibleProjects.flatMap(p => p.missingRequirements).length > 3 && (
+                    <p className="text-[10px] text-muted-foreground">
+                      +{ineligibleProjects.flatMap(p => p.missingRequirements).length - 3} more
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Overdue Training */}
+            {overdueTraining.length > 0 && (
+              <div className="p-3 rounded-lg bg-background border border-border">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="h-2 w-2 rounded-full bg-warning" />
+                  <span className="text-xs font-medium">Overdue Training</span>
+                </div>
+                <div className="space-y-1.5">
+                  {overdueTraining.slice(0, 3).map((t) => (
+                    <div key={t.id} className="flex items-center gap-2 text-xs">
+                      <Clock className="h-3 w-3 text-warning shrink-0" />
+                      <span className="truncate">{t.title}</span>
+                    </div>
+                  ))}
+                  {overdueTraining.length > 3 && (
+                    <p className="text-[10px] text-muted-foreground">+{overdueTraining.length - 3} more</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Expired Items */}
+            {expiringItems.filter(e => new Date(e.expiryDate!) < new Date()).length > 0 && (
+              <div className="p-3 rounded-lg bg-background border border-border">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="h-2 w-2 rounded-full bg-destructive" />
+                  <span className="text-xs font-medium">Expired Certifications</span>
+                </div>
+                <div className="space-y-1.5">
+                  {expiringItems.filter(e => new Date(e.expiryDate!) < new Date()).slice(0, 3).map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-xs">
+                      <AlertCircle className="h-3 w-3 text-destructive shrink-0" />
+                      <span className="truncate">{('name' in item ? item.name : item.activityName) || 'Certification'}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Top Row: 4 column grid for main cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Column 1: Role & Deployment Context + Contact */}
