@@ -134,14 +134,6 @@ export function MissionControl() {
             <Calendar className="h-4 w-4" />
             Last 30 days
           </Button>
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <Download className="h-4 w-4" />
-            Export readiness pack
-          </Button>
-          <Button size="sm" className="gap-1.5">
-            <Plus className="h-4 w-4" />
-            New action
-          </Button>
         </div>
       </div>
 
