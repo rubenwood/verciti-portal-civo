@@ -14,6 +14,7 @@ import { ReadinessRules } from "@/components/dashboard/readiness-rules";
 import { AssurancePack } from "@/components/dashboard/assurance-pack";
 import { CompetencyVerification } from "@/components/dashboard/competency-verification";
 import { IntegrationsModal } from "@/components/dashboard/integrations-modal";
+import { Programmes } from "@/components/dashboard/programmes";
 import { type UserProfile } from "@/lib/mock-data";
 
 // Placeholder components for pages we haven't built yet
@@ -55,7 +56,7 @@ export default function DashboardPage() {
       case "ecosystem":
         return <WorkforceReadinessNetwork />;
       case "programmes":
-        return <PlaceholderPage title="Programmes" description="Manage projects and programmes with workforce planning, timeline tracking, and resource allocation." />;
+        return <Programmes />;
       case "mobilisation-map":
         return <SkillsMap />;
       case "mobilisation-timeline":
