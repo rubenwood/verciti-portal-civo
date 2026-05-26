@@ -15,6 +15,7 @@ import { AssurancePack } from "@/components/dashboard/assurance-pack";
 import { CompetencyVerification } from "@/components/dashboard/competency-verification";
 import { IntegrationsModal } from "@/components/dashboard/integrations-modal";
 import { Programmes } from "@/components/dashboard/programmes";
+import { Learning } from "@/components/dashboard/learning";
 import { type UserProfile } from "@/lib/mock-data";
 
 // Placeholder components for pages we haven't built yet
@@ -80,6 +81,8 @@ export default function DashboardPage() {
         return <CompetencyVerification />;
       case "interventions":
         return <ActionQueue />;
+      case "learning":
+        return <Learning />;
       case "reports":
         return <AssurancePack />;
       case "readiness-pack":

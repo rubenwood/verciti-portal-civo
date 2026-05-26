@@ -22,6 +22,7 @@ import {
   Settings2,
   UserCog,
   Lock,
+  GraduationCap,
 } from "lucide-react";
 
 export type SidebarPage =
@@ -37,6 +38,7 @@ export type SidebarPage =
   | "safety-critical"
   | "evidence"
   | "interventions"
+  | "learning"
   | "reports"
   | "readiness-pack"
   | "readiness-assistant"
@@ -65,6 +67,7 @@ const workspaceItems: { id: SidebarPage; label: string; icon: React.ElementType 
   { id: "safety-critical", label: "Safety-Critical Assurance", icon: ShieldCheck },
   { id: "evidence", label: "Evidence", icon: FileText },
   { id: "interventions", label: "Interventions", icon: CheckSquare },
+  { id: "learning", label: "Learning", icon: GraduationCap },
   { id: "reports", label: "Reports", icon: BarChart3 },
   { id: "readiness-pack", label: "Readiness Pack", icon: Package },
   { id: "readiness-assistant", label: "Readiness Assistant", icon: Bot },
