@@ -20,6 +20,12 @@ import { Timeline } from "@/components/dashboard/timeline";
 import { Reports } from "@/components/dashboard/reports";
 import { SupplierDiscovery } from "@/components/dashboard/supplier-discovery";
 import { StakeholderAccess } from "@/components/dashboard/stakeholder-access";
+import { Workforce } from "@/components/dashboard/workforce";
+import { AccessGovernance } from "@/components/dashboard/access-governance";
+import { ReadinessAssistant } from "@/components/dashboard/readiness-assistant";
+import { TrainingModules } from "@/components/dashboard/training-modules";
+import { WorkerReadinessProfile } from "@/components/dashboard/worker-readiness-profile";
+import { SupplierReadinessProfile } from "@/components/dashboard/supplier-readiness-profile";
 import { type UserProfile } from "@/lib/mock-data";
 
 // Placeholder components for pages we haven't built yet
@@ -86,13 +92,13 @@ export default function DashboardPage() {
       case "interventions":
         return <ActionQueue />;
       case "learning":
-        return <Learning />;
+        return <TrainingModules />;
       case "reports":
         return <Reports />;
       case "readiness-pack":
         return <AssurancePack />;
       case "readiness-assistant":
-        return <PlaceholderPage title="Readiness Assistant" description="AI-powered assistant to help analyse readiness gaps, suggest interventions, and optimise workforce deployment." />;
+        return <ReadinessAssistant />;
       case "alerts":
         return <PlaceholderPage title="Alerts" description="Real-time notifications for expiring certifications, compliance risks, and intervention deadlines." />;
       case "integrations":
@@ -108,7 +114,7 @@ export default function DashboardPage() {
       case "stakeholder-access":
         return <StakeholderAccess />;
       case "access-governance":
-        return <PlaceholderPage title="Access & Governance" description="Configure role-based access control, audit logs, and compliance governance settings." />;
+        return <AccessGovernance />;
       default:
         return <MissionControl />;
     }
