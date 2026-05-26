@@ -16,6 +16,10 @@ import { CompetencyVerification } from "@/components/dashboard/competency-verifi
 import { IntegrationsModal } from "@/components/dashboard/integrations-modal";
 import { Programmes } from "@/components/dashboard/programmes";
 import { Learning } from "@/components/dashboard/learning";
+import { Timeline } from "@/components/dashboard/timeline";
+import { Reports } from "@/components/dashboard/reports";
+import { SupplierDiscovery } from "@/components/dashboard/supplier-discovery";
+import { StakeholderAccess } from "@/components/dashboard/stakeholder-access";
 import { type UserProfile } from "@/lib/mock-data";
 
 // Placeholder components for pages we haven't built yet
@@ -61,7 +65,7 @@ export default function DashboardPage() {
       case "mobilisation-map":
         return <SkillsMap />;
       case "mobilisation-timeline":
-        return <PlaceholderPage title="Mobilisation Timeline" description="Gantt-style timeline showing workforce mobilisation schedules and milestone tracking." />;
+        return <Timeline />;
       case "workforce-readiness":
         return (
           <div className="space-y-6">
@@ -72,7 +76,7 @@ export default function DashboardPage() {
       case "supplier-readiness":
         return <WorkforceReadinessNetwork />;
       case "supplier-discovery":
-        return <PlaceholderPage title="Supplier Discovery" description="Search and discover suppliers with matching capabilities, readiness scores, and availability." />;
+        return <SupplierDiscovery />;
       case "role-readiness":
         return <SkillsMap />;
       case "safety-critical":
@@ -84,7 +88,7 @@ export default function DashboardPage() {
       case "learning":
         return <Learning />;
       case "reports":
-        return <AssurancePack />;
+        return <Reports />;
       case "readiness-pack":
         return <AssurancePack />;
       case "readiness-assistant":
@@ -102,7 +106,7 @@ export default function DashboardPage() {
       case "readiness-rules":
         return <ReadinessRules />;
       case "stakeholder-access":
-        return <PlaceholderPage title="Stakeholder Access" description="Manage access permissions and visibility for different stakeholder groups." />;
+        return <StakeholderAccess />;
       case "access-governance":
         return <PlaceholderPage title="Access & Governance" description="Configure role-based access control, audit logs, and compliance governance settings." />;
       default:
