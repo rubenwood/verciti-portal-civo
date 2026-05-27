@@ -365,10 +365,11 @@ function SiteDetailPanel({ site, onClose }: { site: ProjectSite; onClose: () => 
 
 export function MobilisationMap() {
   const [activeOverlay, setActiveOverlay] = useState<MapOverlay>("projects");
-  const [selectedSite, setSelectedSite] = useState<ProjectSite | null>(aberdeenSite);
+  const [selectedSite, setSelectedSite] = useState<ProjectSite>(aberdeenSite);
 
-  const handleSiteClick = (site?: ProjectSite) => {
-    setSelectedSite(site || sampleSite);
+  const handleSiteClick = () => {
+    // Toggle between Aberdeen and Trafford sites when clicking on the map
+    setSelectedSite(prev => prev.id === aberdeenSite.id ? sampleSite : aberdeenSite);
   };
 
   return (
@@ -465,10 +466,8 @@ export function MobilisationMap() {
           <SkillsMap />
         </div>
 
-        {/* Site Detail Panel */}
-        {selectedSite && (
-          <SiteDetailPanel site={selectedSite} onClose={() => setSelectedSite(null)} />
-        )}
+        {/* Site Detail Panel - Always visible */}
+        <SiteDetailPanel site={selectedSite} onClose={() => setSelectedSite(aberdeenSite)} />
       </div>
     </div>
   );
