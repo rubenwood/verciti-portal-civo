@@ -31,6 +31,7 @@ import { RoleReadiness } from "@/components/dashboard/role-readiness";
 import { WorkforceReadinessSimple } from "@/components/dashboard/workforce-readiness-simple";
 import { SupplierReadinessSimple } from "@/components/dashboard/supplier-readiness-simple";
 import { SafetyCriticalAssurance } from "@/components/dashboard/safety-critical-assurance";
+import { EvidencePage } from "@/components/dashboard/evidence-page";
 import { type UserProfile } from "@/lib/mock-data";
 
 // Placeholder components for pages we haven't built yet
@@ -88,7 +89,7 @@ export default function DashboardPage() {
       case "safety-critical":
         return <SafetyCriticalAssurance />;
       case "evidence":
-        return <CompetencyVerification />;
+        return <EvidencePage />;
       case "interventions":
         return <ActionQueue />;
       case "learning":
