@@ -329,9 +329,9 @@ export function MobilisationMap() {
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="space-y-4">
       {/* Full-width Header Section */}
-      <div className="space-y-4 mb-4">
+      <div className="space-y-4">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
@@ -413,10 +413,10 @@ export function MobilisationMap() {
       </div>
 
       {/* Map + Side Panel Row */}
-      <div className="flex flex-1 min-h-0 gap-4">
+      <div className="flex gap-4">
         {/* Map Component - Clickable */}
         <div 
-          className="flex-1 bg-card/30 border border-border/50 rounded-lg p-4 cursor-pointer overflow-auto" 
+          className="flex-1 bg-card/30 border border-border/50 rounded-lg p-4 cursor-pointer min-h-[600px]" 
           onClick={handleSiteClick}
         >
           <SkillsMap />
