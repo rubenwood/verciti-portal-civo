@@ -90,6 +90,49 @@ const sampleSite: ProjectSite = {
   ]
 };
 
+const aberdeenSite: ProjectSite = {
+  id: "2",
+  name: "Aberdeen Hydrogen Plant",
+  type: "Hydrogen Storage & Distribution",
+  status: "conditional",
+  overallReadiness: 74,
+  deploymentDate: "12 Aug 2025",
+  daysRemaining: 113,
+  requiredThreshold: 85,
+  readinessForecast: 82,
+  readinessGap: 8,
+  staffAllocated: 45,
+  staffRequired: 68,
+  evidenceCompletion: 76,
+  evidenceTarget: 85,
+  certificationsCurrent: 38,
+  certificationsRequired: 52,
+  riskReasons: [
+    "23 staff still needed across 3 critical roles",
+    "2 critical skills below target",
+    "Evidence completion at 76% (target 85%)",
+    "4 certifications expiring within 30 days",
+    "1 supplier below readiness threshold"
+  ],
+  criticalRoleGaps: [
+    { role: "Hydrogen Storage Technician", gap: 12 },
+    { role: "Pipeline Engineer", gap: 8 },
+    { role: "Safety Systems Operator", gap: 3 }
+  ],
+  workPackages: [
+    { name: "Storage Tank Systems", readiness: 78, status: "conditional" },
+    { name: "Distribution Network", readiness: 72, status: "conditional" },
+    { name: "Safety & Monitoring", readiness: 81, status: "conditional" },
+    { name: "Site Operations", readiness: 65, status: "conditional" }
+  ],
+  recommendedActions: [
+    { action: "Complete pipeline safety certification for 8 engineers", impact: "+8 workers toward readiness" },
+    { action: "Schedule storage systems refresher training", impact: "+12 workers toward readiness" }
+  ]
+};
+
+const projectSites: ProjectSite[] = [aberdeenSite, sampleSite];
+
 const kpiData = [
   { label: "Active Project Sites", value: "7", subtitle: "Portfolio view", icon: MapPin, color: "text-[#e8efe9]" },
   { label: "Ready / Low Risk", value: "2", subtitle: "29% of sites", icon: CheckCircle2, color: "text-success" },
@@ -322,10 +365,10 @@ function SiteDetailPanel({ site, onClose }: { site: ProjectSite; onClose: () => 
 
 export function MobilisationMap() {
   const [activeOverlay, setActiveOverlay] = useState<MapOverlay>("projects");
-  const [selectedSite, setSelectedSite] = useState<ProjectSite | null>(null);
+  const [selectedSite, setSelectedSite] = useState<ProjectSite | null>(aberdeenSite);
 
-  const handleSiteClick = () => {
-    setSelectedSite(sampleSite);
+  const handleSiteClick = (site?: ProjectSite) => {
+    setSelectedSite(site || sampleSite);
   };
 
   return (
