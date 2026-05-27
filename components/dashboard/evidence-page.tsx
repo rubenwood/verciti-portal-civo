@@ -57,7 +57,22 @@ const evidenceCoverage = [
   { type: "Immersive module completion", percentage: 78 },
   { type: "Assessment result", percentage: 84 },
   { type: "Practical competency", percentage: 71 },
+  { type: "Employer sign-off", percentage: 63 },
+  { type: "Assessor verification", percentage: 58 },
+  { type: "Certificate upload", percentage: 88 },
+  { type: "Expiry date present", percentage: 92 },
+  { type: "Site induction", percentage: 54 },
+  { type: "Equipment authorisation", percentage: 47 },
+  { type: "Permit-to-work status", percentage: 62 },
+  { type: "Refresher requirement", percentage: 71 },
+  { type: "Fitness-to-work check", percentage: 82 },
 ];
+
+const getCoverageBarColor = (percentage: number) => {
+  if (percentage >= 80) return "bg-[#a3e635]";
+  if (percentage >= 60) return "bg-[#f59e0b]";
+  return "bg-[#ef4444]";
+};
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -281,13 +296,13 @@ export function EvidencePage() {
             <h3 className="text-sm font-medium text-[#e8efe9]">Evidence type coverage</h3>
             <p className="text-xs text-[#6e7a70]">Coverage across all 13 evidence types Trace tracks</p>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {evidenceCoverage.map((item, i) => (
               <div key={i} className="flex items-center gap-4">
-                <span className="text-sm text-[#e8efe9] w-48">{item.type}</span>
+                <span className="text-sm text-[#e8efe9] w-52">{item.type}</span>
                 <div className="flex-1 h-2 bg-[#1a1f1c] rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-[#a3e635] rounded-full"
+                    className={cn("h-full rounded-full", getCoverageBarColor(item.percentage))}
                     style={{ width: `${item.percentage}%` }}
                   />
                 </div>
