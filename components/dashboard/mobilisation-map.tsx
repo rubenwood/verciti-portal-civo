@@ -146,7 +146,7 @@ function SiteDetailPanel({ site, onClose }: { site: ProjectSite; onClose: () => 
   const certifiedPercent = Math.round((site.certificationsCurrent / site.certificationsRequired) * 100);
 
   return (
-    <div className="w-[420px] bg-[#0f1211] border-l border-border/50 h-full overflow-y-auto">
+    <div className="w-[420px] bg-[#0f1211] border border-border/50 rounded-lg overflow-y-auto shrink-0">
       {/* Header */}
       <div className="p-4 border-b border-border/30">
         <div className="flex items-start justify-between mb-2">
@@ -329,8 +329,9 @@ export function MobilisationMap() {
   };
 
   return (
-    <div className="flex h-full">
-      <div className={cn("flex-1 space-y-4 transition-all", selectedSite ? "pr-0" : "")}>
+    <div className="h-full flex flex-col">
+      {/* Full-width Header Section */}
+      <div className="space-y-4 mb-4">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
@@ -409,20 +410,23 @@ export function MobilisationMap() {
             ))}
           </div>
         </div>
+      </div>
 
+      {/* Map + Side Panel Row */}
+      <div className="flex flex-1 min-h-0 gap-4">
         {/* Map Component - Clickable */}
         <div 
-          className="bg-card/30 border border-border/50 rounded-lg p-4 cursor-pointer" 
+          className="flex-1 bg-card/30 border border-border/50 rounded-lg p-4 cursor-pointer overflow-auto" 
           onClick={handleSiteClick}
         >
           <SkillsMap />
         </div>
-      </div>
 
-      {/* Site Detail Panel */}
-      {selectedSite && (
-        <SiteDetailPanel site={selectedSite} onClose={() => setSelectedSite(null)} />
-      )}
+        {/* Site Detail Panel */}
+        {selectedSite && (
+          <SiteDetailPanel site={selectedSite} onClose={() => setSelectedSite(null)} />
+        )}
+      </div>
     </div>
   );
 }
