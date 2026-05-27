@@ -47,11 +47,19 @@ const getStatusBadge = (status: string) => {
   }
 };
 
-const getReadinessColor = (readiness: number) => {
-  if (readiness >= 80) return "bg-[#a3e635]";
-  if (readiness >= 70) return "bg-[#a3e635]";
-  if (readiness >= 60) return "bg-[#f59e0b]";
-  return "bg-[#ef4444]";
+const getReadinessColor = (status: string) => {
+  switch (status) {
+    case "Ready":
+      return "bg-[#a3e635]";
+    case "At Risk":
+      return "bg-[#f59e0b]";
+    case "Blocked":
+      return "bg-[#ef4444]";
+    case "Evidence Required":
+      return "bg-[#6e7a70]";
+    default:
+      return "bg-[#6e7a70]";
+  }
 };
 
 export function SupplierReadinessSimple() {
@@ -171,7 +179,7 @@ export function SupplierReadinessSimple() {
                   <div className="flex items-center gap-3">
                     <div className="w-24 h-2 bg-[#1a1f1c] rounded-full overflow-hidden">
                       <div 
-                        className={cn("h-full rounded-full", getReadinessColor(supplier.readiness))}
+                        className={cn("h-full rounded-full", getReadinessColor(supplier.status))}
                         style={{ width: `${supplier.readiness}%` }}
                       />
                     </div>
