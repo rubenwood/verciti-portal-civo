@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Search, Settings, Leaf, Plus, Filter } from "lucide-react";
+import { Bell, Search, Settings, Plus, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -18,19 +18,8 @@ export function Brandbar() {
 
   return (
     <header className="h-14 bg-[#0a0d0c] border-b border-[#1c211e] flex items-center px-7 gap-5">
-      {/* Brand */}
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-[#a3ff3c] grid place-items-center">
-          <Leaf className="h-4 w-4 text-[#0a0d0c]" />
-        </div>
-        <div>
-          <div className="text-[15px] font-semibold text-[#e8efe9] tracking-tight">Verciti Trace</div>
-          <div className="text-[11px] text-[#6e7a70]">Workforce Readiness Platform</div>
-        </div>
-      </div>
-
       {/* Search */}
-      <div className="flex items-center gap-2 bg-[#0f1311] border border-[#232a25] rounded-lg px-3 py-1.5 w-[280px] ml-4">
+      <div className="flex items-center gap-2 bg-[#0f1311] border border-[#232a25] rounded-lg px-3 py-1.5 w-[280px]">
         <Search className="h-4 w-4 text-[#6e7a70]" />
         <input
           type="text"

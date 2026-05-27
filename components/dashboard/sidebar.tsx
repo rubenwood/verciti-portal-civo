@@ -23,6 +23,7 @@ import {
   UserCog,
   Lock,
   GraduationCap,
+  Leaf,
 } from "lucide-react";
 
 export type SidebarPage =
@@ -84,6 +85,19 @@ const systemItems: { id: SidebarPage; label: string; icon: React.ElementType; ba
 export function Sidebar({ activePage, onPageChange, alertCount = 11 }: SidebarProps) {
   return (
     <aside className="w-[232px] h-screen bg-[#0a0d0c] border-r border-[#1c211e] flex flex-col overflow-hidden">
+      {/* Brand Logo */}
+      <div className="px-4 py-4 border-b border-[#1c211e]">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#a3ff3c] grid place-items-center">
+            <Leaf className="h-4 w-4 text-[#0a0d0c]" />
+          </div>
+          <div>
+            <div className="text-[15px] font-semibold text-[#e8efe9] tracking-tight">Verciti Trace</div>
+            <div className="text-[11px] text-[#6e7a70]">Workforce Readiness Platform</div>
+          </div>
+        </div>
+      </div>
+
       {/* Scrollable nav */}
       <nav className="flex-1 overflow-y-auto py-4 px-3">
         {/* Workspace Section */}
