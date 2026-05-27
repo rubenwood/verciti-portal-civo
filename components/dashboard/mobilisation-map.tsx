@@ -133,6 +133,217 @@ const aberdeenSite: ProjectSite = {
 
 const projectSites: ProjectSite[] = [aberdeenSite, sampleSite];
 
+const manchesterSite: ProjectSite = {
+  id: "3",
+  name: "Manchester Wind Farm",
+  type: "Offshore Wind Installation",
+  status: "ready",
+  overallReadiness: 89,
+  deploymentDate: "15 Mar 2025",
+  daysRemaining: 21,
+  requiredThreshold: 85,
+  readinessForecast: 92,
+  readinessGap: 0,
+  staffAllocated: 115,
+  staffRequired: 125,
+  evidenceCompletion: 91,
+  evidenceTarget: 85,
+  certificationsCurrent: 48,
+  certificationsRequired: 52,
+  riskReasons: [
+    "10 staff positions remaining to fill",
+    "All critical skills above target",
+    "Evidence completion exceeds threshold"
+  ],
+  criticalRoleGaps: [
+    { role: "Marine Engineer", gap: 5 },
+    { role: "Wind Turbine Technician", gap: 3 },
+    { role: "Electrical Systems Operator", gap: 2 }
+  ],
+  workPackages: [
+    { name: "Turbine Installation", readiness: 92, status: "ready" },
+    { name: "Electrical Grid Connection", readiness: 88, status: "ready" },
+    { name: "Marine Operations", readiness: 85, status: "ready" },
+    { name: "Safety Systems", readiness: 91, status: "ready" }
+  ],
+  recommendedActions: [
+    { action: "Complete final marine certification batch", impact: "+5 workers toward full readiness" }
+  ]
+};
+
+const londonSite: ProjectSite = {
+  id: "4",
+  name: "London HQ",
+  type: "Operations & Training Centre",
+  status: "ready",
+  overallReadiness: 94,
+  deploymentDate: "01 Feb 2025",
+  daysRemaining: 0,
+  requiredThreshold: 85,
+  readinessForecast: 94,
+  readinessGap: 0,
+  staffAllocated: 245,
+  staffRequired: 250,
+  evidenceCompletion: 96,
+  evidenceTarget: 85,
+  certificationsCurrent: 98,
+  certificationsRequired: 100,
+  riskReasons: [
+    "Fully operational headquarters",
+    "5 positions in recruitment pipeline",
+    "All evidence and certifications current"
+  ],
+  criticalRoleGaps: [
+    { role: "Training Coordinator", gap: 3 },
+    { role: "Compliance Officer", gap: 2 }
+  ],
+  workPackages: [
+    { name: "Training Delivery", readiness: 96, status: "ready" },
+    { name: "Compliance Management", readiness: 94, status: "ready" },
+    { name: "Operations Support", readiness: 92, status: "ready" },
+    { name: "Administration", readiness: 94, status: "ready" }
+  ],
+  recommendedActions: [
+    { action: "Onboard remaining training coordinators", impact: "+5 workers toward full capacity" }
+  ]
+};
+
+const cardiffSite: ProjectSite = {
+  id: "5",
+  name: "Cardiff Solar Installation",
+  type: "Solar Farm Development",
+  status: "conditional",
+  overallReadiness: 71,
+  deploymentDate: "30 Jun 2025",
+  daysRemaining: 98,
+  requiredThreshold: 85,
+  readinessForecast: 79,
+  readinessGap: 6,
+  staffAllocated: 49,
+  staffRequired: 85,
+  evidenceCompletion: 72,
+  evidenceTarget: 85,
+  certificationsCurrent: 31,
+  certificationsRequired: 48,
+  riskReasons: [
+    "36 staff still needed across 4 critical roles",
+    "3 critical skills below target",
+    "Evidence completion at 72% (target 85%)",
+    "2 certifications expiring within 30 days"
+  ],
+  criticalRoleGaps: [
+    { role: "Solar Panel Installer", gap: 18 },
+    { role: "Electrical Engineer", gap: 10 },
+    { role: "Energy Storage Technician", gap: 5 },
+    { role: "Site Supervisor", gap: 3 }
+  ],
+  workPackages: [
+    { name: "Panel Installation", readiness: 68, status: "conditional" },
+    { name: "Grid Integration", readiness: 74, status: "conditional" },
+    { name: "Energy Storage", readiness: 69, status: "conditional" },
+    { name: "Site Infrastructure", readiness: 73, status: "conditional" }
+  ],
+  recommendedActions: [
+    { action: "Fast-track solar installer certification program", impact: "+18 workers toward readiness" },
+    { action: "Partner with Cardiff University for graduate intake", impact: "+8 workers toward readiness" }
+  ]
+};
+
+const edinburghSite: ProjectSite = {
+  id: "6",
+  name: "Edinburgh R&D Center",
+  type: "Research & Development Facility",
+  status: "conditional",
+  overallReadiness: 76,
+  deploymentDate: "01 Sep 2025",
+  daysRemaining: 127,
+  requiredThreshold: 85,
+  readinessForecast: 84,
+  readinessGap: 1,
+  staffAllocated: 81,
+  staffRequired: 105,
+  evidenceCompletion: 79,
+  evidenceTarget: 85,
+  certificationsCurrent: 42,
+  certificationsRequired: 55,
+  riskReasons: [
+    "24 staff still needed across 3 critical roles",
+    "Specialized R&D skills in high demand",
+    "Evidence completion at 79% (target 85%)",
+    "3 certifications expiring within 30 days"
+  ],
+  criticalRoleGaps: [
+    { role: "Hydrogen Research Scientist", gap: 12 },
+    { role: "FCEV Systems Engineer", gap: 8 },
+    { role: "Laboratory Technician", gap: 4 }
+  ],
+  workPackages: [
+    { name: "Hydrogen Research Labs", readiness: 78, status: "conditional" },
+    { name: "FCEV Testing Facility", readiness: 74, status: "conditional" },
+    { name: "Data Analysis Centre", readiness: 81, status: "conditional" },
+    { name: "Prototype Development", readiness: 71, status: "conditional" }
+  ],
+  recommendedActions: [
+    { action: "Partner with University of Edinburgh for PhD placements", impact: "+6 researchers toward readiness" },
+    { action: "Launch hydrogen specialist recruitment campaign", impact: "+12 workers toward readiness" }
+  ]
+};
+
+const belfastSite: ProjectSite = {
+  id: "7",
+  name: "Belfast Marine Hub",
+  type: "Marine Operations Centre",
+  status: "high-risk",
+  overallReadiness: 58,
+  deploymentDate: "15 Jul 2025",
+  daysRemaining: 84,
+  requiredThreshold: 85,
+  readinessForecast: 68,
+  readinessGap: 17,
+  staffAllocated: 34,
+  staffRequired: 80,
+  evidenceCompletion: 61,
+  evidenceTarget: 85,
+  certificationsCurrent: 22,
+  certificationsRequired: 45,
+  riskReasons: [
+    "46 staff still needed across 5 critical roles",
+    "Marine specialist shortage in region",
+    "Evidence completion at 61% (target 85%)",
+    "8 certifications expiring within 30 days",
+    "3 suppliers below readiness threshold"
+  ],
+  criticalRoleGaps: [
+    { role: "Marine Engineer", gap: 16 },
+    { role: "Offshore Wind Technician", gap: 14 },
+    { role: "Storage Tank Specialist", gap: 8 },
+    { role: "Plant Machinery Operator", gap: 5 },
+    { role: "Safety Officer", gap: 3 }
+  ],
+  workPackages: [
+    { name: "Marine Operations", readiness: 54, status: "high-risk" },
+    { name: "Offshore Support", readiness: 56, status: "high-risk" },
+    { name: "Equipment Maintenance", readiness: 62, status: "conditional" },
+    { name: "Safety & Compliance", readiness: 60, status: "high-risk" }
+  ],
+  recommendedActions: [
+    { action: "Emergency recruitment drive for marine specialists", impact: "+16 workers toward readiness" },
+    { action: "Partner with Queen's University Belfast", impact: "+8 workers toward readiness" },
+    { action: "Accelerate offshore wind certification program", impact: "+14 workers toward readiness" }
+  ]
+};
+
+// Map of workplace names to site data
+const sitesByName: Record<string, ProjectSite> = {
+  "Aberdeen Hydrogen Plant": aberdeenSite,
+  "Manchester Wind Farm": manchesterSite,
+  "London HQ": londonSite,
+  "Cardiff Solar Installation": cardiffSite,
+  "Edinburgh R&D Center": edinburghSite,
+  "Belfast Marine Hub": belfastSite,
+  "Trafford Green Hydrogen": sampleSite,
+};
+
 const kpiData = [
   { label: "Active Project Sites", value: "7", subtitle: "Portfolio view", icon: MapPin, color: "text-[#e8efe9]" },
   { label: "Ready / Low Risk", value: "2", subtitle: "29% of sites", icon: CheckCircle2, color: "text-success" },
@@ -367,9 +578,12 @@ export function MobilisationMap() {
   const [activeOverlay, setActiveOverlay] = useState<MapOverlay>("projects");
   const [selectedSite, setSelectedSite] = useState<ProjectSite>(aberdeenSite);
 
-  const handleSiteClick = () => {
-    // Toggle between Aberdeen and Trafford sites when clicking on the map
-    setSelectedSite(prev => prev.id === aberdeenSite.id ? sampleSite : aberdeenSite);
+  const handleWorkplaceClick = (workplaceName: string) => {
+    // Look up the site by workplace name
+    const site = sitesByName[workplaceName];
+    if (site) {
+      setSelectedSite(site);
+    }
   };
 
   return (
@@ -458,12 +672,9 @@ export function MobilisationMap() {
 
       {/* Map + Side Panel Row */}
       <div className="flex gap-4">
-        {/* Map Component - Clickable */}
-        <div 
-          className="flex-1 bg-card/30 border border-border/50 rounded-lg p-4 cursor-pointer min-h-[600px]" 
-          onClick={handleSiteClick}
-        >
-          <SkillsMap />
+        {/* Map Component */}
+        <div className="flex-1 bg-card/30 border border-border/50 rounded-lg p-4 min-h-[600px]">
+          <SkillsMap onExternalWorkplaceClick={handleWorkplaceClick} />
         </div>
 
         {/* Site Detail Panel - Always visible */}

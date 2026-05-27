@@ -285,7 +285,7 @@ function MapContent({
   );
 }
 
-export function SkillsMap() {
+export function SkillsMap({ onExternalWorkplaceClick }: { onExternalWorkplaceClick?: (workplaceName: string) => void } = {}) {
   const [selectedWorkplace, setSelectedWorkplace] = useState<Workplace | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [showTalentSources, setShowTalentSources] = useState(false);
@@ -345,6 +345,10 @@ export function SkillsMap() {
     setSelectedSkill(null);
     setShowTalentSources(false);
     setHighlightedSkill(null);
+    // Call external handler if provided
+    if (onExternalWorkplaceClick) {
+      onExternalWorkplaceClick(workplace.name);
+    }
   };
 
   const handleMapRightClick = (lat: number, lng: number) => {
