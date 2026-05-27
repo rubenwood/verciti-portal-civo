@@ -27,6 +27,7 @@ import { TrainingModules } from "@/components/dashboard/training-modules";
 import { WorkerReadinessProfile } from "@/components/dashboard/worker-readiness-profile";
 import { SupplierReadinessProfile } from "@/components/dashboard/supplier-readiness-profile";
 import { MobilisationMap } from "@/components/dashboard/mobilisation-map";
+import { RoleReadiness } from "@/components/dashboard/role-readiness";
 import { type UserProfile } from "@/lib/mock-data";
 
 // Placeholder components for pages we haven't built yet
@@ -85,7 +86,7 @@ export default function DashboardPage() {
       case "supplier-discovery":
         return <SupplierDiscovery />;
       case "role-readiness":
-        return <SkillsMap />;
+        return <RoleReadiness />;
       case "safety-critical":
         return <CompetencyVerification />;
       case "evidence":
