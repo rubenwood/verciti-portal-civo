@@ -28,6 +28,7 @@ import { WorkerReadinessProfile } from "@/components/dashboard/worker-readiness-
 import { SupplierReadinessProfile } from "@/components/dashboard/supplier-readiness-profile";
 import { MobilisationMap } from "@/components/dashboard/mobilisation-map";
 import { RoleReadiness } from "@/components/dashboard/role-readiness";
+import { WorkforceReadinessSimple } from "@/components/dashboard/workforce-readiness-simple";
 import { type UserProfile } from "@/lib/mock-data";
 
 // Placeholder components for pages we haven't built yet
@@ -75,12 +76,7 @@ export default function DashboardPage() {
       case "mobilisation-timeline":
         return <Timeline />;
       case "workforce-readiness":
-        return (
-          <div className="space-y-6">
-            <WorkforceStats />
-            <UserProfilesTable onViewUser={setSelectedUser} />
-          </div>
-        );
+        return <WorkforceReadinessSimple />;
       case "supplier-readiness":
         return <WorkforceReadinessNetwork />;
       case "supplier-discovery":
