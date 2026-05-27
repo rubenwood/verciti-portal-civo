@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  AlertTriangle, 
-  ChevronDown, 
-  Download, 
+import {
+  AlertTriangle,
+  ChevronDown,
+  Download,
   X,
   MapPin,
   CheckCircle2,
@@ -424,7 +424,9 @@ function SiteDetailPanel({ site, onClose }: { site: ProjectSite; onClose: () => 
             <div className={cn("text-2xl font-semibold", site.overallReadiness < 70 ? "text-destructive" : site.overallReadiness < 85 ? "text-warning" : "text-success")}>
               {site.overallReadiness}%
             </div>
-            <div className="text-xs text-destructive">At Risk</div>
+            <div className={cn("text-xs text-destructive", site.overallReadiness < 70 ? "text-destructive" : site.overallReadiness < 85 ? "text-warning" : "text-success")}>
+              {site.overallReadiness < 70 ? "At Risk" : site.overallReadiness < 85 ? "Medium Risk" : "Low Risk"}
+            </div>
           </div>
           <div>
             <div className="text-[10px] text-[#6e7a70] uppercase tracking-wider mb-1">Deployment Date</div>
@@ -533,9 +535,9 @@ function SiteDetailPanel({ site, onClose }: { site: ProjectSite; onClose: () => 
                 <td className="py-2.5">
                   <div className="flex items-center gap-2">
                     <div className="w-12 h-1.5 bg-[#1a1f1c] rounded-full overflow-hidden">
-                      <div 
-                        className={cn("h-full rounded-full", pkg.status === "high-risk" ? "bg-destructive" : pkg.status === "conditional" ? "bg-warning" : "bg-success")} 
-                        style={{ width: `${pkg.readiness}%` }} 
+                      <div
+                        className={cn("h-full rounded-full", pkg.status === "high-risk" ? "bg-destructive" : pkg.status === "conditional" ? "bg-warning" : "bg-success")}
+                        style={{ width: `${pkg.readiness}%` }}
                       />
                     </div>
                     <span className="text-xs text-[#e8efe9] w-8">{pkg.readiness}%</span>
