@@ -26,6 +26,7 @@ import { ReadinessAssistant } from "@/components/dashboard/readiness-assistant";
 import { TrainingModules } from "@/components/dashboard/training-modules";
 import { WorkerReadinessProfile } from "@/components/dashboard/worker-readiness-profile";
 import { SupplierReadinessProfile } from "@/components/dashboard/supplier-readiness-profile";
+import { MobilisationMap } from "@/components/dashboard/mobilisation-map";
 import { type UserProfile } from "@/lib/mock-data";
 
 // Placeholder components for pages we haven't built yet
@@ -69,7 +70,7 @@ export default function DashboardPage() {
       case "programmes":
         return <Programmes />;
       case "mobilisation-map":
-        return <SkillsMap />;
+        return <MobilisationMap />;
       case "mobilisation-timeline":
         return <Timeline />;
       case "workforce-readiness":
