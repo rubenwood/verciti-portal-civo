@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { 
   Filter, 
   Download, 
-  Plus,
   ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -48,13 +46,6 @@ const workers: Worker[] = [
   { id: "MAINT-204", employer: "Supplier A", role: "Maintenance Technician", sector: "Cross-sector", status: "ready", evidence: "All verified", expiryRisk: "180 days" },
   { id: "EV-INST-077", employer: "Supplier B", role: "EV Installation Lead", sector: "Electrification", status: "ready", evidence: "Verified", expiryRisk: "112 days" },
   { id: "PTW-SUP-005", employer: "Anchor org", role: "Permit-to-Work Supervisor", sector: "Cross-sector", status: "at-risk", evidence: "Site authority renewal due", expiryRisk: "21 days" },
-];
-
-const sectorFilters = [
-  { id: "all", label: "All", active: true },
-  { id: "hydrogen", label: "Hydrogen", active: false },
-  { id: "electrification", label: "Electrification", active: false },
-  { id: "smr", label: "SMR · future", active: false, disabled: true },
 ];
 
 function StatusBadge({ status }: { status: WorkerStatus }) {
@@ -114,53 +105,15 @@ function ExpiryRiskText({ risk }: { risk: ExpiryRisk }) {
 }
 
 export function WorkforceReadinessSimple() {
-  const [activeSector, setActiveSector] = useState("all");
-
   return (
     <div className="space-y-4">
-      {/* Breadcrumb and Sector Filters */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs text-[#6e7a70]">
-          <span>Regional Net Zero Infrastructure Workforce Readiness Programme</span>
-          <span>/</span>
-          <span>Workspace</span>
-          <span>/</span>
-          <span className="text-[#e8efe9] font-medium">Workforce Readiness</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-xs">
-            <Filter className="h-3.5 w-3.5 text-[#6e7a70]" />
-            <span className="text-[#6e7a70]">Sectors</span>
-            {sectorFilters.map((filter) => (
-              <button
-                key={filter.id}
-                onClick={() => !filter.disabled && setActiveSector(filter.id)}
-                disabled={filter.disabled}
-                className={cn(
-                  "px-2 py-1 rounded text-xs font-medium transition-colors",
-                  activeSector === filter.id
-                    ? "bg-[#a3ff3c] text-[#0a0d0c]"
-                    : filter.disabled
-                    ? "text-[#3a4540] cursor-not-allowed"
-                    : "text-[#6e7a70] hover:text-[#e8efe9]"
-                )}
-              >
-                {!filter.disabled && <span className={cn(
-                  "inline-block w-1.5 h-1.5 rounded-full mr-1.5",
-                  filter.id === "hydrogen" && "bg-[#a3ff3c]",
-                  filter.id === "electrification" && "bg-[#f59e0b]",
-                  filter.id === "all" && activeSector === "all" && "bg-[#0a0d0c]",
-                  filter.id === "all" && activeSector !== "all" && "bg-[#a3ff3c]"
-                )} />}
-                {filter.label}
-              </button>
-            ))}
-          </div>
-          <Button className="h-8 px-3 text-sm bg-[#a3ff3c] text-[#0a0d0c] hover:bg-[#a3ff3c]/90">
-            <Plus className="mr-1.5 h-3.5 w-3.5" />
-            New Action
-          </Button>
-        </div>
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-xs text-[#6e7a70]">
+        <span>Regional Net Zero Infrastructure Workforce Readiness Programme</span>
+        <span>/</span>
+        <span>Workspace</span>
+        <span>/</span>
+        <span className="text-[#e8efe9] font-medium">Workforce Readiness</span>
       </div>
 
       {/* Page Header */}

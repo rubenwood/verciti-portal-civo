@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Filter, Download, Plus, Zap, FlameKindling } from "lucide-react";
+import { Filter, Download, Zap, FlameKindling } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type RiskLevel = "red" | "amber" | "green";
@@ -23,13 +22,6 @@ const roleData: RoleData[] = [
   { role: "High-voltage engineer", needed: 35, ready: 19, inTraining: 6, conditional: 4, blocked: 6, risk: "red" },
   { role: "Maintenance technician", needed: 68, ready: 42, inTraining: 10, conditional: 5, blocked: 3, risk: "amber" },
   { role: "Emergency response lead", needed: 12, ready: 7, inTraining: 2, conditional: 1, blocked: 2, risk: "red" },
-];
-
-const sectors = [
-  { id: "all", label: "All", active: true },
-  { id: "hydrogen", label: "Hydrogen", color: "bg-[#a3ff3c]" },
-  { id: "electrification", label: "Electrification", color: "bg-[#f59e0b]" },
-  { id: "smr", label: "SMR - future", disabled: true },
 ];
 
 const hydrogenRequirements = [
@@ -91,48 +83,15 @@ function ProgressBadge({ percent }: { percent: number }) {
 }
 
 export function RoleReadiness() {
-  const [activeSector, setActiveSector] = useState("all");
-
   return (
     <div className="space-y-6">
-      {/* Breadcrumb and Sector Filters */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-[#6e7a70]">
-          <span>Regional Net Zero Infrastructure Workforce Readiness Programme</span>
-          <span>/</span>
-          <span>Workspace</span>
-          <span>/</span>
-          <span className="text-[#e8efe9]">Role Readiness</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1 text-sm">
-            <Filter className="h-4 w-4 text-[#6e7a70]" />
-            <span className="text-[#6e7a70]">Sectors</span>
-            {sectors.map((sector) => (
-              <button
-                key={sector.id}
-                onClick={() => !sector.disabled && setActiveSector(sector.id)}
-                disabled={sector.disabled}
-                className={cn(
-                  "px-2.5 py-1 rounded text-xs font-medium transition-colors",
-                  sector.disabled && "opacity-40 cursor-not-allowed",
-                  activeSector === sector.id
-                    ? "bg-primary text-primary-foreground"
-                    : "text-[#6e7a70] hover:text-[#e8efe9]"
-                )}
-              >
-                {sector.color && activeSector !== sector.id && (
-                  <span className={cn("inline-block w-1.5 h-1.5 rounded-full mr-1.5", sector.color)} />
-                )}
-                {sector.label}
-              </button>
-            ))}
-          </div>
-          <Button className="h-8 px-3 text-sm bg-primary text-primary-foreground">
-            <Plus className="mr-1.5 h-4 w-4" />
-            New Action
-          </Button>
-        </div>
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-[#6e7a70]">
+        <span>Regional Net Zero Infrastructure Workforce Readiness Programme</span>
+        <span>/</span>
+        <span>Workspace</span>
+        <span>/</span>
+        <span className="text-[#e8efe9]">Role Readiness</span>
       </div>
 
       {/* Page Header */}

@@ -1,16 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, ChevronDown, FileText, Lightbulb, Clock, ChevronRight } from "lucide-react";
+import { FileText, Lightbulb, Clock, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const sectors = [
-  { id: "all", label: "All", active: true },
-  { id: "hydrogen", label: "Hydrogen", color: "bg-[#a3e635]" },
-  { id: "electrification", label: "Electrification", color: "bg-[#f59e0b]" },
-  { id: "smr", label: "SMR - future", color: "bg-[#6e7a70]", disabled: true },
-];
 
 const kpiData = [
   { label: "AUTHORISED", value: "412", subtitle: "48% of workforce", color: "text-[#a3e635]" },
@@ -53,49 +45,15 @@ const deploymentBlockers = [
 ];
 
 export function SafetyCriticalAssurance() {
-  const [activeSector, setActiveSector] = useState("all");
-
   return (
     <div className="space-y-4">
-      {/* Breadcrumb Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-[#6e7a70]">
-          <span>Regional Net Zero Infrastructure Workforce Readiness Programme</span>
-          <span>/</span>
-          <span>Workspace</span>
-          <span>/</span>
-          <span className="text-[#e8efe9] font-medium">Safety-Critical Assurance</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-[#6e7a70] flex items-center gap-1">
-              <ChevronDown className="h-4 w-4" />
-              Sectors
-            </span>
-            {sectors.map((sector) => (
-              <button
-                key={sector.id}
-                onClick={() => !sector.disabled && setActiveSector(sector.id)}
-                disabled={sector.disabled}
-                className={cn(
-                  "px-3 py-1 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5",
-                  activeSector === sector.id
-                    ? "bg-[#a3e635]/20 text-[#a3e635] border border-[#a3e635]/50"
-                    : sector.disabled
-                    ? "text-[#6e7a70]/50 cursor-not-allowed"
-                    : "text-[#e8efe9] hover:bg-card/50"
-                )}
-              >
-                {sector.color && <span className={cn("w-2 h-2 rounded-full", sector.color)} />}
-                {sector.label}
-              </button>
-            ))}
-          </div>
-          <Button className="h-8 px-4 text-sm bg-primary text-primary-foreground">
-            <Plus className="mr-2 h-4 w-4" />
-            New Action
-          </Button>
-        </div>
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-[#6e7a70]">
+        <span>Regional Net Zero Infrastructure Workforce Readiness Programme</span>
+        <span>/</span>
+        <span>Workspace</span>
+        <span>/</span>
+        <span className="text-[#e8efe9] font-medium">Safety-Critical Assurance</span>
       </div>
 
       {/* Page Title */}

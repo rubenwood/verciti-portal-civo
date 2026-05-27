@@ -8,7 +8,6 @@ import {
   Plus,
   FileText,
   ChevronRight,
-  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -20,13 +19,6 @@ const stakeholderTabs: { id: StakeholderView; label: string }[] = [
   { id: "government", label: "Government / Funder" },
   { id: "college", label: "College / Training Provider" },
   { id: "investor", label: "Investor / Strategic" },
-];
-
-const sectorFilters = [
-  { id: "all", label: "All", active: true },
-  { id: "hydrogen", label: "Hydrogen", active: false },
-  { id: "electrification", label: "Electrification", active: false },
-  { id: "smr", label: "SMR - future", active: false, disabled: true },
 ];
 
 const reportSections = [
@@ -46,41 +38,13 @@ export function Reports() {
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumb and Sector Filters */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-[#6e7a70]">
-          <span>Regional Net Zero Infrastructure Workforce Readiness Programme</span>
-          <span>/</span>
-          <span>Workspace</span>
-          <span>/</span>
-          <span className="text-[#e8efe9] font-medium">Reports</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-[#6e7a70]">Sectors</span>
-            {sectorFilters.map((filter) => (
-              <button
-                key={filter.id}
-                disabled={filter.disabled}
-                className={cn(
-                  "px-3 py-1 rounded-full text-sm transition-colors",
-                  filter.active
-                    ? "bg-[#a3e635] text-black font-medium"
-                    : filter.disabled
-                    ? "text-[#4a5250] cursor-not-allowed"
-                    : "text-[#6e7a70] hover:text-[#e8efe9]"
-                )}
-              >
-                {!filter.disabled && !filter.active && <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#a3e635] mr-1.5" />}
-                {filter.label}
-              </button>
-            ))}
-          </div>
-          <Button className="h-8 px-4 bg-[#a3e635] text-black hover:bg-[#95d62f]">
-            <Plus className="mr-2 h-4 w-4" />
-            New Action
-          </Button>
-        </div>
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-[#6e7a70]">
+        <span>Regional Net Zero Infrastructure Workforce Readiness Programme</span>
+        <span>/</span>
+        <span>Workspace</span>
+        <span>/</span>
+        <span className="text-[#e8efe9] font-medium">Reports</span>
       </div>
 
       {/* Page Header */}

@@ -1,28 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
-  ChevronDown,
-  Plus,
   Filter,
   Upload,
   CheckCircle2,
   FileText,
   Users,
-  Clock,
-  AlertTriangle,
-  ChevronRight,
+  Plus,
   RefreshCw,
 } from "lucide-react";
-
-const sectors = [
-  { id: "all", label: "All", active: true },
-  { id: "hydrogen", label: "Hydrogen", color: "bg-[#a3e635]" },
-  { id: "electrification", label: "Electrification", color: "bg-[#f59e0b]" },
-  { id: "smr", label: "SMR - future", color: "bg-[#6e7a70]", disabled: true },
-];
 
 const kpis = [
   { label: "EVIDENCE ITEMS", value: "8,421", subtitle: "Across 24 organisations", color: "text-[#e8efe9]" },
@@ -109,49 +97,15 @@ const getLevelColor = (level: string) => {
 };
 
 export function EvidencePage() {
-  const [activeSector, setActiveSector] = useState("all");
-
   return (
     <div className="space-y-6">
       {/* Breadcrumb */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-[#6e7a70]">
-          <span>Regional Net Zero Infrastructure Workforce Readiness Programme</span>
-          <span>/</span>
-          <span>Workspace</span>
-          <span>/</span>
-          <span className="text-[#e8efe9] font-medium">Evidence</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-[#6e7a70]" />
-            <span className="text-sm text-[#6e7a70]">Sectors</span>
-            {sectors.map((sector) => (
-              <button
-                key={sector.id}
-                onClick={() => !sector.disabled && setActiveSector(sector.id)}
-                disabled={sector.disabled}
-                className={cn(
-                  "px-3 py-1 text-xs rounded-full border transition-colors",
-                  activeSector === sector.id
-                    ? "bg-[#a3e635]/20 border-[#a3e635]/50 text-[#a3e635]"
-                    : sector.disabled
-                    ? "border-border/30 text-[#6e7a70]/50 cursor-not-allowed"
-                    : "border-border/50 text-[#6e7a70] hover:border-[#a3e635]/30"
-                )}
-              >
-                {sector.color && !sector.disabled && (
-                  <span className={cn("inline-block w-2 h-2 rounded-full mr-1.5", sector.color)} />
-                )}
-                {sector.label}
-              </button>
-            ))}
-          </div>
-          <Button className="h-8 px-4 text-sm bg-primary text-primary-foreground">
-            <Plus className="mr-2 h-4 w-4" />
-            New Action
-          </Button>
-        </div>
+      <div className="flex items-center gap-2 text-sm text-[#6e7a70]">
+        <span>Regional Net Zero Infrastructure Workforce Readiness Programme</span>
+        <span>/</span>
+        <span>Workspace</span>
+        <span>/</span>
+        <span className="text-[#e8efe9] font-medium">Evidence</span>
       </div>
 
       {/* Page Header */}
