@@ -2,12 +2,9 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  AlertTriangle,
   Users,
-  Building2,
   Download,
   Filter,
   Plus,
@@ -18,242 +15,106 @@ import {
 } from "lucide-react";
 
 // Types for the ecosystem network
-type OrgStatus = "ready" | "at-risk" | "blocked" | "evidence-required" | "in-training";
-type OrgType = "anchor" | "anchor-programme" | "tier-1" | "tier-2" | "education" | "public-sector";
+type NodeStatus = "ready" | "risk" | "blocked" | "evidence" | "training";
 
-interface Organisation {
+interface EcosystemNode {
   id: string;
-  name: string;
-  type: OrgType;
-  subtext: string;
-  status: OrgStatus;
+  tier: string;
+  title: string;
+  meta: string;
+  status: NodeStatus;
+  x: number; // percentage position
+  y: number; // percentage position
   workers?: number;
   roles?: number;
-  learners?: number;
-  assessors?: number;
   readinessScore?: number;
   missingEvidence?: number;
   openBlockers?: number;
   actionsAssigned?: number;
 }
 
-// Mock ecosystem data matching the screenshot
-const ecosystemOrgs: Organisation[] = [
-  // Anchors
-  { id: "anc1", name: "Infrastructure operator", type: "anchor", subtext: "North-West Infrastructure Authority", status: "ready" },
-  { id: "anc2", name: "Regional programme lead", type: "anchor", subtext: "Combined-authority delivery team", status: "ready" },
-  // Tier 1
-  { id: "t1-1", name: "Electrical systems integrator", type: "tier-1", subtext: "Supplier B", status: "blocked", workers: 86, roles: 14, readinessScore: 41, missingEvidence: 7, openBlockers: 2, actionsAssigned: 4 },
-  { id: "t1-2", name: "Engineering delivery partner", type: "tier-1", subtext: "Supplier A", status: "ready", workers: 102, roles: 11 },
-  { id: "t1-3", name: "Hydrogen infrastructure contractor", type: "tier-1", subtext: "Supplier C", status: "at-risk", workers: 64, roles: 9 },
-  // Tier 2
-  { id: "t2-1", name: "Installation subcontractor", type: "tier-2", subtext: "Electrification", status: "at-risk", workers: 44 },
-  { id: "t2-2", name: "Specialist safety contractor", type: "tier-2", subtext: "Hydrogen", status: "evidence-required", workers: 22 },
-  { id: "t2-3", name: "Maintenance provider", type: "tier-2", subtext: "Cross-sector", status: "ready", workers: 36 },
-  // Education
-  { id: "edu1", name: "College partner", type: "education", subtext: "Hydrogen Cohort 3", status: "in-training", learners: 45 },
-  { id: "edu2", name: "University partner", type: "education", subtext: "HV Engineering pathway", status: "ready", learners: 18 },
-  { id: "edu3", name: "Independent training provider", type: "education", subtext: "Multi-sector", status: "ready", learners: 64 },
-  { id: "edu4", name: "Assessor network", type: "education", subtext: "NDT-3 / NVQ", status: "evidence-required", assessors: 12 },
-  // Public Sector
-  { id: "pub1", name: "Combined authority", type: "public-sector", subtext: "Funder & convener", status: "ready" },
-  { id: "pub2", name: "Skills funder", type: "public-sector", subtext: "Bootcamp & retraining", status: "ready" },
+interface CentreNode {
+  title: string;
+  meta: string;
+  status: NodeStatus;
+}
+
+// Ecosystem data matching the reference design
+const centreNode: CentreNode = {
+  title: "Regional Net Zero Infrastructure Programme",
+  meta: "Anchor",
+  status: "risk",
+};
+
+const ecosystemNodes: EcosystemNode[] = [
+  // Tier 1 suppliers - top area
+  { id: "t1-1", tier: "Tier 1 — Engineering delivery", title: "Engineering delivery partner", meta: "Supplier A · 102 workers", status: "ready", x: 20, y: 25, workers: 102, roles: 11, readinessScore: 84, missingEvidence: 2, openBlockers: 0, actionsAssigned: 3 },
+  { id: "t1-2", tier: "Tier 1 — Hydrogen contractor", title: "Hydrogen infrastructure contractor", meta: "Supplier C · 64 workers", status: "risk", x: 80, y: 25, workers: 64, roles: 9, readinessScore: 62, missingEvidence: 5, openBlockers: 1, actionsAssigned: 5 },
+  { id: "t1-3", tier: "Tier 1 — Electrical integrator", title: "Electrical systems integrator", meta: "Supplier B · 86 workers", status: "blocked", x: 15, y: 55, workers: 86, roles: 14, readinessScore: 41, missingEvidence: 7, openBlockers: 2, actionsAssigned: 4 },
+  
+  // Tier 2 suppliers - middle-right area
+  { id: "t2-1", tier: "Tier 2 — Installation", title: "Installation subcontractor", meta: "Electrification · 44 workers", status: "risk", x: 85, y: 55, workers: 44, roles: 6, readinessScore: 55, missingEvidence: 4, openBlockers: 1, actionsAssigned: 2 },
+  { id: "t2-2", tier: "Tier 2 — Safety", title: "Specialist safety contractor", meta: "Hydrogen · 22 workers", status: "evidence", x: 75, y: 75, workers: 22, roles: 4, readinessScore: 55, missingEvidence: 6, openBlockers: 0, actionsAssigned: 3 },
+  { id: "t2-3", tier: "Tier 2 — Maintenance", title: "Maintenance provider", meta: "Cross-sector · 36 workers", status: "ready", x: 25, y: 80, workers: 36, roles: 5, readinessScore: 78, missingEvidence: 1, openBlockers: 0, actionsAssigned: 1 },
+  
+  // Education - bottom area
+  { id: "edu1", tier: "Education — College", title: "College partner", meta: "Hydrogen Cohort 3 · 45 learners", status: "training", x: 50, y: 85, workers: 45, roles: 3, readinessScore: 0, missingEvidence: 0, openBlockers: 0, actionsAssigned: 2 },
+  { id: "edu2", tier: "Education — University", title: "University partner", meta: "HV Engineering pathway · 18 learners", status: "ready", x: 10, y: 35, workers: 18, roles: 2, readinessScore: 82, missingEvidence: 1, openBlockers: 0, actionsAssigned: 1 },
+  
+  // Public sector - corners
+  { id: "pub1", tier: "Public sector — Authority", title: "Combined authority", meta: "Funder & convener", status: "ready", x: 90, y: 15, workers: 0, roles: 0, readinessScore: 94, missingEvidence: 0, openBlockers: 0, actionsAssigned: 0 },
+  { id: "pub2", tier: "Public sector — Skills", title: "Skills funder", meta: "Bootcamp & retraining", status: "ready", x: 5, y: 70, workers: 0, roles: 0, readinessScore: 88, missingEvidence: 0, openBlockers: 0, actionsAssigned: 0 },
 ];
 
-const getStatusBadge = (status: OrgStatus) => {
-  switch (status) {
-    case "ready":
-      return { label: "Ready", className: "bg-success text-success-foreground" };
-    case "at-risk":
-      return { label: "At Risk", className: "bg-warning text-warning-foreground" };
-    case "blocked":
-      return { label: "Blocked", className: "bg-destructive text-destructive-foreground" };
-    case "evidence-required":
-      return { label: "Evidence Required", className: "bg-muted text-muted-foreground" };
-    case "in-training":
-      return { label: "In Training", className: "bg-primary text-primary-foreground" };
-    default:
-      return { label: status, className: "bg-muted text-muted-foreground" };
-  }
-};
-
-const getTypeLabel = (type: OrgType) => {
-  switch (type) {
-    case "anchor": return "ANCHOR";
-    case "anchor-programme": return "ANCHOR PROGRAMME";
-    case "tier-1": return "TIER 1";
-    case "tier-2": return "TIER 2";
-    case "education": return "EDUCATION";
-    case "public-sector": return "PUBLIC SECTOR";
-    default: return type.toUpperCase();
-  }
-};
-
-// Organisation Card Component
-function OrgCard({ 
-  org, 
-  isSelected, 
-  onClick 
-}: { 
-  org: Organisation; 
-  isSelected: boolean;
-  onClick: () => void;
-}) {
-  const statusBadge = getStatusBadge(org.status);
-  const isAnchorProgramme = org.type === "anchor-programme";
-  
+// Readiness chip component
+function ReadinessChip({ status, children }: { status: NodeStatus; children?: React.ReactNode }) {
+  const config = {
+    ready: { bg: "bg-[#a3e635]/20", text: "text-[#a3e635]", label: "Ready" },
+    risk: { bg: "bg-[#f59e0b]/20", text: "text-[#f59e0b]", label: "At Risk" },
+    blocked: { bg: "bg-[#ef4444]/20", text: "text-[#ef4444]", label: "Blocked" },
+    evidence: { bg: "bg-[#6b7280]/20", text: "text-[#9ca3af]", label: "Evidence Required" },
+    training: { bg: "bg-[#3b82f6]/20", text: "text-[#60a5fa]", label: "In Training" },
+  };
+  const c = config[status];
   return (
-    <div
-      onClick={onClick}
-      className={cn(
-        "p-3 rounded-lg border cursor-pointer transition-all",
-        isAnchorProgramme 
-          ? "bg-primary/20 border-primary" 
-          : isSelected 
-            ? "bg-card border-primary ring-1 ring-primary" 
-            : "bg-card/50 border-border/50 hover:border-border hover:bg-card"
-      )}
-    >
-      <div className={cn(
-        "text-[10px] font-medium tracking-wider mb-1",
-        isAnchorProgramme ? "text-primary" : "text-muted-foreground"
-      )}>
-        {getTypeLabel(org.type)}
-      </div>
-      <h4 className={cn(
-        "font-medium text-sm mb-0.5",
-        isAnchorProgramme && "text-primary"
-      )}>
-        {org.name}
-      </h4>
-      <p className="text-[11px] text-muted-foreground mb-2">{org.subtext}</p>
-      {org.workers && (
-        <p className="text-[10px] text-muted-foreground mb-2">{org.workers} workers · {org.roles} roles</p>
-      )}
-      {org.learners && (
-        <p className="text-[10px] text-muted-foreground mb-2">{org.learners} learners</p>
-      )}
-      {org.assessors && (
-        <p className="text-[10px] text-muted-foreground mb-2">{org.assessors} assessors</p>
-      )}
-      <Badge className={cn("text-[10px] h-5", statusBadge.className)}>
-        <span className="mr-1">●</span>
-        {statusBadge.label}
-      </Badge>
-    </div>
+    <span className={cn("inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-medium", c.bg, c.text)}>
+      <span className="w-1.5 h-1.5 rounded-full bg-current" />
+      {children || c.label}
+    </span>
   );
 }
 
-// Organisation Detail Sidebar
-function OrgDetailSidebar({ org }: { org: Organisation }) {
-  const statusBadge = getStatusBadge(org.status);
-  
-  return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Share2 className="h-4 w-4 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground uppercase tracking-wider">Organisation Detail</span>
-        </div>
-        <Badge className={cn("text-[10px]", statusBadge.className)}>
-          <span className="mr-1">●</span>
-          {statusBadge.label}
-        </Badge>
-      </div>
+// Get line color based on status
+function getLineColor(status: NodeStatus) {
+  switch (status) {
+    case "blocked": return "rgba(248,113,113,0.45)";
+    case "risk": return "rgba(245,185,66,0.45)";
+    default: return "rgba(163,255,60,0.25)";
+  }
+}
 
-      {/* Org Info */}
-      <div>
-        <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">
-          {getTypeLabel(org.type)}
-        </div>
-        <h3 className="text-lg font-semibold">{org.name}</h3>
-        <p className="text-sm text-muted-foreground">
-          {org.subtext} · {org.workers || org.learners || org.assessors || 0} {org.workers ? "workers" : org.learners ? "learners" : "assessors"} · {org.roles || 0} roles
-        </p>
-      </div>
-
-      {/* Stats */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground uppercase tracking-wider">Readiness Score</span>
-          <span className={cn(
-            "text-lg font-bold",
-            (org.readinessScore || 0) >= 70 ? "text-success" : 
-            (org.readinessScore || 0) >= 50 ? "text-warning" : "text-destructive"
-          )}>
-            {org.readinessScore || 41}%
-          </span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground uppercase tracking-wider">Workers Mapped</span>
-          <span className="text-sm font-medium">{org.workers || 86}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground uppercase tracking-wider">Roles Covered</span>
-          <span className="text-sm font-medium">{org.roles || 14}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground uppercase tracking-wider">Missing Evidence Items</span>
-          <span className="text-sm font-medium text-warning">{org.missingEvidence || 7}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground uppercase tracking-wider">Open Blockers</span>
-          <span className="text-sm font-medium text-destructive">{org.openBlockers || 2}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground uppercase tracking-wider">Actions Assigned</span>
-          <span className="text-sm font-medium">{org.actionsAssigned || 4}</span>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" className="flex-1 text-xs">
-          <Users className="h-3.5 w-3.5 mr-1.5" />
-          Workers
-        </Button>
-        <Button variant="outline" size="sm" className="flex-1 text-xs">
-          <FileText className="h-3.5 w-3.5 mr-1.5" />
-          Evidence
-        </Button>
-        <Button size="sm" className="flex-1 text-xs bg-primary text-primary-foreground">
-          <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
-          Actions
-        </Button>
-      </div>
-
-      {/* Ecosystem Pull-through */}
-      <div className="p-4 rounded-lg bg-muted/30 border border-border">
-        <div className="flex items-center gap-2 mb-2">
-          <Lightbulb className="h-4 w-4 text-primary" />
-          <span className="text-sm font-medium">Ecosystem pull-through</span>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Trace activates one anchor programme into 23 downstream organisations — supply chain, education and public sector — into a shared workforce readiness system.
-        </p>
-      </div>
-    </div>
-  );
+// Get readiness score display
+function getReadinessDisplay(status: NodeStatus, score?: number) {
+  if (status === "training") return "—";
+  if (score !== undefined) return `${score}%`;
+  switch (status) {
+    case "ready": return "84%";
+    case "risk": return "62%";
+    case "blocked": return "41%";
+    default: return "55%";
+  }
 }
 
 export function WorkforceReadinessNetwork() {
-  const [selectedOrg, setSelectedOrg] = useState<Organisation | null>(ecosystemOrgs.find(o => o.id === "t1-1") || null);
+  const [selected, setSelected] = useState<EcosystemNode | null>(ecosystemNodes[2]); // Default to Electrical integrator
 
-  // Calculate KPIs
-  const totalOrgs = ecosystemOrgs.length + 1; // +1 for anchor programme
-  const tier1Count = ecosystemOrgs.filter(o => o.type === "tier-1").length;
-  const tier2Count = ecosystemOrgs.filter(o => o.type === "tier-2").length;
-  const educationCount = ecosystemOrgs.filter(o => o.type === "education").length;
-  const publicSectorCount = ecosystemOrgs.filter(o => o.type === "public-sector").length;
+  // KPIs
+  const totalOrgs = 24;
+  const tier1Count = 6;
+  const tier2Count = 11;
+  const educationCount = 5;
+  const publicSectorCount = 2;
   const evidenceCompletion = 71;
-
-  // Group orgs by type
-  const anchors = ecosystemOrgs.filter(o => o.type === "anchor");
-  const tier1 = ecosystemOrgs.filter(o => o.type === "tier-1");
-  const tier2 = ecosystemOrgs.filter(o => o.type === "tier-2");
-  const education = ecosystemOrgs.filter(o => o.type === "education");
-  const publicSector = ecosystemOrgs.filter(o => o.type === "public-sector");
 
   return (
     <div className="space-y-6">
@@ -261,211 +122,224 @@ export function WorkforceReadinessNetwork() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold mb-1">Ecosystem</h1>
-          <p className="text-muted-foreground">
-            {totalOrgs} organisations mapped across anchor, tier 1/2 supply chain, education and public sector. Trace connects the full workforce readiness ecosystem.
+          <p className="text-[#6e7a70] text-sm max-w-2xl">
+            24 organisations mapped across anchor, tier 1/2 supply chain, education and public sector. Trace connects the full workforce readiness ecosystem.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4 mr-2" />
+          <Button variant="outline" size="sm" className="text-xs border-[#232a25] text-[#6e7a70] hover:text-[#e8efe9]">
+            <Filter className="h-3.5 w-3.5 mr-1.5" />
             Filter by tier
           </Button>
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
+          <Button variant="outline" size="sm" className="text-xs border-[#232a25] text-[#6e7a70] hover:text-[#e8efe9]">
+            <Download className="h-3.5 w-3.5 mr-1.5" />
             Export network
           </Button>
-          <Button size="sm" className="bg-primary text-primary-foreground">
-            <Plus className="h-4 w-4 mr-2" />
+          <Button size="sm" className="text-xs bg-[#a3e635] text-[#0a0d0c] hover:bg-[#a3e635]/90">
+            <Plus className="h-3.5 w-3.5 mr-1.5" />
             Onboard organisation
           </Button>
         </div>
       </div>
 
-      {/* KPI Strip */}
-      <div className="grid grid-cols-6 gap-4">
-        <div className="p-4 rounded-lg bg-card border border-border">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Organisations</p>
-          <p className="text-2xl font-bold">{totalOrgs}</p>
+      {/* KPI Summary Strip */}
+      <div className="grid grid-cols-6 gap-3">
+        <div className="p-3 rounded-lg bg-[#0f1311] border border-[#1c211e]">
+          <div className="text-[10px] text-[#6e7a70] uppercase tracking-wider mb-1">Organisations</div>
+          <div className="text-xl font-bold text-[#e8efe9]">{totalOrgs}</div>
         </div>
-        <div className="p-4 rounded-lg bg-card border border-border">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Tier 1 Suppliers</p>
-          <p className="text-2xl font-bold">{tier1Count}</p>
+        <div className="p-3 rounded-lg bg-[#0f1311] border border-[#1c211e]">
+          <div className="text-[10px] text-[#6e7a70] uppercase tracking-wider mb-1">Tier 1 suppliers</div>
+          <div className="text-xl font-bold text-[#e8efe9]">{tier1Count}</div>
         </div>
-        <div className="p-4 rounded-lg bg-card border border-border">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Tier 2 Suppliers</p>
-          <p className="text-2xl font-bold">{tier2Count}</p>
+        <div className="p-3 rounded-lg bg-[#0f1311] border border-[#1c211e]">
+          <div className="text-[10px] text-[#6e7a70] uppercase tracking-wider mb-1">Tier 2 suppliers</div>
+          <div className="text-xl font-bold text-[#e8efe9]">{tier2Count}</div>
         </div>
-        <div className="p-4 rounded-lg bg-card border border-border">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Education / Training</p>
-          <p className="text-2xl font-bold">{educationCount}</p>
+        <div className="p-3 rounded-lg bg-[#0f1311] border border-[#1c211e]">
+          <div className="text-[10px] text-[#6e7a70] uppercase tracking-wider mb-1">Education / training</div>
+          <div className="text-xl font-bold text-[#e8efe9]">{educationCount}</div>
         </div>
-        <div className="p-4 rounded-lg bg-card border border-border">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Public Sector</p>
-          <p className="text-2xl font-bold">{publicSectorCount}</p>
+        <div className="p-3 rounded-lg bg-[#0f1311] border border-[#1c211e]">
+          <div className="text-[10px] text-[#6e7a70] uppercase tracking-wider mb-1">Public sector</div>
+          <div className="text-xl font-bold text-[#e8efe9]">{publicSectorCount}</div>
         </div>
-        <div className="p-4 rounded-lg bg-card border border-border">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Evidence Completion</p>
-          <p className="text-2xl font-bold text-primary">{evidenceCompletion}%</p>
+        <div className="p-3 rounded-lg bg-[#0f1311] border border-[#1c211e]">
+          <div className="text-[10px] text-[#6e7a70] uppercase tracking-wider mb-1">Evidence completion</div>
+          <div className="text-xl font-bold text-[#f59e0b]">{evidenceCompletion}%</div>
         </div>
       </div>
 
-      {/* Main Content: Network + Detail Sidebar */}
-      <div className="flex gap-6">
-        {/* Workforce Readiness Network */}
-        <div className="flex-1 p-4 rounded-xl bg-card border border-border">
-          <div className="mb-4">
-            <h2 className="font-semibold mb-1">Workforce readiness network</h2>
-            <p className="text-sm text-muted-foreground">
-              Trace supports pull-through: one anchor programme can activate multiple supply-chain organisations into a shared readiness system.
-            </p>
-          </div>
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-12 gap-4">
+        {/* Network Visualization - 8 columns */}
+        <div className="col-span-8">
+          <div className="rounded-lg bg-[#0f1311] border border-[#1c211e]">
+            <div className="p-4 border-b border-[#1c211e]">
+              <h2 className="font-semibold text-[#e8efe9] mb-1">Workforce readiness network</h2>
+              <p className="text-xs text-[#6e7a70]">
+                Trace supports pull-through: one anchor programme can activate multiple supply-chain organisations into a shared readiness system.
+              </p>
+            </div>
+            
+            <div className="p-4">
+              {/* Network container with relative positioning */}
+              <div className="relative h-[500px] w-full">
+                {/* SVG connection lines */}
+                <svg 
+                  className="absolute inset-0 w-full h-full pointer-events-none" 
+                  viewBox="0 0 100 100" 
+                  preserveAspectRatio="none"
+                >
+                  {ecosystemNodes.map((n) => (
+                    <line 
+                      key={n.id}
+                      x1="50" 
+                      y1="50" 
+                      x2={n.x} 
+                      y2={n.y}
+                      stroke={getLineColor(n.status)}
+                      strokeWidth="0.2"
+                      strokeDasharray={n.status === "evidence" ? "0.6 0.6" : "0"}
+                    />
+                  ))}
+                </svg>
 
-          {/* Network Visualization */}
-          <div className="relative min-h-[600px]">
-            {/* SVG Connection Lines */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
-              {/* Lines from Anchors to Anchor Programme */}
-              <path d="M180,60 Q300,60 380,220" fill="none" stroke="#a3ff3c" strokeWidth="1.5" strokeOpacity="0.3" />
-              <path d="M500,60 Q400,60 420,220" fill="none" stroke="#a3ff3c" strokeWidth="1.5" strokeOpacity="0.3" />
-              
-              {/* Lines from Anchor Programme to Tier 1 */}
-              <path d="M350,260 Q200,280 100,160" fill="none" stroke="#ef4444" strokeWidth="1.5" strokeOpacity="0.3" strokeDasharray="4 2" />
-              <path d="M400,240 Q400,150 350,130" fill="none" stroke="#a3ff3c" strokeWidth="1.5" strokeOpacity="0.3" />
-              <path d="M450,260 Q550,200 620,160" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeOpacity="0.3" />
-              
-              {/* Lines from Anchor Programme to Tier 2 */}
-              <path d="M350,300 Q200,400 100,370" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeOpacity="0.3" />
-              <path d="M400,310 Q400,380 400,360" fill="none" stroke="#6b7280" strokeWidth="1.5" strokeOpacity="0.3" strokeDasharray="4 2" />
-              <path d="M450,300 Q550,350 600,370" fill="none" stroke="#a3ff3c" strokeWidth="1.5" strokeOpacity="0.3" />
-              
-              {/* Lines from Tier 2 to Education */}
-              <path d="M100,420 Q100,500 100,500" fill="none" stroke="#a3ff3c" strokeWidth="1.5" strokeOpacity="0.3" />
-              <path d="M250,420 Q250,500 250,490" fill="none" stroke="#a3ff3c" strokeWidth="1.5" strokeOpacity="0.3" />
-              <path d="M400,420 Q400,500 430,490" fill="none" stroke="#a3ff3c" strokeWidth="1.5" strokeOpacity="0.3" />
-              <path d="M600,420 Q620,500 620,500" fill="none" stroke="#6b7280" strokeWidth="1.5" strokeOpacity="0.3" strokeDasharray="4 2" />
-              
-              {/* Lines to Public Sector */}
-              <path d="M200,560 Q200,620 200,600" fill="none" stroke="#a3ff3c" strokeWidth="1.5" strokeOpacity="0.3" />
-              <path d="M520,560 Q520,620 520,600" fill="none" stroke="#a3ff3c" strokeWidth="1.5" strokeOpacity="0.3" />
-            </svg>
-
-            {/* Anchor Row */}
-            <div className="flex justify-center gap-8 mb-4" style={{ position: 'relative', zIndex: 1 }}>
-              {anchors.map(org => (
-                <div key={org.id} className="w-52">
-                  <OrgCard 
-                    org={org} 
-                    isSelected={selectedOrg?.id === org.id}
-                    onClick={() => setSelectedOrg(org)}
-                  />
+                {/* Centre node - Anchor Programme */}
+                <div 
+                  className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+                  style={{ left: "50%", top: "50%" }}
+                  onClick={() => setSelected(null)}
+                >
+                  <div className="p-3 rounded-lg bg-[#0a0d0c] border border-[#a3e635]/30 min-w-[180px] text-center">
+                    <div className="text-[9px] text-[#a3e635] uppercase tracking-wider mb-1">Anchor programme</div>
+                    <div className="text-sm font-semibold text-[#a3e635] mb-1">{centreNode.title}</div>
+                    <div className="text-[10px] text-[#6e7a70] mb-2">{centreNode.meta}</div>
+                    <ReadinessChip status={centreNode.status} />
+                  </div>
                 </div>
-              ))}
-            </div>
 
-            {/* Tier 1 Row */}
-            <div className="flex justify-between items-start mb-4 px-4" style={{ position: 'relative', zIndex: 1 }}>
-              <div className="w-44">
-                <OrgCard 
-                  org={tier1[0]} 
-                  isSelected={selectedOrg?.id === tier1[0].id}
-                  onClick={() => setSelectedOrg(tier1[0])}
-                />
+                {/* Surrounding nodes */}
+                {ecosystemNodes.map((node) => (
+                  <div
+                    key={node.id}
+                    className={cn(
+                      "absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all",
+                    )}
+                    style={{ 
+                      left: `${node.x}%`, 
+                      top: `${node.y}%`,
+                    }}
+                    onClick={() => setSelected(node)}
+                  >
+                    <div 
+                      className={cn(
+                        "p-2.5 rounded-lg bg-[#0a0d0c] border min-w-[140px]",
+                        selected?.id === node.id 
+                          ? "border-[#a3e635] shadow-[0_0_0_3px_rgba(163,255,60,0.12)]" 
+                          : "border-[#232a25] hover:border-[#3a4540]"
+                      )}
+                    >
+                      <div className="text-[8px] text-[#6e7a70] uppercase tracking-wider mb-0.5">{node.tier}</div>
+                      <div className="text-xs font-medium text-[#e8efe9] mb-0.5">{node.title}</div>
+                      <div className="text-[9px] text-[#6e7a70] mb-1.5">{node.meta}</div>
+                      <ReadinessChip status={node.status} />
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="w-48">
-                <OrgCard 
-                  org={tier1[1]} 
-                  isSelected={selectedOrg?.id === tier1[1].id}
-                  onClick={() => setSelectedOrg(tier1[1])}
-                />
-              </div>
-              
-              {/* Anchor Programme - Center */}
-              <div className="w-56 -mt-2">
-                <OrgCard 
-                  org={{
-                    id: "anchor-prog",
-                    name: "Regional Net Zero Infrastructure Programme",
-                    type: "anchor-programme",
-                    subtext: "Anchor",
-                    status: "at-risk"
-                  }} 
-                  isSelected={false}
-                  onClick={() => {}}
-                />
-              </div>
-              
-              <div className="w-44">
-                <OrgCard 
-                  org={tier1[2]} 
-                  isSelected={selectedOrg?.id === tier1[2].id}
-                  onClick={() => setSelectedOrg(tier1[2])}
-                />
-              </div>
-            </div>
-
-            {/* Tier 2 Row */}
-            <div className="flex justify-between items-start mb-4 px-8" style={{ position: 'relative', zIndex: 1 }}>
-              <div className="w-44">
-                <OrgCard 
-                  org={tier2[0]} 
-                  isSelected={selectedOrg?.id === tier2[0].id}
-                  onClick={() => setSelectedOrg(tier2[0])}
-                />
-              </div>
-              <div className="w-48">
-                <OrgCard 
-                  org={tier2[1]} 
-                  isSelected={selectedOrg?.id === tier2[1].id}
-                  onClick={() => setSelectedOrg(tier2[1])}
-                />
-              </div>
-              <div className="w-44">
-                <OrgCard 
-                  org={tier2[2]} 
-                  isSelected={selectedOrg?.id === tier2[2].id}
-                  onClick={() => setSelectedOrg(tier2[2])}
-                />
-              </div>
-            </div>
-
-            {/* Education Row */}
-            <div className="flex justify-between items-start mb-4 px-4" style={{ position: 'relative', zIndex: 1 }}>
-              {education.map(org => (
-                <div key={org.id} className="w-40">
-                  <OrgCard 
-                    org={org} 
-                    isSelected={selectedOrg?.id === org.id}
-                    onClick={() => setSelectedOrg(org)}
-                  />
-                </div>
-              ))}
-            </div>
-
-            {/* Public Sector Row */}
-            <div className="flex justify-center gap-8" style={{ position: 'relative', zIndex: 1 }}>
-              {publicSector.map(org => (
-                <div key={org.id} className="w-44">
-                  <OrgCard 
-                    org={org} 
-                    isSelected={selectedOrg?.id === org.id}
-                    onClick={() => setSelectedOrg(org)}
-                  />
-                </div>
-              ))}
             </div>
           </div>
         </div>
 
-        {/* Organisation Detail Sidebar */}
-        <div className="w-80 shrink-0 p-4 rounded-xl bg-card border border-border">
-          {selectedOrg ? (
-            <OrgDetailSidebar org={selectedOrg} />
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center py-12">
-              <Building2 className="h-12 w-12 text-muted-foreground/50 mb-4" />
-              <p className="text-sm text-muted-foreground">Select an organisation to view details</p>
+        {/* Detail Sidebar - 4 columns */}
+        <div className="col-span-4 space-y-3">
+          {/* Organisation Detail Drawer */}
+          <div className="rounded-lg bg-[#0f1311] border border-[#1c211e] p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Share2 className="h-3.5 w-3.5 text-[#a3e635]" />
+                <span className="text-[10px] text-[#6e7a70] uppercase tracking-wider">Organisation detail</span>
+              </div>
+              {selected && <ReadinessChip status={selected.status} />}
             </div>
-          )}
+
+            {selected ? (
+              <>
+                <div className="text-[9px] text-[#6e7a70] uppercase tracking-wider mb-0.5">{selected.tier}</div>
+                <div className="text-base font-semibold text-[#e8efe9] mb-0.5">{selected.title}</div>
+                <div className="text-xs text-[#6e7a70] mb-4">{selected.meta}</div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-[#6e7a70] uppercase tracking-wider">Readiness score</span>
+                    <span className={cn(
+                      "text-sm font-mono font-medium",
+                      selected.status === "ready" ? "text-[#a3e635]" : 
+                      selected.status === "risk" ? "text-[#f59e0b]" : 
+                      selected.status === "blocked" ? "text-[#ef4444]" : 
+                      selected.status === "training" ? "text-[#6e7a70]" : "text-[#6e7a70]"
+                    )}>
+                      {getReadinessDisplay(selected.status, selected.readinessScore)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-[#6e7a70] uppercase tracking-wider">Workers mapped</span>
+                    <span className="text-sm font-mono text-[#e8efe9]">{selected.workers || 86}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-[#6e7a70] uppercase tracking-wider">Roles covered</span>
+                    <span className="text-sm font-mono text-[#e8efe9]">{selected.roles || 14}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-[#6e7a70] uppercase tracking-wider">Missing evidence items</span>
+                    <span className="text-sm font-mono text-[#ef4444]">{selected.missingEvidence ?? 7}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-[#6e7a70] uppercase tracking-wider">Open blockers</span>
+                    <span className="text-sm font-mono text-[#f59e0b]">{selected.openBlockers ?? 2}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-[#6e7a70] uppercase tracking-wider">Actions assigned</span>
+                    <span className="text-sm font-mono text-[#e8efe9]">{selected.actionsAssigned ?? 4}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 mt-4 pt-3 border-t border-[#1c211e]">
+                  <Button variant="outline" size="sm" className="flex-1 text-[10px] h-7 border-[#232a25] text-[#e8efe9]">
+                    <Users className="h-3 w-3 mr-1" />
+                    Workers
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1 text-[10px] h-7 border-[#232a25] text-[#e8efe9]">
+                    <FileText className="h-3 w-3 mr-1" />
+                    Evidence
+                  </Button>
+                  <Button size="sm" className="flex-1 text-[10px] h-7 bg-[#a3e635] text-[#0a0d0c]">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Actions
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="text-sm text-[#6e7a70] text-center py-8">
+                Click a node to view details
+              </div>
+            )}
+          </div>
+
+          {/* Ecosystem Pull-through Card */}
+          <div 
+            className="rounded-lg p-4 border border-[#a3e635]/20"
+            style={{ background: "linear-gradient(180deg, rgba(163,255,60,0.04), transparent 70%)" }}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Lightbulb className="h-3.5 w-3.5 text-[#a3e635]" />
+              <span className="text-xs font-semibold text-[#e8efe9]">Ecosystem pull-through</span>
+            </div>
+            <p className="text-[11px] text-[#6e7a70] leading-relaxed">
+              Trace activates one anchor programme into 23 downstream organisations — supply chain, education and public sector — into a shared workforce readiness system.
+            </p>
+          </div>
         </div>
       </div>
     </div>
