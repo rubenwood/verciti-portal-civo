@@ -29,6 +29,7 @@ import { SupplierReadinessProfile } from "@/components/dashboard/supplier-readin
 import { MobilisationMap } from "@/components/dashboard/mobilisation-map";
 import { RoleReadiness } from "@/components/dashboard/role-readiness";
 import { WorkforceReadinessSimple } from "@/components/dashboard/workforce-readiness-simple";
+import { SupplierReadinessSimple } from "@/components/dashboard/supplier-readiness-simple";
 import { type UserProfile } from "@/lib/mock-data";
 
 // Placeholder components for pages we haven't built yet
@@ -78,7 +79,7 @@ export default function DashboardPage() {
       case "workforce-readiness":
         return <WorkforceReadinessSimple />;
       case "supplier-readiness":
-        return <WorkforceReadinessNetwork />;
+        return <SupplierReadinessSimple />;
       case "supplier-discovery":
         return <SupplierDiscovery />;
       case "role-readiness":
