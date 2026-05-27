@@ -424,7 +424,9 @@ function SiteDetailPanel({ site, onClose }: { site: ProjectSite; onClose: () => 
             <div className={cn("text-2xl font-semibold", site.overallReadiness < 70 ? "text-destructive" : site.overallReadiness < 85 ? "text-warning" : "text-success")}>
               {site.overallReadiness}%
             </div>
-            <div className="text-xs text-destructive">At Risk</div>
+            <div className={cn("text-xs text-destructive", site.overallReadiness < 70 ? "text-destructive" : site.overallReadiness < 85 ? "text-warning" : "text-success")}>
+              At Risk
+            </div>
           </div>
           <div>
             <div className="text-[10px] text-[#6e7a70] uppercase tracking-wider mb-1">Deployment Date</div>
