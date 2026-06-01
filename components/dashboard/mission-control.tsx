@@ -345,7 +345,7 @@ export function MissionControl() {
                       "py-2.5 text-right font-mono text-xs pl-1 pr-6",
                       r.risk === "red" ? "text-destructive" : "text-warning"
                     )}>{gap}</td>
-                    <td className="py-2.5">
+                    <td className="px-3 py-2.5">
                       <div className="flex h-2.5 rounded-full overflow-hidden">
                         <div className="bg-success" style={{ width: `${r.ready / r.needed * 100}%` }} title={`Ready: ${r.ready}`} />
                         <div className="bg-primary" style={{ width: `${r.inTraining / r.needed * 100}%` }} title={`In Training: ${r.inTraining}`} />
