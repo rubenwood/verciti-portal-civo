@@ -114,6 +114,17 @@ export function MissionControl() {
     );
   };
 
+
+  const heroMetrics = [
+          { label: "Readiness score", value: `${programmeData.readiness}%`, sub: `Target ${programmeData.target}% · ${programmeData.target - programmeData.readiness} pts to recover`, tone: "warn", large: true },
+          { label: "Evidence confidence", value: programmeData.evidenceConfidence, sub: "L4-L5 verified: 39%", tone: "neutral" },
+          { label: "Deployment blockers", value: programmeData.blockers.toString(), sub: "2 high impact", tone: "bad" },
+          { label: "Organisations mapped", value: programmeData.orgs.toString(), sub: "Anchor · Tier 1/2 · Education", tone: "neutral" },
+          { label: "Workers tracked", value: programmeData.workers.toString(), sub: "Across 14 employers", tone: "neutral" },
+          { label: "Safety-critical roles", value: programmeData.safetyCriticalRoles.toString(), sub: "Mapped · evidence-led", tone: "neutral" },
+          { label: "Mobilisation window", value: programmeData.mobilisationWindow, sub: "Hydrogen Safety Deployment", tone: "neutral", large: true },
+        ]
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -168,17 +179,13 @@ export function MissionControl() {
       </div>
 
       {/* Hero Metric Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-        {[
-          { label: "Readiness score", value: `${programmeData.readiness}%`, sub: `Target ${programmeData.target}% · ${programmeData.target - programmeData.readiness} pts to recover`, tone: "warn", large: true },
-          { label: "Evidence confidence", value: programmeData.evidenceConfidence, sub: "L4-L5 verified: 39%", tone: "neutral" },
-          { label: "Deployment blockers", value: programmeData.blockers.toString(), sub: "2 high impact", tone: "bad" },
-          { label: "Organisations mapped", value: programmeData.orgs.toString(), sub: "Anchor · Tier 1/2 · Education", tone: "neutral" },
-          { label: "Workers tracked", value: programmeData.workers.toString(), sub: "Across 14 employers", tone: "neutral" },
-          { label: "Safety-critical roles", value: programmeData.safetyCriticalRoles.toString(), sub: "Mapped · evidence-led", tone: "neutral" },
-          { label: "Mobilisation window", value: programmeData.mobilisationWindow, sub: "Hydrogen Safety Deployment", tone: "neutral", large: true },
-        ].map((metric, i) => (
-          <div key={i} className="p-3 rounded-xl bg-muted/30 border border-border">
+      <div className="grid grid-cols-2 lg:grid-cols-7">
+        {heroMetrics.map((metric, i) => (
+          <div key={i} className={
+              cn("p-3 bg-muted/30 border border-border",
+              i === 0 && "rounded-l-lg",
+              i === heroMetrics.length - 1 && "rounded-r-lg")
+            }>
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{metric.label}</p>
             <p className={cn(
               "font-bold mb-1",
