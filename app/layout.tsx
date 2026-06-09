@@ -7,8 +7,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Greenskills Analytics | EdTech Dashboard',
-  description: 'Analytics dashboard for Greenskills EdTech platform - track learner progress, assessments, and learning pathways',
+  title: 'Verciti Trace',
+  description: 'Workforce Compliance & Assurance Layer',
   generator: 'v0.app',
   icons: {
     icon: [
