@@ -1,0 +1,94 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: rubenwood1/verciti-portal-civo
+  DEPLOYMENT_NAME: verciti-portal-civo
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Generate Tag
+        id: vars
+        run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Build Image
+        run: |
+          docker build \
+            -t $IMAGE_NAME:${{ steps.vars.outputs.TAG }} \
+            -t $IMAGE_NAME:latest \
+            .
+
+      - name: Push Image
+        run: |
+          docker push $IMAGE_NAME:${{ steps.vars.outputs.TAG }}
+          docker push $IMAGE_NAME:latest
+
+      - name: Configure Kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/civo-verciti-kc-kubeconfig
+
+      - name: Update Deployment
+        run: |
+          kubectl set image deployment/$DEPLOYMENT_NAME \
+            $DEPLOYMENT_NAME=$IMAGE_NAME:${{ steps.vars.outputs.TAG }}
+
+      - name: Verify Rollout
+        run: |
+          kubectl rollout status deployment/$DEPLOYMENT_NAME --timeout=300s
+
+      - name: Deployment Report
+        if: always()
+        run: |
+          echo ""
+          echo "=== DEPLOYMENT ==="
+          kubectl get deployment $DEPLOYMENT_NAME
+
+          echo ""
+          echo "=== PODS ==="
+          kubectl get pods -o wide
+
+          echo ""
+          echo "=== NODES ==="
+          kubectl get nodes
+
+          echo ""
+          echo "=== RESOURCE USAGE ==="
+          kubectl top nodes || true
+          kubectl top pods || true
+
+          echo ""
+          echo "=== RECENT EVENTS ==="
+          kubectl get events \
+            --sort-by='.metadata.creationTimestamp' \
+            | tail -20
+
+      - name: Debug Failed Rollout
+        if: failure()
+        run: |
+          echo ""
+          echo "=== DESCRIBE DEPLOYMENT ==="
+          kubectl describe deployment $DEPLOYMENT_NAME
+
+          echo ""
+          echo "=== POD LOGS ==="
+          kubectl logs -l app=$DEPLOYMENT_NAME --tail=200 || true
