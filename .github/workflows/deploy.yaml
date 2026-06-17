@@ -8,6 +8,7 @@ on:
 env:
   IMAGE_NAME: rubenwood1/verciti-portal-civo
   DEPLOYMENT_NAME: verciti-portal-civo
+  KUBECONFIG: ${{ github.workspace }}/kubeconfig
 
 jobs:
   deploy:
@@ -44,11 +45,14 @@ jobs:
 
       - name: Configure Kubectl
         run: |
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/kubeconfig
-          export KUBECONFIG=$HOME/kubeconfig
-
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
           kubectl config current-context
           kubectl get nodes
+
+      - name: Verify kubectl context
+        run: |
+          kubectl config view
+          kubectl cluster-info
 
       - name: Update Deployment
         run: |
