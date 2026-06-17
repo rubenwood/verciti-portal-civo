@@ -44,8 +44,11 @@ jobs:
 
       - name: Configure Kubectl
         run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/civo-verciti-kc-kubeconfig
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/kubeconfig
+          export KUBECONFIG=$HOME/kubeconfig
+
+          kubectl config current-context
+          kubectl get nodes
 
       - name: Update Deployment
         run: |
