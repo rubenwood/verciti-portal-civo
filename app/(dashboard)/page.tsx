@@ -32,6 +32,7 @@ import { WorkforceReadinessSimple } from "@/components/dashboard/workforce-readi
 import { SupplierReadinessSimple } from "@/components/dashboard/supplier-readiness-simple";
 import { SafetyCriticalAssurance } from "@/components/dashboard/safety-critical-assurance";
 import { EvidencePage } from "@/components/dashboard/evidence-page";
+import { Events } from "@/components/dashboard/events";
 import { type UserProfile } from "@/lib/mock-data";
 
 // Placeholder components for pages we haven't built yet
@@ -78,6 +79,8 @@ export default function DashboardPage() {
         return <MobilisationMap />;
       case "mobilisation-timeline":
         return <Timeline />;
+      case "events":
+        return <Events />;
       case "workforce-readiness":
         return <WorkforceReadinessSimple />;
       case "supplier-readiness":
