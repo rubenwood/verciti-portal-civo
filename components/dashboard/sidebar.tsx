@@ -24,6 +24,7 @@ import {
   Lock,
   GraduationCap,
   Leaf,
+  CalendarCheck,
 } from "lucide-react";
 
 export type SidebarPage =
@@ -32,6 +33,7 @@ export type SidebarPage =
   | "programmes"
   | "mobilisation-map"
   | "mobilisation-timeline"
+  | "events"
   | "workforce-readiness"
   | "supplier-readiness"
   | "supplier-discovery"
@@ -61,6 +63,7 @@ const workspaceItems: { id: SidebarPage; label: string; icon: React.ElementType 
   { id: "programmes", label: "Programmes", icon: FolderKanban },
   { id: "mobilisation-map", label: "Mobilisation Map", icon: Map },
   { id: "mobilisation-timeline", label: "Mobilisation Timeline", icon: Clock },
+  { id: "events", label: "Events", icon: CalendarCheck },
   { id: "workforce-readiness", label: "Workforce Readiness", icon: Users },
   { id: "supplier-readiness", label: "Supplier Readiness", icon: Building2 },
   { id: "supplier-discovery", label: "Supplier Discovery", icon: Search },
