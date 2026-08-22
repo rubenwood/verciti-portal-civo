@@ -91,7 +91,7 @@ const events: EventData[] = [
     insurance: {
       status: "outstanding",
       items: [
-        { label: "Training & inspection complete (required before cover)", done: false },
+        { label: "Training & inspection complete", done: false },
         { label: "Public liability insurance current (£10m)", done: false },
         { label: "Terrorism cover in place", done: false },
         { label: "Employer's liability certificate valid", done: false },
@@ -136,7 +136,7 @@ const events: EventData[] = [
     insurance: {
       status: "outstanding",
       items: [
-        { label: "Training & inspection complete (required before cover)", done: false },
+        { label: "Training & inspection complete", done: false },
         { label: "Public liability insurance current (£5m)", done: false },
         { label: "Terrorism cover in place", done: false },
         { label: "Employer's liability certificate valid", done: false },
@@ -181,7 +181,7 @@ const events: EventData[] = [
     insurance: {
       status: "outstanding",
       items: [
-        { label: "Training & inspection complete (required before cover)", done: true },
+        { label: "Training & inspection complete", done: true },
         { label: "Public liability insurance current (£5m)", done: false },
         { label: "Terrorism cover in place", done: false },
         { label: "Employer's liability certificate valid", done: false },
@@ -223,7 +223,7 @@ const events: EventData[] = [
     insurance: {
       status: "outstanding",
       items: [
-        { label: "Training & inspection complete (required before cover)", done: false },
+        { label: "Training & inspection complete", done: false },
         { label: "Public liability insurance current (£2m)", done: false },
         { label: "Employer's liability certificate valid", done: false },
       ],
@@ -264,7 +264,7 @@ const events: EventData[] = [
     insurance: {
       status: "outstanding",
       items: [
-        { label: "Training & inspection complete (required before cover)", done: false },
+        { label: "Training & inspection complete", done: false },
         { label: "Public liability insurance current (£2m)", done: false },
         { label: "Employer's liability certificate valid", done: false },
       ],
@@ -365,10 +365,6 @@ export function Events() {
               people) requires simple, low-cost public protection procedures. Enhanced tier (800+ people) additionally
               requires documented public protection measures, procedures provided to the SIA, and a designated senior
               responsible individual.
-            </p>
-            <p className="text-xs text-[#f59e0b] mt-2">
-              Insurance cover cannot be purchased until all staff are trained and venue inspections are complete — no
-              event is currently insured.
             </p>
           </div>
         </div>
