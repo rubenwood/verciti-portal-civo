@@ -366,10 +366,6 @@ export function Events() {
               requires documented public protection measures, procedures provided to the SIA, and a designated senior
               responsible individual.
             </p>
-            <p className="text-xs text-[#f59e0b] mt-2">
-              Insurance cover cannot be purchased until all staff are trained and venue inspections are complete — no
-              event is currently insured.
-            </p>
           </div>
         </div>
       </div>
