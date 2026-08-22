@@ -91,7 +91,7 @@ const events: EventData[] = [
     insurance: {
       status: "outstanding",
       items: [
-        { label: "Training & inspection complete (required before cover)", done: false },
+        { label: "Training & inspection complete", done: false },
         { label: "Public liability insurance current (£10m)", done: false },
         { label: "Terrorism cover in place", done: false },
         { label: "Employer's liability certificate valid", done: false },
@@ -136,7 +136,7 @@ const events: EventData[] = [
     insurance: {
       status: "outstanding",
       items: [
-        { label: "Training & inspection complete (required before cover)", done: false },
+        { label: "Training & inspection complete", done: false },
         { label: "Public liability insurance current (£5m)", done: false },
         { label: "Terrorism cover in place", done: false },
         { label: "Employer's liability certificate valid", done: false },
@@ -181,7 +181,7 @@ const events: EventData[] = [
     insurance: {
       status: "outstanding",
       items: [
-        { label: "Training & inspection complete (required before cover)", done: true },
+        { label: "Training & inspection complete", done: true },
         { label: "Public liability insurance current (£5m)", done: false },
         { label: "Terrorism cover in place", done: false },
         { label: "Employer's liability certificate valid", done: false },
@@ -223,7 +223,7 @@ const events: EventData[] = [
     insurance: {
       status: "outstanding",
       items: [
-        { label: "Training & inspection complete (required before cover)", done: false },
+        { label: "Training & inspection complete", done: false },
         { label: "Public liability insurance current (£2m)", done: false },
         { label: "Employer's liability certificate valid", done: false },
       ],
@@ -264,7 +264,7 @@ const events: EventData[] = [
     insurance: {
       status: "outstanding",
       items: [
-        { label: "Training & inspection complete (required before cover)", done: false },
+        { label: "Training & inspection complete", done: false },
         { label: "Public liability insurance current (£2m)", done: false },
         { label: "Employer's liability certificate valid", done: false },
       ],
