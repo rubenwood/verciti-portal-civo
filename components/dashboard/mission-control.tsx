@@ -116,7 +116,7 @@ export function MissionControl() {
 
 
   const heroMetrics = [
-          { label: "Readiness score", value: `${programmeData.readiness}%`, sub: `Target ${programmeData.target}% · ${programmeData.target - programmeData.readiness} pts to recover`, tone: "warn", large: true },
+          { label: "Readiness score", value: `${programmeData.readiness}%`, sub: `Target ${programmeData.target}% · ${programmeData.target - programmeData.readiness} pts to recover`, tone: "warn", large: true, status: "At Risk" },
           { label: "Evidence confidence", value: programmeData.evidenceConfidence, sub: "L4-L5 verified: 39%", tone: "neutral" },
           { label: "Deployment blockers", value: programmeData.blockers.toString(), sub: "2 high impact", tone: "bad" },
           { label: "Organisations mapped", value: programmeData.orgs.toString(), sub: "Anchor · Tier 1/2 · Education", tone: "neutral" },
@@ -130,13 +130,6 @@ export function MissionControl() {
       {/* Page Header */}
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <Badge variant="outline" className="text-xs bg-warning/10 text-warning border-warning/20 flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-warning" />
-              At Risk
-            </Badge>
-            <span className="text-xs text-muted-foreground">Programme status</span>
-          </div>
           <h1 className="text-2xl font-bold mb-1">Mission Control</h1>
           <p className="text-sm text-muted-foreground">{programmeData.name}</p>
         </div>
@@ -187,13 +180,21 @@ export function MissionControl() {
               i === heroMetrics.length - 1 && "rounded-r-lg")
             }>
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{metric.label}</p>
-            <p className={cn(
-              "font-bold mb-1",
-              metric.large ? "text-2xl" : "text-xl",
-              metric.tone === "warn" ? "text-warning" : metric.tone === "bad" ? "text-destructive" : "text-foreground"
-            )}>
-              {metric.value}
-            </p>
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <p className={cn(
+                "font-bold",
+                metric.large ? "text-2xl" : "text-xl",
+                metric.tone === "warn" ? "text-warning" : metric.tone === "bad" ? "text-destructive" : "text-foreground"
+              )}>
+                {metric.value}
+              </p>
+              {metric.status && (
+                <Badge variant="outline" className="text-[10px] bg-warning/10 text-warning border-warning/20 flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-warning" />
+                  {metric.status}
+                </Badge>
+              )}
+            </div>
             <p className={cn(
               "text-[10px]",
               metric.tone === "warn" ? "text-warning" : metric.tone === "bad" ? "text-destructive" : "text-muted-foreground"
