@@ -55,7 +55,7 @@ interface EventData {
 const events: EventData[] = [
   {
     id: "1",
-    venue: "Manchester Arena",
+    venue: "Manchester Arena TEST EDIT",
     location: "Manchester, Greater Manchester",
     date: "18 Jun 2025",
     capacity: 21000,
