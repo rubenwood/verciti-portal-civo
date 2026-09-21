@@ -55,7 +55,7 @@ interface EventData {
 const events: EventData[] = [
   {
     id: "1",
-    venue: "Manchester Arena TEST EDIT",
+    venue: "Manchester Arena",
     location: "Manchester, Greater Manchester",
     date: "18 Jun 2025",
     capacity: 21000,
@@ -266,6 +266,51 @@ const events: EventData[] = [
       items: [
         { label: "Training & inspection complete", done: false },
         { label: "Public liability insurance current (£2m)", done: false },
+        { label: "Employer's liability certificate valid", done: false },
+      ],
+    },
+  },
+  {
+    id: "6",
+    venue: "OVO Hydro",
+    location: "Glasgow, Scotland",
+    date: "24 Aug 2025",
+    capacity: 14300,
+    attendees: 12800,
+    tier: 2,
+    staffTrained: 31,
+    staffRequired: 52,
+    inspected: false,
+    trainingBreakdown: [
+      { role: "Approved person / SRI", trained: 2, required: 3 },
+      { role: "Bag & search officers", trained: 11, required: 18 },
+      { role: "Evacuation marshals", trained: 10, required: 16 },
+      { role: "Control room operators", trained: 5, required: 8 },
+      { role: "ACT Awareness certified", trained: 3, required: 7 },
+    ],
+    training: {
+      status: "in-progress",
+      items: [
+        { label: "ACT Awareness e-learning completed", done: true },
+        { label: "Search & screening training current", done: false },
+        { label: "Evacuation & invacuation drill logged", done: false },
+        { label: "Control room briefing delivered", done: false },
+      ],
+    },
+    inspection: {
+      status: "outstanding",
+      items: [
+        { label: "Venue security walkthrough booked", done: false },
+        { label: "Vulnerability assessment completed", done: false },
+        { label: "Public protection measures documented", done: false },
+      ],
+    },
+    insurance: {
+      status: "outstanding",
+      items: [
+        { label: "Training & inspection complete", done: false },
+        { label: "Public liability insurance current (£10m)", done: false },
+        { label: "Terrorism cover in place", done: false },
         { label: "Employer's liability certificate valid", done: false },
       ],
     },
